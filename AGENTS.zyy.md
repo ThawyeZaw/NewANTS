@@ -44,5 +44,8 @@ Every feature UI you build must follow this exact pattern:
    - Semantic token classes only (no raw hex values in components).
    - **Plus Jakarta Sans** for UI copy; **JetBrains Mono** (`font-mono tabular-nums`) for timers, syllabus codes, scores, and durations.
    - **`lucide-react`** icons only.
-4. **End-of-Session Rule:** Always run `pnpm typecheck` & `pnpm lint`, and update the **`[ZYY]`** section in [`progress.md`](./progress.md) at the end of every session.
+4. **Available `@ants/ui` Core Primitives (`[ZYY-1.1]`):**
+   - Import shared primitives directly from `@ants/ui`: `ThemeToggle`, `Button`, `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`), `Badge`, `Input`, `Checkbox`, `Tabs` (`TabsList`, `TabsTrigger`, `TabsContent`), `Modal`, and `cn`.
+   - Import paired Stitch semantic tokens in app stylesheets via `@import '@ants/ui/styles/tokens.css';`.
+5. **End-of-Session Rule:** Always run `pnpm typecheck` & `pnpm lint`, and update the **`[ZYY]`** section in [`progress.md`](./progress.md) at the end of every session.
 

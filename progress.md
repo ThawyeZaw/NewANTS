@@ -16,7 +16,7 @@
 - **`[THAW-1.1]` Toolchain, ESLint, Vitest & Runnable Empty App Bootstrapping:** Install core workspace dependencies (`next`, `react`, `tailwindcss` v4, `hono`, `drizzle-orm`, `zod`, `lucide-react`, `eslint`, `vitest`, `@opennextjs/cloudflare`) and create minimal runnable shells for `apps/org` (`:3000`), `apps/study` (`:3001`), `apps/flow` (`:3002`), and `apps/api` (`:8787`) so both Thaw and Zyy can run `pnpm dev` and `pnpm typecheck`.
 
 ### 👉 Next Up for `[ZYY]` (Zyy Linn Htet — UI Prototypes & Polishing)
-- **`[ZYY-1.1]` `@ants/ui` Paired Stitch Design Tokens (`tokens.css`) & Core Primitives Prototype:** Map Light (`the_ants_academic_system.md`) and Dark (`amber_academic_studio.md`) CSS variables into `packages/ui/src/styles/tokens.css` and build pure presentational `Button`, `Card`, `Badge`, `Input`, `Checkbox`, `Tabs`, and `Modal` components. *(Starts immediately after `[THAW-1.1]` bootstraps `pnpm`).*
+- **`[ZYY-1.2]` `@ants/ui` Ecosystem Chrome Views:** 9-dot `<AppSwitcher />` (`The ANTs` · `Flow` · `Study`), subtle *"by The ANTs"* header badge, `<AuthFormView />` (`/login`, `/signup` UI), and `<UserMenuView />`.
 
 ---
 
@@ -38,7 +38,7 @@
 > **Rule for `[ZYY]` tasks:** Build pure `'use client'` presentational views (`*View.tsx`) with exported TypeScript `*ViewProps` and default mock data (`mocks/*.mock.ts`). **Never** edit `packages/db`, `apps/api`, `actions/`, or `hooks/`.
 
 ### Stage Z1: Shared Design System, Navigation & Calculator UI (`@ants/ui` & `@ants/calculator`)
-- [ ] **`[ZYY-1.1]`** `@ants/ui` Stitch Design Tokens (`tokens.css` Light + Amber Dark), ThemeToggle, `Button`, `Card`, `Badge`, `Input`, `Checkbox`, `Tabs`, `Modal`.
+- [x] **`[ZYY-1.1]`** `@ants/ui` Stitch Design Tokens (`tokens.css` Light + Amber Dark), ThemeToggle, `Button`, `Card`, `Badge`, `Input`, `Checkbox`, `Tabs`, `Modal`.
 - [ ] **`[ZYY-1.2]`** `@ants/ui` Ecosystem Chrome Views: 9-dot `<AppSwitcher />` (`The ANTs` · `Flow` · `Study`), subtle *"by The ANTs"* header badge, `<AuthFormView />` (`/login`, `/signup` UI), and `<UserMenuView />`.
 - [ ] **`[ZYY-1.3]`** `@ants/calculator` UI Prototype (`<GradeCalculatorView />`): Interactive board/subject selector UI, paper mark sliders, UMS/grade pills (`A*`–`U`), mounted with mock catalog at both `the-ants.org/calculator` and `study.the-ants.org/calculator`.
 
@@ -114,3 +114,12 @@
     4. **`study.the-ants.org` (`apps/study`)** scoped as the **IGCSE & IAL Study Tracker** (Topic Tracker, Past Paper Tracker, Exam Countdown, Grade Calculator).
   - Configured dual-developer workflow for **Thaw Ye Zaw** (`AGENTS.thaw.md` · `[THAW]` track) and **Zyy Linn Htet** (`AGENTS.zyy.md` · `[ZYY]` UI-Prototype-First track) plus `.github/CODEOWNERS`.
 - **Next Session Target:** Run `/continue` to start **`[THAW-1.1]`** (Toolchain & Runnable Empty App Bootstrapping), which unlocks **`[ZYY-1.1]`** (Design Tokens & UI Primitives) in parallel.
+
+### Session Z1.1 — 2026-11-10 (`[ZYY]` Environment Onboarding & `@ants/ui` Design Tokens + Primitives)
+- **In Review (`[~]`):** Item **`[ZYY-1.1]`** on branch `ui/tokens-primitives`.
+- **Summary:**
+  - Completed Zyy Linn Htet's onboarding setup (`pnpm@10.6.5`, Git remote linked to `https://github.com/ThawyeZaw/NewANTS.git`, branch `ui/tokens-primitives`).
+  - Implemented paired Stitch semantic CSS tokens in `packages/ui/src/styles/tokens.css` (*The ANTs Academic System* Light + *Amber Academic Studio* Dark) with Tailwind CSS v4 `@theme inline` bridge.
+  - Built pure `'use client'` presentational primitives in `@ants/ui`: `ThemeToggle`, `Button`, `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`), `Badge`, `Input`, `Checkbox`, `Tabs` (`segmented` & `underline`), and `Modal`.
+  - Created interactive `<DesignSystemShowcaseView />` (`packages/ui/src/views/DesignSystemShowcaseView.tsx`) with mock data (`packages/ui/src/mocks/design-system.mock.ts`) mounted on `apps/org` (`http://localhost:3000`) + Vitest unit tests (`packages/ui/src/__tests__/primitives.test.ts`).
+- **Next Session Target (`[ZYY]`):** Confirm `[ZYY-1.1]` manual sign-off (`[x]`) and run `/continue` for **`[ZYY-1.2]`** (`@ants/ui` Ecosystem Chrome Views: 9-dot `<AppSwitcher />`, *"by The ANTs"* badge, `<AuthFormView />`, and `<UserMenuView />`).
