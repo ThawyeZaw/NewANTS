@@ -1,4 +1,4 @@
-// @ants/ui — Shared Stitch Design System (Light + Amber Dark semantic CSS tokens) & Core Primitives
+// @ants/ui — Shared Stitch Design System (Light + Amber Dark semantic CSS tokens), Core Primitives & Ecosystem Chrome
 
 export { cn } from './utils/cn';
 
@@ -66,6 +66,41 @@ export {
   type DesignSystemShowcaseMockData,
   type MockSyllabusChecklistItem,
 } from './mocks/design-system.mock';
+
+export {
+  MOCK_ADMIN_USER,
+  MOCK_AUTHENTICATED_USER,
+  MOCK_ECOSYSTEM_APPS,
+  MOCK_ECOSYSTEM_SHORTCUTS,
+  type EcosystemAppId,
+  type EcosystemAppItem,
+  type EcosystemQuickShortcut,
+  type MockUserProfile,
+  type UserRole,
+} from './mocks/ecosystem-chrome.mock';
+
+export {
+  BrandHeaderBadge,
+  type BrandHeaderBadgeProps,
+} from './views/BrandHeaderBadge';
+
+export {
+  AppSwitcher,
+  type AppSwitcherProps,
+} from './views/AppSwitcher';
+
+export {
+  AuthFormView,
+  type AcademicTrackOption,
+  type AuthFormMode,
+  type AuthFormSubmitPayload,
+  type AuthFormViewProps,
+} from './views/AuthFormView';
+
+export {
+  UserMenuView,
+  type UserMenuViewProps,
+} from './views/UserMenuView';
 
 export {
   DesignSystemShowcaseView,

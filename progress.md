@@ -16,7 +16,7 @@
 - **`[THAW-1.1]` Toolchain, ESLint, Vitest & Runnable Empty App Bootstrapping:** Install core workspace dependencies (`next`, `react`, `tailwindcss` v4, `hono`, `drizzle-orm`, `zod`, `lucide-react`, `eslint`, `vitest`, `@opennextjs/cloudflare`) and create minimal runnable shells for `apps/org` (`:3000`), `apps/study` (`:3001`), `apps/flow` (`:3002`), and `apps/api` (`:8787`) so both Thaw and Zyy can run `pnpm dev` and `pnpm typecheck`.
 
 ### 👉 Next Up for `[ZYY]` (Zyy Linn Htet — UI Prototypes & Polishing)
-- **`[ZYY-1.2]` `@ants/ui` Ecosystem Chrome Views:** 9-dot `<AppSwitcher />` (`The ANTs` · `Flow` · `Study`), subtle *"by The ANTs"* header badge, `<AuthFormView />` (`/login`, `/signup` UI), and `<UserMenuView />`.
+- **`[ZYY-2.1]` `apps/org` Showcase Navbar, Footer & Home Landing View (`/`):** Hero, mission, impact stats, **"Our Products"** (`Flow` & `Study`) showcase cards, and **Hackathon Showcase** spotlight banner.
 
 ---
 
@@ -39,8 +39,8 @@
 
 ### Stage Z1: Shared Design System, Navigation & Calculator UI (`@ants/ui` & `@ants/calculator`)
 - [x] **`[ZYY-1.1]`** `@ants/ui` Stitch Design Tokens (`tokens.css` Light + Amber Dark), ThemeToggle, `Button`, `Card`, `Badge`, `Input`, `Checkbox`, `Tabs`, `Modal`.
-- [ ] **`[ZYY-1.2]`** `@ants/ui` Ecosystem Chrome Views: 9-dot `<AppSwitcher />` (`The ANTs` · `Flow` · `Study`), subtle *"by The ANTs"* header badge, `<AuthFormView />` (`/login`, `/signup` UI), and `<UserMenuView />`.
-- [ ] **`[ZYY-1.3]`** `@ants/calculator` UI Prototype (`<GradeCalculatorView />`): Interactive board/subject selector UI, paper mark sliders, UMS/grade pills (`A*`–`U`), mounted with mock catalog at both `the-ants.org/calculator` and `study.the-ants.org/calculator`.
+- [x] **`[ZYY-1.2]`** `@ants/ui` Ecosystem Chrome Views: 9-dot `<AppSwitcher />` (`The ANTs` · `Flow` · `Study`), subtle *"by The ANTs"* header badge, `<AuthFormView />` (`/login`, `/signup` UI), and `<UserMenuView />`.
+- [x] **`[ZYY-1.3]`** `@ants/calculator` UI Prototype (`<GradeCalculatorView />`): Interactive board/subject selector UI, paper mark sliders, UMS/grade pills (`A*`–`U`), mounted with mock catalog at both `the-ants.org/calculator` and `study.the-ants.org/calculator`.
 
 ### Stage Z2: `the-ants.org` Organization Showcase UI Prototypes (`apps/org`)
 - [ ] **`[ZYY-2.1]`** `apps/org` Showcase Navbar, Footer & Home Landing View (`/`): Hero, mission, impact stats, **"Our Products"** (`Flow` & `Study`) showcase cards, and **Hackathon Showcase** spotlight banner.
@@ -123,3 +123,15 @@
   - Built pure `'use client'` presentational primitives in `@ants/ui`: `ThemeToggle`, `Button`, `Card` (`CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`), `Badge`, `Input`, `Checkbox`, `Tabs` (`segmented` & `underline`), and `Modal`.
   - Created interactive `<DesignSystemShowcaseView />` (`packages/ui/src/views/DesignSystemShowcaseView.tsx`) with mock data (`packages/ui/src/mocks/design-system.mock.ts`) mounted on `apps/org` (`http://localhost:3000`) + Vitest unit tests (`packages/ui/src/__tests__/primitives.test.ts`).
 - **Next Session Target (`[ZYY]`):** Confirm `[ZYY-1.1]` manual sign-off (`[x]`) and run `/continue` for **`[ZYY-1.2]`** (`@ants/ui` Ecosystem Chrome Views: 9-dot `<AppSwitcher />`, *"by The ANTs"* badge, `<AuthFormView />`, and `<UserMenuView />`).
+
+### Session Z1.2 & Z1.3 — 2026-11-10 (`[ZYY]` Ecosystem Chrome Views & `@ants/calculator` Grade Calculator Prototype)
+- **Approved (`[x]`):** Item **`[ZYY-1.1]`**.
+- **In Review (`[~]`):** Items **`[ZYY-1.2]`** and **`[ZYY-1.3]`** on branch `zaylynn`.
+- **Summary:**
+  - Built `@ants/ui` Ecosystem Chrome components (`BrandHeaderBadge`, 9-dot `AppSwitcher`, `AuthFormView`, and `UserMenuView` with Guest + Authenticated multi-role states) + mock fixtures (`ecosystem-chrome.mock.ts`).
+  - Clarified Grade Calculator UX via `/askmefirst` pop-up modals and built `@ants/calculator` `<GradeCalculatorView />` (`packages/calculator/src/views/GradeCalculatorView.tsx`) with:
+    - Two-column desktop studio layout (sticky live Grade & UMS result card on the right).
+    - Dual paper mark controls (smooth range slider + synced `JetBrains Mono` numeric box + per-paper boundary preset chips).
+    - Exam Series Boundary Switcher (`May/June 2025`, `January 2025`, `Oct/Nov 2024`) across all 4 core ANTs boards (`Edexcel IAL`, `Cambridge AS & A-Level`, `Cambridge IGCSE`, `Edexcel IGCSE`).
+    - Mounted guest-accessible route at `apps/org/src/app/(showcase)/calculator/page.tsx` (`/calculator`).
+- **Next Session Target (`[ZYY]`):** Verify `/calculator` and `/` on `http://localhost:3000`, mark `[ZYY-1.2]` & `[ZYY-1.3]` as `[x]`, and run `/continue` for **`[ZYY-2.1]`** (`apps/org` Showcase Navbar, Footer & Home Landing View).

@@ -30,6 +30,10 @@ import { Input } from '../primitives/Input';
 import { Modal } from '../primitives/Modal';
 import { Tabs } from '../primitives/Tabs';
 import { ThemeToggle, type ThemeMode } from '../primitives/ThemeToggle';
+import { AppSwitcher } from './AppSwitcher';
+import { AuthFormView } from './AuthFormView';
+import { BrandHeaderBadge } from './BrandHeaderBadge';
+import { UserMenuView } from './UserMenuView';
 
 export interface DesignSystemShowcaseViewProps {
   /** Mock or live showcase dataset */
@@ -82,15 +86,17 @@ export function DesignSystemShowcaseView({
               <span className="font-mono">study.the-ants.org</span>.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle defaultTheme={defaultTheme} showLabel />
-            <Button
-              variant="primary"
-              leftIcon={<Sparkles className="h-4 w-4" />}
-              onClick={() => setIsModalOpen(true)}
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href="/calculator"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary-tint-border bg-primary-tint px-3.5 py-2 text-xs font-bold text-on-primary-tint transition-colors hover:bg-primary hover:text-on-primary"
             >
-              Open Modal Preview
-            </Button>
+              <Calculator className="h-4 w-4" />
+              <span>Open Grade Calculator (/calculator)</span>
+            </a>
+            <ThemeToggle defaultTheme={defaultTheme} showLabel />
+            <AppSwitcher currentApp="org" useLocalUrls />
+            <UserMenuView />
           </div>
         </div>
 
@@ -102,9 +108,15 @@ export function DesignSystemShowcaseView({
           items={[
             {
               value: 'overview',
-              label: 'All Primitives',
+              label: 'Core Primitives (ZYY-1.1)',
               icon: <BookOpen className="h-4 w-4" />,
               badge: '8',
+            },
+            {
+              value: 'chrome',
+              label: 'Ecosystem Chrome & Auth (ZYY-1.2)',
+              icon: <Sparkles className="h-4 w-4" />,
+              badge: '4',
             },
             {
               value: 'subjects',
@@ -114,6 +126,49 @@ export function DesignSystemShowcaseView({
             },
           ]}
         />
+
+        {activeTab === 'chrome' && (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader
+                action={
+                  <Badge variant="verified" dot>
+                    ZYY-1.2
+                  </Badge>
+                }
+              >
+                <CardTitle>Ecosystem Header Chrome & 9-Dot Switcher</CardTitle>
+                <CardDescription>
+                  Shared across The ANTs (the-ants.org), Flow (flow.the-ants.org), and Study (study.the-ants.org).
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="space-y-3 rounded-xl border border-border bg-surface-inset/50 p-4">
+                  <p className="label-caps text-foreground-subtle">
+                    STANDALONE PRODUCT ENDORSEMENT HEADERS
+                  </p>
+                  <div className="flex flex-wrap items-center gap-6">
+                    <BrandHeaderBadge app="flow" showEndorsement />
+                    <BrandHeaderBadge app="study" showEndorsement />
+                    <BrandHeaderBadge app="org" showEndorsement={false} />
+                  </div>
+                </div>
+
+                <div className="space-y-3 rounded-xl border border-border bg-surface-inset/50 p-4">
+                  <p className="label-caps text-foreground-subtle">
+                    GUEST VS AUTHENTICATED USER MENU STATES
+                  </p>
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <UserMenuView user={null} />
+                    <UserMenuView />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <AuthFormView app="study" />
+          </div>
+        )}
 
         {/* Grid of Interactive Primitives */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
