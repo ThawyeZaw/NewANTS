@@ -17,3 +17,4 @@
 ## Custom Agent Slash Commands
 - `/continue` — Picks up, builds, tests, and verifies the single next queued component for `[THAW]` or `[ZYY]` in `progress.md`.
 - `/askmefirst` — Clarifies requirements via interactive pop-up modals before writing any code.
+- `/push` — Verifies code health (`typecheck`, `lint`, `test`), fixes any local errors first, and pushes cleanly to the active branch.

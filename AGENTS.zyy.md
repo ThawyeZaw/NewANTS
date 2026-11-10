@@ -45,4 +45,5 @@ Every feature UI you build must follow this exact pattern:
    - **Plus Jakarta Sans** for UI copy; **JetBrains Mono** (`font-mono tabular-nums`) for timers, syllabus codes, scores, and durations.
    - **`lucide-react`** icons only.
 4. **End-of-Session Rule:** Always run `pnpm typecheck` & `pnpm lint`, and update the **`[ZYY]`** section in [`progress.md`](./progress.md) at the end of every session.
+5. **Verified Push:** Use **`/push`** to automatically verify, fix styling/type errors locally, and push cleanly to your `ui/*` branch.
 

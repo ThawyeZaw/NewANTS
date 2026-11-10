@@ -51,6 +51,9 @@ We follow a strict **UI-Prototype-First (`Zyy`) → Full-Stack Wiring (`Thaw`)**
 ### Clarify Before Coding (`/askmefirst`)
 - Whenever requirements, UI states, or contracts have any ambiguity—or when `/askmefirst` is invoked—call the **`ask_question` tool (interactive pop-up modals)** with a `(Recommended)` option first before writing code.
 
+### Safe Verified Push (`/push`)
+- When ready to push to GitHub, invoking **`/push`** automatically runs the verification gate (`pnpm typecheck`, `pnpm lint`, `pnpm test`), fixes any detected errors locally first, checks ownership boundaries (e.g. `ui/*` branches touching backend paths), and only pushes to the remote branch when 100% error-free.
+
 ### Strict "One Component at a Time" & Verification Gate
 Build **one atomic item per session** from your track (`[ZYY]` or `[THAW]`) in `progress.md`. Every item must pass **all 5 gates** before being marked `[x]`:
 1. **Typecheck:** `pnpm typecheck` passes with zero errors across the monorepo.

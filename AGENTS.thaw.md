@@ -35,4 +35,5 @@ Zyy never edits these paths; you have full authority here:
    - If you are building a backend module before Zyy has built its `*View.tsx`, export the typed hook/container and test it thoroughly with **Vitest** (or a minimal unstyled harness), leaving the `*View.tsx` slot ready for Zyy.
 3. **End-of-Session Rule:**
    - Always update the **`[THAW]`** section in [`progress.md`](./progress.md), plus [`spec.md`](./spec.md) and [`AGENTS.md`](./AGENTS.md) / [`AGENTS.thaw.md`](./AGENTS.thaw.md) at the end of every session.
+- Use **`/push`** to test, fix local errors, and push to your `feat/*` branch (or `main`).
 
