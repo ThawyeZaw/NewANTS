@@ -1,0 +1,23 @@
+{
+  "name": "@ants/org",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The ANTs Organization Showcase (Mission, Members, Tutors, Activities, Hackathon Showcase, Articles, Admin CMS) + /calculator route (https://the-ants.org)",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+  },
+  "dependencies": {
+    "@ants/auth-client": "workspace:*",
+    "@ants/calculator": "workspace:*",
+    "@ants/db": "workspace:*",
+    "@ants/shared-types": "workspace:*",
+    "@ants/ui": "workspace:*"
+  }
+}

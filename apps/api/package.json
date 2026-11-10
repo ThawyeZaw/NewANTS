@@ -1,0 +1,19 @@
+{
+  "name": "@ants/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Headless Hono Worker on Cloudflare Workers: Better Auth cross-subdomain SSO, R2 private asset proxy, Telegram Webhook & 5-min Cron Queue (https://api.the-ants.org)",
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "build": "tsc --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@ants/db": "workspace:*",
+    "@ants/shared-types": "workspace:*"
+  }
+}
+

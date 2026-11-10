@@ -1,0 +1,21 @@
+{
+  "name": "@ants/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared Stitch Academic Design System (Light + Amber Dark semantic CSS tokens), primitives, AppSwitcher, and GlobalUserMenu",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles/tokens.css": "./src/styles/tokens.css"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@ants/shared-types": "workspace:*"
+  }
+}
+

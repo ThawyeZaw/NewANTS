@@ -1,0 +1,33 @@
+{
+  "name": "the-ants-ecosystem",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The ANTs multi-app HONC monorepo: The ANTs Showcase (the-ants.org), Study (study.the-ants.org), Flow (flow.the-ants.org), and Hono API Worker (api.the-ants.org).",
+  "packageManager": "pnpm@10.6.5",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:org": "pnpm --filter @ants/org dev",
+    "dev:study": "pnpm --filter @ants/study dev",
+    "dev:flow": "pnpm --filter @ants/flow dev",
+    "dev:api": "pnpm --filter @ants/api dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:generate": "pnpm --filter @ants/db db:generate",
+    "db:migrate:local": "pnpm --filter @ants/api db:migrate:local",
+    "cf:deploy:api": "pnpm --filter @ants/api deploy",
+    "cf:deploy:org": "pnpm --filter @ants/org cf:deploy",
+    "cf:deploy:study": "pnpm --filter @ants/study cf:deploy",
+    "cf:deploy:flow": "pnpm --filter @ants/flow cf:deploy"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.8",
+    "wrangler": "^4.14.0"
+  }
+}

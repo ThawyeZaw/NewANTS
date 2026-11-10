@@ -1,0 +1,22 @@
+{
+  "name": "@ants/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloudflare D1 (SQLite) + Drizzle ORM single source of truth schema and migrations",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@ants/shared-types": "workspace:*"
+  }
+}
+

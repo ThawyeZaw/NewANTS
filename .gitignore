@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build & Framework outputs
+.next/
+.open-next/
+.wrangler/
+.turbo/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment & Secrets (NEVER COMMIT)
+.env
+.env.local
+.env.*.local
+.dev.vars
+
+# Local SQLite / D1 state
+*.db
+*.db-shm
+*.db-wal
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+

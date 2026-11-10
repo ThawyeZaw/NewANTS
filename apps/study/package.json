@@ -1,0 +1,24 @@
+{
+  "name": "@ants/study",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Study (by The ANTs) — IGCSE & IAL Academic Tracker: Syllabus Topic Tracker, Past Paper Tracker, Exam Countdown, Grade Calculator (/calculator), Notes, Flashcards & Quizzes (https://study.the-ants.org)",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+  },
+  "dependencies": {
+    "@ants/auth-client": "workspace:*",
+    "@ants/calculator": "workspace:*",
+    "@ants/db": "workspace:*",
+    "@ants/shared-types": "workspace:*",
+    "@ants/ui": "workspace:*"
+  }
+}
+
