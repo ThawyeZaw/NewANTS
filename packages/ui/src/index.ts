@@ -106,3 +106,77 @@ export {
   DesignSystemShowcaseView,
   type DesignSystemShowcaseViewProps,
 } from './views/DesignSystemShowcaseView';
+
+export {
+  ACCOUNT_PROFILE_STORAGE_KEY,
+  ACCOUNT_WEEKDAYS,
+  TUTOR_SLOT_HOURS,
+  applyTutorSchedulePreset,
+  buildTelegramBotDeepLink,
+  buildTelegramInquiryUrl,
+  cloneTutorSchedule,
+  completeTelegramVerification,
+  computeProfileCompleteness,
+  createEmptyTutorSchedule,
+  cycleAvailabilityStatus,
+  formatSlotHourLabel,
+  formatSlotRangeLabel,
+  generateTelegramVerificationCode,
+  hasTutorRole,
+  loadAccountStorageState,
+  normalizeProfileHandle,
+  normalizeTelegramHandle,
+  paintTutorSlotRect,
+  renameAccountStorageProfile,
+  sanitizeAccountStorageState,
+  sanitizeAccountUsernameInput,
+  saveAccountStorageState,
+  setTutorSlotStatus,
+  startTelegramLinking,
+  summarizeTutorSchedule,
+  unlinkTelegramAccount,
+  validateAccountUsername,
+  type AccountProfileStorageState,
+  type AvailabilityStatus,
+  type CertificationItem,
+  type PortfolioHighlightItem,
+  type ProfileSectionVisibility,
+  type SharedUserProfileData,
+  type TelegramAccountState,
+  type TelegramConnectionStatus,
+  type TelegramLeadMinutes,
+  type TelegramNotificationPreferences,
+  type TutorScheduleMap,
+  type TutorSchedulePresetId,
+  type WeekdayKey,
+} from './lib/account';
+
+export {
+  MOCK_SHARED_PROFILES,
+  STUDENT_PROFILE_MOCK,
+  THAW_PROFILE_MOCK,
+  ZYY_PROFILE_MOCK,
+  createInitialAccountStorageState,
+} from './mocks/account-profile.mock';
+
+export {
+  TutorSlotPainterView,
+  type TutorSlotPainterViewProps,
+} from './views/TutorSlotPainterView';
+
+export {
+  TelegramConnectCardView,
+  type TelegramConnectCardViewProps,
+} from './views/TelegramConnectCardView';
+
+export {
+  AccountSettingsView,
+  type AccountSettingsViewProps,
+  type SettingsTabId,
+} from './views/AccountSettingsView';
+
+export {
+  UserProfileView,
+  type PublicProfileSwitchItem,
+  type UserProfileViewProps,
+} from './views/UserProfileView';

@@ -52,13 +52,13 @@ export function CardHeader({ action, className, children, ...props }: CardHeader
   return (
     <div
       className={cn(
-        'flex items-start justify-between gap-4 border-b border-border-subtle px-5 py-4',
+        'flex flex-col gap-2.5 border-b border-border-subtle px-5 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4',
         className
       )}
       {...props}
     >
-      <div className="space-y-1">{children}</div>
-      {action && <div className="shrink-0">{action}</div>}
+      <div className="min-w-0 space-y-1">{children}</div>
+      {action && <div className="shrink-0 self-start">{action}</div>}
     </div>
   );
 }

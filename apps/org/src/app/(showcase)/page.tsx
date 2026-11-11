@@ -1,7 +1,6 @@
 import React from 'react';
-import { DesignSystemShowcaseView } from '@ants/ui';
+import { OrgHomeLandingView } from '../../components/home/views/OrgHomeLandingView';
 
 export default function OrgShowcasePage() {
-  return <DesignSystemShowcaseView />;
+  return <OrgHomeLandingView />;
 }
-

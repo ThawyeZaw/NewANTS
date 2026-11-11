@@ -47,7 +47,9 @@ describe('@ants/ui [ZYY-1.1] & [ZYY-1.2] Primitives & Ecosystem Chrome', () => {
     expect(UserMenuView).toBeDefined();
     expect(MOCK_ECOSYSTEM_APPS).toHaveLength(3);
     expect(MOCK_AUTHENTICATED_USER.username).toBe('zyylinnhtet');
+    expect(MOCK_AUTHENTICATED_USER.telegramConnected).toBe(false);
     expect(MOCK_ADMIN_USER.roles).toContain('admin');
+    expect(MOCK_ADMIN_USER.telegramConnected).toBe(false);
   });
 
   it('provides realistic mock data for DesignSystemShowcaseView', () => {

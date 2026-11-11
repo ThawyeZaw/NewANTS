@@ -100,7 +100,7 @@ export const MOCK_AUTHENTICATED_USER: MockUserProfile = {
   roles: ['student', 'tutor', 'contributor'],
   xp: 2840,
   streakDays: 14,
-  telegramConnected: true,
+  telegramConnected: false,
   curriculumLabel: 'Pearson Edexcel IAL · WMA11',
 };
 
@@ -113,7 +113,7 @@ export const MOCK_ADMIN_USER: MockUserProfile = {
   roles: ['admin', 'main_contributor', 'tutor'],
   xp: 5420,
   streakDays: 32,
-  telegramConnected: true,
+  telegramConnected: false,
   curriculumLabel: 'Platform Admin · Full-Stack',
 };
 

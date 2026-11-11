@@ -93,21 +93,26 @@ export function UserMenuView({
   // Guest Mode State
   if (!user) {
     return (
-      <div className={cn('inline-flex items-center gap-2', className)}>
-        <Badge variant="editorial" mono>
-          GUEST MODE
-        </Badge>
+      <div className={cn('inline-flex shrink-0 items-center gap-1.5 sm:gap-2', className)}>
+        <span className="hidden sm:inline-flex">
+          <Badge variant="editorial" mono>
+            GUEST MODE
+          </Badge>
+        </span>
         <Button
           variant="ghost"
           size="sm"
           leftIcon={<LogIn className="h-3.5 w-3.5" />}
           onClick={onSignIn}
+          className="px-2 sm:px-3"
         >
           Sign In
         </Button>
-        <Button variant="primary" size="sm" onClick={onSignUp}>
-          Get Started
-        </Button>
+        <span className="hidden sm:inline-flex">
+          <Button variant="primary" size="sm" onClick={onSignUp}>
+            Get Started
+          </Button>
+        </span>
       </div>
     );
   }
@@ -131,14 +136,14 @@ export function UserMenuView({
             : 'border-border bg-surface-card hover:border-border-hover hover:bg-surface-inset'
         )}
       >
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary font-mono text-xs font-bold text-on-primary">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary-solid font-mono text-xs font-bold text-on-primary">
           {initials}
         </span>
         <div className="hidden sm:flex flex-col">
           <span className="text-xs font-bold text-foreground leading-none">
             {user.name}
           </span>
-          <span className="mt-0.5 font-mono tabular-nums text-[10px] text-primary font-semibold leading-none">
+          <span className="mt-0.5 font-mono tabular-nums text-[10px] text-on-primary-tint font-semibold leading-none">
             {user.streakDays}d streak · {user.xp.toLocaleString()} XP
           </span>
         </div>
@@ -161,7 +166,7 @@ export function UserMenuView({
           {/* Identity & Multi-Role Header */}
           <div className="border-b border-border pb-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary font-mono text-sm font-bold text-on-primary">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-solid font-mono text-sm font-bold text-on-primary">
                 {initials}
               </div>
               <div className="min-w-0 flex-1">

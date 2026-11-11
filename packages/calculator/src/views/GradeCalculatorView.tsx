@@ -1,26 +1,19 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Award,
   BookmarkCheck,
-  Calculator,
+  Calendar,
+  Check,
   CheckCircle2,
+  ChevronDown,
   RotateCcw,
   Sparkles,
-  TrendingUp,
 } from 'lucide-react';
 import {
   AppSwitcher,
-  Badge,
   BrandHeaderBadge,
   Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
   Tabs,
   ThemeToggle,
   cn,
@@ -74,10 +67,9 @@ export interface GradeCalculatorViewProps {
   hideHeader?: boolean;
 }
 
-/**
- * Piecewise linear UMS interpolation for modular Pearson Edexcel units
- * using the paper's series-specific [passC (60%), gradeA (80%), topGrade (90%)] raw cutoffs.
- */
+const FOCUS_RING =
+  'focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900';
+
 function computePaperUmsAndGrade(
   raw: number,
   paper: PaperComponentMock,
@@ -115,16 +107,16 @@ function computePaperUmsAndGrade(
     else if (clamped >= Math.round(cutoffs.passC * 0.75)) paperGrade = '4';
     else paperGrade = 'U';
   } else {
-    if (clamped >= cutoffs.topGrade) paperGrade = 'a*';
-    else if (clamped >= cutoffs.gradeA) paperGrade = 'a';
-    else if (clamped >= Math.round((cutoffs.gradeA + cutoffs.passC) / 2)) paperGrade = 'b';
-    else if (clamped >= cutoffs.passC) paperGrade = 'c';
-    else if (clamped >= Math.round(cutoffs.passC * 0.8)) paperGrade = 'd';
-    else if (clamped >= Math.round(cutoffs.passC * 0.65)) paperGrade = 'e';
-    else paperGrade = 'u';
+    if (clamped >= cutoffs.topGrade) paperGrade = 'A*';
+    else if (clamped >= cutoffs.gradeA) paperGrade = 'A';
+    else if (clamped >= Math.round((cutoffs.gradeA + cutoffs.passC) / 2)) paperGrade = 'B';
+    else if (clamped >= cutoffs.passC) paperGrade = 'C';
+    else if (clamped >= Math.round(cutoffs.passC * 0.8)) paperGrade = 'D';
+    else if (clamped >= Math.round(cutoffs.passC * 0.65)) paperGrade = 'E';
+    else paperGrade = 'U';
   }
 
-  return { ums, paperGrade: paperGrade.toUpperCase(), pct };
+  return { ums, paperGrade, pct };
 }
 
 export function GradeCalculatorView({
@@ -143,7 +135,48 @@ export function GradeCalculatorView({
   const [selectedSeriesId, setSelectedSeriesId] = useState<ExamSeriesId>(defaultSeriesId);
   const [savedBanner, setSavedBanner] = useState<string | null>(null);
 
-  // Filter subjects for current board
+  const [subjectDropdownOpen, setSubjectDropdownOpen] = useState(false);
+  const [seriesDropdownOpen, setSeriesDropdownOpen] = useState(false);
+
+  const subjectDropdownRef = useRef<HTMLDivElement>(null);
+  const seriesDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!subjectDropdownOpen && !seriesDropdownOpen) return;
+
+    const handleMouseDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        subjectDropdownOpen &&
+        subjectDropdownRef.current &&
+        !subjectDropdownRef.current.contains(target)
+      ) {
+        setSubjectDropdownOpen(false);
+      }
+      if (
+        seriesDropdownOpen &&
+        seriesDropdownRef.current &&
+        !seriesDropdownRef.current.contains(target)
+      ) {
+        setSeriesDropdownOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSubjectDropdownOpen(false);
+        setSeriesDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [subjectDropdownOpen, seriesDropdownOpen]);
+
   const boardSubjects = useMemo(
     () => subjects.filter((s) => s.boardId === selectedBoardId),
     [subjects, selectedBoardId]
@@ -157,7 +190,12 @@ export function GradeCalculatorView({
     [boardSubjects, selectedSubjectId, subjects]
   );
 
-  // Raw marks dictionary keyed by paper.id
+  const activeSeries = useMemo(
+    () =>
+      seriesOptions.find((s) => s.id === selectedSeriesId) ?? seriesOptions[0]!,
+    [seriesOptions, selectedSeriesId]
+  );
+
   const [marksByPaper, setMarksByPaper] = useState<Record<string, number>>(() => {
     const initial: Record<string, number> = {};
     for (const subj of subjects) {
@@ -175,30 +213,30 @@ export function GradeCalculatorView({
     if (firstSubj) {
       setSelectedSubjectId(firstSubj.id);
     }
+    setSubjectDropdownOpen(false);
+    setSeriesDropdownOpen(false);
     setSavedBanner(null);
   };
 
   const handlePaperMarkChange = (paperId: string, maxRaw: number, rawValue: number) => {
-    const clamped = Math.max(0, Math.min(maxRaw, Math.round(Number.isNaN(rawValue) ? 0 : rawValue)));
+    const clamped = Math.max(
+      0,
+      Math.min(maxRaw, Math.round(Number.isNaN(rawValue) ? 0 : rawValue))
+    );
     setMarksByPaper((prev) => ({ ...prev, [paperId]: clamped }));
     setSavedBanner(null);
   };
 
-  const applySubjectPreset = (preset: 'zero' | 'passC' | 'gradeA' | 'top' | 'max') => {
+  const applySubjectPreset = (preset: 'zero' | 'top') => {
     const next = { ...marksByPaper };
     for (const paper of activeSubject.papers) {
       const cutoffs = paper.seriesPaperCutoffs[selectedSeriesId];
-      if (preset === 'zero') next[paper.id] = 0;
-      else if (preset === 'passC') next[paper.id] = cutoffs.passC;
-      else if (preset === 'gradeA') next[paper.id] = cutoffs.gradeA;
-      else if (preset === 'top') next[paper.id] = cutoffs.topGrade;
-      else next[paper.id] = paper.maxRaw;
+      next[paper.id] = preset === 'zero' ? 0 : cutoffs.topGrade;
     }
     setMarksByPaper(next);
     setSavedBanner(null);
   };
 
-  // Live calculation for activeSubject
   const calculation = useMemo(() => {
     let totalRaw = 0;
     let totalUms = 0;
@@ -213,20 +251,14 @@ export function GradeCalculatorView({
       );
       totalRaw += raw;
       totalUms += ums;
-      return {
-        paper,
-        raw,
-        ums,
-        paperGrade,
-        pct,
-      };
+      return { paper, raw, ums, paperGrade, pct };
     });
 
     const metricScore = activeSubject.isModularUms ? totalUms : totalRaw;
     const metricMax = activeSubject.isModularUms
       ? (activeSubject.maxTotalUms ?? 600)
       : activeSubject.maxTotalRaw;
-    const metricUnit = activeSubject.isModularUms ? 'UMS' : 'Raw Marks';
+    const metricUnit = activeSubject.isModularUms ? 'UMS' : 'marks';
 
     const boundaries = activeSubject.seriesBoundaries[selectedSeriesId];
     let finalGrade = 'U';
@@ -300,11 +332,9 @@ export function GradeCalculatorView({
       finalGrade: calculation.finalGrade,
     };
 
-    if (onSaveSnapshot) {
-      onSaveSnapshot(snapshot);
-    }
+    onSaveSnapshot?.(snapshot);
     setSavedBanner(
-      `Saved ${activeSubject.code} Grade ${calculation.finalGrade} (${calculation.metricScore}/${calculation.metricMax} ${calculation.metricUnit}) snapshot!`
+      `Saved ${activeSubject.title} (${activeSeries.label}) — Grade ${calculation.finalGrade}`
     );
   };
 
@@ -316,104 +346,43 @@ export function GradeCalculatorView({
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
-      {/* Shared Ecosystem Top Header */}
       {!hideHeader && (
-        <header className="sticky top-0 z-30 border-b border-border bg-surface-card/85 backdrop-blur-md">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-4">
-              <BrandHeaderBadge
-                app={hostApp}
-                productHref="/"
-                showEndorsement={hostApp !== 'org'}
-              />
-              <span className="hidden sm:inline-block h-4 w-px bg-border" />
-              <Badge variant="subject" code="/calculator" mono>
-                IGCSE & IAL Grade Calculator
-              </Badge>
-            </div>
+        <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-md">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3.5 sm:px-6">
+            <BrandHeaderBadge
+              app={hostApp}
+              productHref="/"
+              showEndorsement={hostApp !== 'org'}
+            />
             <div className="flex items-center gap-2.5">
               <a
                 href="/"
-                className="text-xs font-semibold text-foreground-muted hover:text-foreground px-2 py-1"
+                className={cn(
+                  'rounded-lg text-xs font-medium text-foreground-muted hover:text-foreground px-2 py-1',
+                  FOCUS_RING
+                )}
               >
-                ← Design Studio
+                Home
               </a>
-              <ThemeToggle showLabel />
+              <ThemeToggle className={FOCUS_RING} />
               <AppSwitcher currentApp={hostApp} useLocalUrls />
             </div>
           </div>
         </header>
       )}
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
-        {/* Hero Title & Quick Preset Bar */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="active-filter" code="GUEST ACCESSIBLE">
-                No Login Required
-              </Badge>
-              <Badge variant="verified" dot>
-                Official Session Boundaries
-              </Badge>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-              IGCSE & IAL Grade Calculator
+      <main className="mx-auto max-w-5xl px-4 py-10 pb-28 lg:pb-12 sm:px-6 space-y-10">
+        {/* Heading & Exam Board Switcher */}
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between border-b border-border pb-8">
+          <div className="space-y-1.5">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+              Grade Calculator
             </h1>
-            <p className="text-sm text-foreground-muted max-w-2xl">
-              Slide or type your paper marks below to instantly calculate your composite
-              grade, UMS score, and exact marks needed for the next boundary.
+            <p className="text-sm sm:text-base text-foreground-muted">
+              Slide your paper marks to see how they convert across recent exam sessions.
             </p>
           </div>
 
-          {/* Global Quick Presets */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="label-caps text-foreground-subtle mr-1">
-              QUICK FILL:
-            </span>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => applySubjectPreset('passC')}
-            >
-              Pass (C / 5)
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => applySubjectPreset('gradeA')}
-            >
-              Grade A / 7
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              leftIcon={<Sparkles className="h-3.5 w-3.5" />}
-              onClick={() => applySubjectPreset('top')}
-            >
-              Target {activeSubject.gradingScale === '9-1' ? '9' : 'A*'}
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              leftIcon={<RotateCcw className="h-3.5 w-3.5" />}
-              onClick={() => applySubjectPreset('zero')}
-            >
-              Reset
-            </Button>
-          </div>
-        </div>
-
-        {/* Step 1: Exam Board Tabs */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="label-caps text-foreground-muted">
-              1. SELECT EXAM BOARD & QUALIFICATION
-            </span>
-            <span className="font-mono text-xs text-foreground-subtle">
-              {boards.find((b) => b.id === selectedBoardId)?.fullName}
-            </span>
-          </div>
           <Tabs
             variant="segmented"
             value={selectedBoardId}
@@ -421,416 +390,481 @@ export function GradeCalculatorView({
             items={boards.map((b) => ({
               value: b.id,
               label: b.shortName,
-              badge: b.scaleBadge,
             }))}
           />
         </div>
 
-        {/* Main Two-Column Studio Layout */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
-          {/* Left Column (7 cols): Subject Selector, Series Switcher & Paper Sliders */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Subject & Exam Series Card */}
-            <Card>
-              <CardHeader
-                action={
-                  <Badge variant="subject" code={activeSubject.code}>
-                    {activeSubject.gradingScale}
-                  </Badge>
-                }
-              >
-                <CardTitle>2. Choose Subject & Exam Series</CardTitle>
-                <CardDescription>
-                  Compare how your raw score converts across different exam sessions.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Subject Pills */}
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                  {boardSubjects.map((subj) => {
-                    const isSelected = subj.id === activeSubject.id;
-                    return (
-                      <button
-                        key={subj.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedSubjectId(subj.id);
-                          setSavedBanner(null);
-                        }}
-                        className={cn(
-                          'flex flex-col items-start rounded-xl border p-3.5 text-left transition-all duration-150',
-                          isSelected
-                            ? 'border-primary bg-primary-tint/50 shadow-2xs'
-                            : 'border-border bg-surface-card hover:border-border-hover hover:bg-surface-inset'
-                        )}
-                      >
-                        <div className="flex w-full items-center justify-between gap-2">
-                          <span className="font-mono text-xs font-bold text-primary">
-                            {subj.code}
-                          </span>
-                          <Badge
-                            variant={isSelected ? 'primary' : 'editorial'}
-                            mono
-                          >
-                            {subj.papers.length} Papers
-                          </Badge>
-                        </div>
-                        <span className="mt-1 text-sm font-bold text-foreground">
-                          {subj.title}
-                        </span>
-                        <span className="mt-0.5 text-[11px] text-foreground-muted">
-                          {subj.levelLabel}
-                        </span>
-                      </button>
-                    );
-                  })}
+        {/* Paired Subject Dropdown + Exam Session Dropdown Row with gap-8 on desktop */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-12 sm:gap-8">
+          {/* 1. Custom Subject Dropdown Box (8 cols) */}
+          <div ref={subjectDropdownRef} className="relative sm:col-span-8">
+            <label
+              id="subject-dropdown-label"
+              className="block text-xs font-semibold text-foreground-muted mb-1.5"
+            >
+              Subject ({boardSubjects.length} available)
+            </label>
+            <button
+              type="button"
+              aria-labelledby="subject-dropdown-label"
+              aria-haspopup="listbox"
+              aria-expanded={subjectDropdownOpen}
+              onClick={() => {
+                setSubjectDropdownOpen((prev) => !prev);
+                setSeriesDropdownOpen(false);
+              }}
+              className={cn(
+                'flex w-full items-center justify-between gap-3 rounded-xl border bg-surface-card px-4 py-3 text-left transition-all duration-150',
+                FOCUS_RING,
+                subjectDropdownOpen
+                  ? 'border-yellow-500 ring-2 ring-yellow-500 ring-offset-2 ring-offset-gray-900'
+                  : 'border-border hover:border-border-hover'
+              )}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="rounded-lg bg-primary-tint px-2.5 py-1 font-mono text-xs font-bold text-primary shrink-0">
+                  {activeSubject.code}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">
+                    {activeSubject.title}
+                  </p>
+                  <p className="truncate text-xs text-foreground-muted">
+                    {activeSubject.levelLabel}
+                  </p>
                 </div>
+              </div>
 
-                {/* Exam Series Boundary Switcher */}
-                <div className="flex flex-col gap-2 pt-2 border-t border-border-subtle sm:flex-row sm:items-center sm:justify-between">
-                  <span className="text-xs font-semibold text-foreground">
-                    Exam Session Boundary Table:
-                  </span>
-                  <div className="inline-flex flex-wrap items-center gap-1.5">
-                    {seriesOptions.map((series) => {
-                      const active = series.id === selectedSeriesId;
-                      return (
-                        <button
-                          key={series.id}
-                          type="button"
-                          onClick={() => setSelectedSeriesId(series.id)}
+              <ChevronDown
+                className={cn(
+                  'h-4 w-4 shrink-0 text-foreground-muted transition-transform duration-150',
+                  subjectDropdownOpen && 'rotate-180 text-primary'
+                )}
+                aria-hidden="true"
+              />
+            </button>
+
+            {subjectDropdownOpen && (
+              <div
+                role="listbox"
+                aria-labelledby="subject-dropdown-label"
+                className="absolute left-0 right-0 z-40 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-border-hover bg-surface-elevated p-2 shadow-[var(--shadow-tier-3)]"
+              >
+                {boardSubjects.map((subj) => {
+                  const isSelected = subj.id === activeSubject.id;
+                  return (
+                    <button
+                      key={subj.id}
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      onClick={() => {
+                        setSelectedSubjectId(subj.id);
+                        setSubjectDropdownOpen(false);
+                        setSavedBanner(null);
+                      }}
+                      className={cn(
+                        'flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left transition-colors',
+                        FOCUS_RING,
+                        isSelected
+                          ? 'bg-primary-tint/60 text-foreground'
+                          : 'text-foreground hover:bg-surface-inset'
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span
                           className={cn(
-                            'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-all',
-                            active
-                              ? 'border-primary bg-primary text-on-primary shadow-2xs'
-                              : 'border-border bg-surface-inset text-foreground-muted hover:text-foreground'
+                            'rounded-md px-2 py-0.5 font-mono text-xs font-bold shrink-0',
+                            isSelected
+                              ? 'bg-primary text-on-primary'
+                              : 'bg-surface-inset text-primary'
                           )}
                         >
-                          <span>{series.label}</span>
-                          <span className="font-mono text-[10px] opacity-80">
-                            {series.tag}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Step 3: Paper Mark Sliders + Synced Numeric Inputs */}
-            <Card>
-              <CardHeader
-                action={
-                  <Badge variant="editorial" mono>
-                    TOTAL MAX: {activeSubject.maxTotalRaw} RAW
-                  </Badge>
-                }
-              >
-                <CardTitle>3. Enter Paper / Unit Raw Marks</CardTitle>
-                <CardDescription>
-                  Drag the slider, type your exact mark, or tap a boundary preset chip below each paper.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {calculation.paperResults.map(({ paper, raw, ums, paperGrade, pct }) => {
-                  const cutoffs = paper.seriesPaperCutoffs[selectedSeriesId];
-                  const isHighPaper =
-                    paperGrade === 'A*' ||
-                    paperGrade === 'A' ||
-                    paperGrade === '9' ||
-                    paperGrade === '8' ||
-                    paperGrade === '7';
-
-                  return (
-                    <div
-                      key={paper.id}
-                      className="rounded-xl border border-border bg-surface-inset/35 p-4 transition-colors hover:border-border-hover"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="rounded-md bg-primary-tint px-2 py-0.5 font-mono text-xs font-bold text-primary">
-                            {paper.code}
-                          </span>
-                          <h4 className="text-sm font-bold text-foreground">
-                            {paper.title}
-                          </h4>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {activeSubject.isModularUms && (
-                            <Badge variant="active-filter" mono>
-                              {ums} / {paper.maxUms ?? 100} UMS
-                            </Badge>
-                          )}
-                          <Badge
-                            variant={isHighPaper ? 'verified' : 'editorial'}
-                            mono
-                          >
-                            Grade {paperGrade} ({pct}%)
-                          </Badge>
-                        </div>
-                      </div>
-
-                      {/* Dual Slider + JetBrains Mono Numeric Box */}
-                      <div className="mt-3 flex items-center gap-4">
-                        <div className="relative flex-1">
-                          <input
-                            type="range"
-                            min={0}
-                            max={paper.maxRaw}
-                            value={raw}
-                            aria-label={`${paper.code} ${paper.title} raw mark slider`}
-                            onChange={(e) =>
-                              handlePaperMarkChange(
-                                paper.id,
-                                paper.maxRaw,
-                                Number(e.target.value)
-                              )
-                            }
-                            className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-border accent-[var(--primary)]"
-                          />
-                        </div>
-
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <input
-                            type="number"
-                            min={0}
-                            max={paper.maxRaw}
-                            value={raw}
-                            aria-label={`${paper.code} raw mark input`}
-                            onChange={(e) =>
-                              handlePaperMarkChange(
-                                paper.id,
-                                paper.maxRaw,
-                                Number(e.target.value)
-                              )
-                            }
-                            className="w-16 rounded-lg border border-border bg-surface-card px-2.5 py-1.5 text-center font-mono tabular-nums text-sm font-bold text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
-                          />
-                          <span className="font-mono tabular-nums text-xs font-semibold text-foreground-muted">
-                            / {paper.maxRaw}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Per-Paper Quick Boundary Preset Chips */}
-                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border-subtle">
-                        <span className="font-mono text-[11px] text-foreground-subtle">
-                          {paper.weightLabel} · Cutoffs: C={cutoffs.passC} · A={cutoffs.gradeA} ·{' '}
-                          {activeSubject.gradingScale === '9-1' ? '9' : 'A*'}={cutoffs.topGrade}
+                          {subj.code}
                         </span>
-                        <div className="flex items-center gap-1">
-                          {[
-                            { label: '0', val: 0 },
-                            { label: `Pass (${cutoffs.passC})`, val: cutoffs.passC },
-                            { label: `A (${cutoffs.gradeA})`, val: cutoffs.gradeA },
-                            {
-                              label: `${activeSubject.gradingScale === '9-1' ? '9' : 'A*'} (${cutoffs.topGrade})`,
-                              val: cutoffs.topGrade,
-                            },
-                            { label: `Max (${paper.maxRaw})`, val: paper.maxRaw },
-                          ].map((chip) => (
-                            <button
-                              key={chip.label}
-                              type="button"
-                              onClick={() =>
-                                handlePaperMarkChange(paper.id, paper.maxRaw, chip.val)
-                              }
-                              className={cn(
-                                'rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold transition-colors',
-                                raw === chip.val
-                                  ? 'bg-primary text-on-primary'
-                                  : 'bg-surface-card text-foreground-muted border border-border hover:border-border-hover hover:text-foreground'
-                              )}
-                            >
-                              {chip.label}
-                            </button>
-                          ))}
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold">
+                            {subj.title}
+                          </p>
+                          <p className="truncate text-xs text-foreground-muted">
+                            {subj.levelLabel}
+                          </p>
                         </div>
                       </div>
-                    </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="font-mono text-xs text-foreground-muted">
+                          {subj.papers.length} papers
+                        </span>
+                        {isSelected && (
+                          <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                        )}
+                      </div>
+                    </button>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </div>
+            )}
           </div>
 
-          {/* Right Column (5 cols): Sticky Live Grade Result Studio Card */}
-          <div className="lg:col-span-5 lg:sticky lg:top-20 space-y-5">
-            <Card variant="elevated">
-              <CardHeader
-                action={
-                  <Badge variant="subject" mono>
-                    {seriesOptions.find((s) => s.id === selectedSeriesId)?.label}
-                  </Badge>
-                }
-              >
-                <CardTitle className="flex items-center gap-2">
-                  <Calculator className="h-4 w-4 text-primary" />
-                  <span>Live Qualification Result</span>
-                </CardTitle>
-                <CardDescription>
-                  {activeSubject.code} · {activeSubject.title}
-                </CardDescription>
-              </CardHeader>
+          {/* 2. Matching Exam Session Dropdown Box (4 cols) */}
+          <div ref={seriesDropdownRef} className="relative sm:col-span-4">
+            <label
+              id="series-dropdown-label"
+              className="block text-xs font-semibold text-foreground-muted mb-1.5"
+            >
+              Exam Session
+            </label>
+            <button
+              type="button"
+              aria-labelledby="series-dropdown-label"
+              aria-haspopup="listbox"
+              aria-expanded={seriesDropdownOpen}
+              onClick={() => {
+                setSeriesDropdownOpen((prev) => !prev);
+                setSubjectDropdownOpen(false);
+              }}
+              className={cn(
+                'flex w-full items-center justify-between gap-3 rounded-xl border bg-surface-card px-4 py-3 text-left transition-all duration-150',
+                FOCUS_RING,
+                seriesDropdownOpen
+                  ? 'border-yellow-500 ring-2 ring-yellow-500 ring-offset-2 ring-offset-gray-900'
+                  : 'border-border hover:border-border-hover'
+              )}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Calendar className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">
+                    {activeSeries.label}
+                  </p>
+                  <p className="truncate text-xs text-foreground-muted">
+                    {activeSeries.tag} series boundaries
+                  </p>
+                </div>
+              </div>
 
-              <CardContent className="space-y-6">
-                {/* Central Grade & Total Score Display */}
-                <div className="flex items-center justify-between rounded-2xl border border-primary-tint-border bg-primary-tint/40 p-5">
-                  <div className="space-y-1">
-                    <span className="label-caps text-on-primary-tint">
-                      PROJECTED OVERALL GRADE
+              <ChevronDown
+                className={cn(
+                  'h-4 w-4 shrink-0 text-foreground-muted transition-transform duration-150',
+                  seriesDropdownOpen && 'rotate-180 text-primary'
+                )}
+                aria-hidden="true"
+              />
+            </button>
+
+            {seriesDropdownOpen && (
+              <div
+                role="listbox"
+                aria-labelledby="series-dropdown-label"
+                className="absolute left-0 right-0 z-40 mt-2 rounded-2xl border border-border-hover bg-surface-elevated p-2 shadow-[var(--shadow-tier-3)]"
+              >
+                {seriesOptions.map((series) => {
+                  const active = series.id === selectedSeriesId;
+                  return (
+                    <button
+                      key={series.id}
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      onClick={() => {
+                        setSelectedSeriesId(series.id);
+                        setSeriesDropdownOpen(false);
+                      }}
+                      className={cn(
+                        'flex w-full items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left transition-colors',
+                        FOCUS_RING,
+                        active
+                          ? 'bg-primary-tint/60 text-foreground font-semibold'
+                          : 'text-foreground hover:bg-surface-inset'
+                      )}
+                    >
+                      <div>
+                        <p className="text-sm font-semibold">{series.label}</p>
+                        <p className="text-xs text-foreground-muted">
+                          {series.tag} session
+                        </p>
+                      </div>
+                      {active && (
+                        <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Main Workspace: Single Column on Mobile, 12-Col Split on Desktop */}
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 items-start">
+          {/* Left: Clean Paper Mark List */}
+          <div className="lg:col-span-7 space-y-2">
+            <div className="flex items-center justify-between pb-2">
+              <h2 className="text-sm font-semibold text-foreground">
+                Paper Marks ({activeSubject.papers.length})
+              </h2>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => applySubjectPreset('top')}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-primary hover:underline',
+                    FOCUS_RING
+                  )}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>
+                    Fill {activeSubject.gradingScale === '9-1' ? 'Grade 9' : 'A*'} marks
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => applySubjectPreset('zero')}
+                  className={cn(
+                    'inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-foreground-muted hover:text-foreground',
+                    FOCUS_RING
+                  )}
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Clear</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="divide-y divide-border rounded-2xl border border-border bg-surface-card">
+              {calculation.paperResults.map(({ paper, raw, ums, paperGrade }) => (
+                <div key={paper.id} className="p-5 space-y-3">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <label
+                      htmlFor={`mark-input-${paper.id}`}
+                      className="flex items-baseline gap-2.5 min-w-0 cursor-pointer"
+                    >
+                      <span className="font-mono text-xs font-semibold text-primary shrink-0">
+                        {paper.code}
+                      </span>
+                      <span className="truncate text-sm font-semibold text-foreground">
+                        {paper.title}
+                      </span>
+                    </label>
+
+                    <span className="font-mono tabular-nums text-xs text-foreground-muted shrink-0">
+                      {activeSubject.isModularUms
+                        ? `${ums} UMS · ${paperGrade}`
+                        : `Grade ${paperGrade}`}
                     </span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-mono tabular-nums text-3xl font-extrabold text-foreground">
-                        {calculation.metricScore}
-                      </span>
-                      <span className="font-mono tabular-nums text-sm font-semibold text-foreground-muted">
-                        / {calculation.metricMax} {calculation.metricUnit}
-                      </span>
-                    </div>
-                    <p className="font-mono tabular-nums text-xs text-foreground-muted">
-                      Raw Total: {calculation.totalRaw} / {activeSubject.maxTotalRaw} (
-                      {calculation.percentage}%)
-                    </p>
                   </div>
 
-                  {/* Oversized Grade Emblem */}
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min={0}
+                      max={paper.maxRaw}
+                      value={raw}
+                      aria-label={`${paper.code} ${paper.title} slider`}
+                      onChange={(e) =>
+                        handlePaperMarkChange(
+                          paper.id,
+                          paper.maxRaw,
+                          Number(e.target.value)
+                        )
+                      }
+                      className={cn(
+                        'h-1.5 flex-1 cursor-pointer appearance-none rounded-lg bg-surface-inset accent-[var(--primary)]',
+                        FOCUS_RING
+                      )}
+                    />
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <input
+                        id={`mark-input-${paper.id}`}
+                        type="number"
+                        min={0}
+                        max={paper.maxRaw}
+                        value={raw}
+                        onChange={(e) =>
+                          handlePaperMarkChange(
+                            paper.id,
+                            paper.maxRaw,
+                            Number(e.target.value)
+                          )
+                        }
+                        className={cn(
+                          'w-14 rounded-lg border border-border bg-background px-2 py-1 text-center font-mono tabular-nums text-sm font-semibold text-foreground focus:border-yellow-500',
+                          FOCUS_RING
+                        )}
+                      />
+                      <span className="font-mono tabular-nums text-xs text-foreground-muted w-9">
+                        / {paper.maxRaw}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right (Desktop): Sticky Result Summary Card */}
+          <div className="hidden lg:block lg:col-span-5 lg:sticky lg:top-24 rounded-2xl border border-border bg-surface-card p-6 sm:p-7 space-y-6 shadow-[var(--shadow-tier-1)]">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <h2 className="text-base font-semibold text-foreground">
+                  {activeSubject.title}
+                </h2>
+                <p className="text-xs text-foreground-muted">
+                  {activeSeries.label} boundaries
+                </p>
+                <div className="pt-2 flex items-baseline gap-2">
+                  <span className="font-mono tabular-nums text-3xl sm:text-4xl font-extrabold text-foreground">
+                    {calculation.metricScore}
+                  </span>
+                  <span className="font-mono tabular-nums text-sm text-foreground-muted">
+                    / {calculation.metricMax} {calculation.metricUnit}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className={cn(
+                  'flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl font-mono text-2xl font-extrabold',
+                  isTopGrade
+                    ? 'bg-primary text-on-primary'
+                    : 'border border-border bg-surface-inset text-foreground'
+                )}
+                aria-label={`Overall grade ${calculation.finalGrade}`}
+              >
+                {calculation.finalGrade}
+              </div>
+            </div>
+
+            {/* Progress Bar & Humanized Next-Step Guidance */}
+            <div className="space-y-3">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-surface-inset">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+                  style={{ width: `${Math.min(100, calculation.percentage)}%` }}
+                />
+              </div>
+
+              <p className="text-sm text-foreground-muted leading-relaxed">
+                {calculation.nextBoundary ? (
+                  <>
+                    You need{' '}
+                    <strong className="font-mono font-semibold text-foreground">
+                      {calculation.nextBoundary.needed} more {calculation.metricUnit}
+                    </strong>{' '}
+                    to reach{' '}
+                    <strong className="text-foreground">
+                      Grade {calculation.nextBoundary.grade}
+                    </strong>{' '}
+                    ({calculation.nextBoundary.minScore} {calculation.metricUnit}).
+                  </>
+                ) : (
+                  <>
+                    Solid{' '}
+                    <strong className="text-foreground">
+                      Grade {calculation.finalGrade}
+                    </strong>{' '}
+                    — you are{' '}
+                    <strong className="font-mono font-semibold text-foreground">
+                      {calculation.bufferAboveTop} {calculation.metricUnit}
+                    </strong>{' '}
+                    above the top boundary.
+                  </>
+                )}
+              </p>
+            </div>
+
+            {/* Clean Session Boundary Strip */}
+            <div className="grid grid-cols-6 gap-1.5 pt-4 border-t border-border">
+              {calculation.boundaries.map((b) => {
+                const isCurrent = b.grade === calculation.finalGrade;
+                return (
                   <div
+                    key={b.grade}
                     className={cn(
-                      'flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-2xl border-2 font-mono shadow-sm',
-                      isTopGrade
-                        ? 'border-primary bg-primary text-on-primary'
-                        : 'border-border-hover bg-surface-card text-foreground'
+                      'flex flex-col items-center rounded-xl py-2 text-center transition-colors',
+                      isCurrent
+                        ? 'bg-primary-tint text-on-primary-tint font-bold'
+                        : 'text-foreground-muted'
                     )}
                   >
-                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
-                      GRADE
-                    </span>
-                    <span className="text-3xl font-extrabold leading-none mt-0.5">
-                      {calculation.finalGrade}
+                    <span className="font-mono text-xs font-bold">{b.grade}</span>
+                    <span className="font-mono tabular-nums text-[11px] opacity-80 mt-0.5">
+                      {b.minScore}
                     </span>
                   </div>
-                </div>
+                );
+              })}
+            </div>
 
-                {/* Progress Bar & "Marks to Next Grade" Helper */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-foreground inline-flex items-center gap-1.5">
-                      <TrendingUp className="h-3.5 w-3.5 text-primary" />
-                      <span>Boundary Progress</span>
-                    </span>
-                    <span className="font-mono tabular-nums font-bold text-primary">
-                      {calculation.percentage}%
-                    </span>
-                  </div>
+            {savedBanner && (
+              <div
+                role="status"
+                className="flex items-center gap-2 rounded-xl bg-success-tint px-3.5 py-2.5 text-xs font-medium text-on-success-tint"
+              >
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <span>{savedBanner}</span>
+              </div>
+            )}
 
-                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-surface-inset border border-border">
-                    <div
-                      className="h-full rounded-full bg-primary transition-all duration-200 ease-out"
-                      style={{ width: `${Math.min(100, calculation.percentage)}%` }}
-                    />
-                  </div>
-
-                  {calculation.nextBoundary ? (
-                    <div className="flex items-center justify-between rounded-xl border border-border bg-surface-inset/60 px-3.5 py-2.5 text-xs">
-                      <span className="text-foreground-muted">
-                        Next Grade Target:{' '}
-                        <strong className="font-mono text-foreground">
-                          Grade {calculation.nextBoundary.grade}
-                        </strong>{' '}
-                        ({calculation.nextBoundary.minScore} {calculation.metricUnit})
-                      </span>
-                      <Badge variant="active-filter" mono>
-                        +{calculation.nextBoundary.needed} {calculation.metricUnit} needed
-                      </Badge>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between rounded-xl border border-success-border bg-success-tint px-3.5 py-2.5 text-xs text-on-success-tint">
-                      <span className="inline-flex items-center gap-1.5 font-semibold">
-                        <Award className="h-4 w-4" />
-                        <span>
-                          Top Grade ({calculation.finalGrade}) Achieved!
-                        </span>
-                      </span>
-                      <span className="font-mono font-bold">
-                        +{calculation.bufferAboveTop} {calculation.metricUnit} above cutoff
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Official Session Boundary Threshold Table */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="label-caps text-foreground-subtle">
-                      SESSION GRADE BOUNDARIES ({calculation.metricUnit.toUpperCase()})
-                    </span>
-                    <span className="font-mono text-[11px] text-foreground-subtle">
-                      Max {calculation.metricMax}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-                    {calculation.boundaries.map((b) => {
-                      const isCurrentGrade = b.grade === calculation.finalGrade;
-                      const isPassed = calculation.metricScore >= b.minScore;
-                      return (
-                        <div
-                          key={b.grade}
-                          className={cn(
-                            'flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-center transition-all',
-                            isCurrentGrade
-                              ? 'border-primary bg-primary text-on-primary shadow-xs scale-[1.03]'
-                              : isPassed
-                                ? 'border-success-border bg-success-tint/50 text-on-success-tint'
-                                : 'border-border bg-surface-inset/40 text-foreground-muted'
-                          )}
-                        >
-                          <span className="font-mono text-xs font-extrabold">
-                            {b.grade}
-                          </span>
-                          <span className="font-mono tabular-nums text-[11px] opacity-90">
-                            {b.minScore}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {savedBanner && (
-                  <div className="flex items-center gap-2 rounded-xl border border-success-border bg-success-tint px-3.5 py-2.5 text-xs font-semibold text-on-success-tint">
-                    <CheckCircle2 className="h-4 w-4 shrink-0" />
-                    <span>{savedBanner}</span>
-                  </div>
-                )}
-              </CardContent>
-
-              <CardFooter className="flex-wrap">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  leftIcon={<RotateCcw className="h-3.5 w-3.5" />}
-                  onClick={() => applySubjectPreset('zero')}
-                >
-                  Clear All
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  leftIcon={<BookmarkCheck className="h-4 w-4" />}
-                  onClick={handleSaveSnapshot}
-                >
-                  Save to Study Tracker
-                </Button>
-              </CardFooter>
-            </Card>
+            <Button
+              variant="primary"
+              fullWidth
+              className={FOCUS_RING}
+              leftIcon={<BookmarkCheck className="h-4 w-4" />}
+              onClick={handleSaveSnapshot}
+            >
+              Save to Study Tracker
+            </Button>
           </div>
         </div>
       </main>
+
+      {/* Mobile Sticky Bottom Total Score & Grade Summary Bar (sticky bottom-0 z-50) */}
+      <div className="sticky bottom-0 z-50 border-t border-border-hover bg-surface-elevated/95 px-4 py-3 backdrop-blur-md shadow-[var(--shadow-tier-3)] lg:hidden">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div
+              className={cn(
+                'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-mono text-lg font-extrabold',
+                isTopGrade
+                  ? 'bg-primary text-on-primary'
+                  : 'border border-border bg-surface-inset text-foreground'
+              )}
+              aria-label={`Overall grade ${calculation.finalGrade}`}
+            >
+              {calculation.finalGrade}
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex items-baseline gap-1.5">
+                <span className="font-mono tabular-nums text-lg font-extrabold text-foreground">
+                  {calculation.metricScore}
+                </span>
+                <span className="font-mono tabular-nums text-xs text-foreground-muted">
+                  / {calculation.metricMax} {calculation.metricUnit}
+                </span>
+              </div>
+              <p className="truncate text-xs text-foreground-muted">
+                {calculation.nextBoundary
+                  ? `+${calculation.nextBoundary.needed} ${calculation.metricUnit} to Grade ${calculation.nextBoundary.grade}`
+                  : `Top Grade ${calculation.finalGrade} (+${calculation.bufferAboveTop} ${calculation.metricUnit})`}
+              </p>
+            </div>
+          </div>
+
+          <Button
+            variant="primary"
+            size="sm"
+            className={cn('shrink-0', FOCUS_RING)}
+            leftIcon={<BookmarkCheck className="h-4 w-4" />}
+            onClick={handleSaveSnapshot}
+          >
+            Save
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
-

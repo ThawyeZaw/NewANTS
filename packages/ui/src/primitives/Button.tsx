@@ -24,7 +24,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary text-on-primary border border-transparent hover:bg-primary-hover active:bg-primary-active shadow-xs',
+    'bg-primary-solid text-on-primary border border-transparent hover:bg-primary-solid-hover active:bg-primary-active shadow-xs',
   secondary:
     'bg-surface-card text-foreground border border-border hover:bg-surface-inset hover:border-border-hover',
   outline:
@@ -68,7 +68,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       className={cn(
         'inline-flex items-center justify-center font-semibold transition-all duration-150 select-none',
         'active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        'disabled:pointer-events-none disabled:opacity-50',
+        'disabled:pointer-events-none disabled:bg-surface-inset disabled:text-foreground-muted disabled:border-border disabled:shadow-none disabled:opacity-100',
         variantClasses[variant],
         sizeClasses[size],
         fullWidth && 'w-full',
