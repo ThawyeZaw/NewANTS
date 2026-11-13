@@ -48,7 +48,7 @@ export type SettingsTabId = 'profile' | 'schedule' | 'telegram' | 'visibility';
 export interface AccountSettingsViewProps {
   /** Active signed-in user profile */
   profile?: SharedUserProfileData;
-  /** Optional demo persona switcher list (`@zyylinnhtet`, `@thawyezaw`, `@minkhant`) */
+  /** Optional demo persona switcher list (`@zaylynnhtet`, `@thawyezaw`, `@minkhant`) */
   availablePersonas?: SharedUserProfileData[];
   /** Controlled active tab override (defaults to URL `#telegram` hash check -> `'profile'`) */
   initialTab?: SettingsTabId;
@@ -929,7 +929,7 @@ export function AccountSettingsView({
                         </p>
                         <p className="mt-1 text-xs leading-relaxed text-foreground-muted">
                           Switch to a tutor demo persona on the right rail (
-                          <span className="font-mono text-foreground">@zyylinnhtet</span> or{' '}
+                          <span className="font-mono text-foreground">@zaylynnhtet</span> or{' '}
                           <span className="font-mono text-foreground">@thawyezaw</span>) to test
                           drag-painting, or submit a role verification request below.
                         </p>
@@ -1377,7 +1377,7 @@ export function AccountSettingsView({
             </CardContent>
           </Card>
 
-          {/* Demo Persona Switcher (Zyy Tutor / Thaw Admin / Min Khant Student) */}
+          {/* Demo Persona Switcher (Zay Tutor / Thaw Admin / Min Khant Student) */}
           {availablePersonas && availablePersonas.length > 0 && onSwitchPersona && (
             <Card>
               <CardHeader>

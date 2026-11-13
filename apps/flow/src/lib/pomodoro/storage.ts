@@ -19,7 +19,6 @@ import {
   type PomodoroSettings,
   type PomodoroTask,
   type SoundId,
-  type ThemeModePreference,
   type TimerState,
 } from './engine';
 
@@ -31,7 +30,6 @@ const PHASES: PomodoroPhase[] = ['work', 'shortBreak', 'longBreak'];
 const SOUNDS: SoundId[] = ['bell', 'chime', 'digital', 'soft', 'none'];
 const AMBIENT_SOUNDS: AmbientSoundId[] = ['off', 'rain', 'fireplace', 'forest', 'cafe', 'brown-noise'];
 const FOCUS_SCENES: FocusSceneId[] = ['none', 'rainy-study', 'quiet-library', 'misty-forest', 'warm-fireplace'];
-const MODES: ThemeModePreference[] = ['light', 'dark', 'system'];
 const ACCENTS: AccentId[] = ['amber', 'ocean', 'forest', 'rose', 'violet'];
 const FONTS: FontId[] = ['jakarta', 'inter', 'serif'];
 
@@ -90,7 +88,7 @@ export function sanitizeSettings(raw: unknown): PomodoroSettings {
       showSceneOnTimer: bool(ambient.showSceneOnTimer, d.ambient.showSceneOnTimer),
     },
     appearance: {
-      mode: pick(appearance.mode, MODES, d.appearance.mode),
+      mode: appearance.mode === 'dark' ? 'dark' : 'light',
       accent: pick(appearance.accent, ACCENTS, d.appearance.accent),
       font: pick(appearance.font, FONTS, d.appearance.font),
     },

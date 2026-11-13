@@ -39,7 +39,7 @@ describe('@ants/ui [ZYY-3.4] Account Settings, Portfolio, Slot Painter & Telegra
     expect(TelegramConnectCardView).toBeDefined();
 
     expect(Object.keys(MOCK_SHARED_PROFILES)).toEqual([
-      'zyylinnhtet',
+      'zaylynnhtet',
       'thawyezaw',
       'minkhant',
     ]);
@@ -50,7 +50,7 @@ describe('@ants/ui [ZYY-3.4] Account Settings, Portfolio, Slot Painter & Telegra
     // All default personas start with Telegram unlinked (linked later in onboarding or Settings)
     expect(ZYY_PROFILE_MOCK.telegram.status).toBe('unlinked');
     expect(ZYY_PROFILE_MOCK.telegram.handle).toBe('');
-    expect(ZYY_PROFILE_MOCK.tutorTelegramUsername).toBe('@zyy_ants');
+    expect(ZYY_PROFILE_MOCK.tutorTelegramUsername).toBe('@zay_ants');
     expect(THAW_PROFILE_MOCK.telegram.status).toBe('unlinked');
     expect(THAW_PROFILE_MOCK.telegram.handle).toBe('');
     expect(STUDENT_PROFILE_MOCK.telegram.status).toBe('unlinked');
@@ -111,9 +111,9 @@ describe('@ants/ui [ZYY-3.4] Account Settings, Portfolio, Slot Painter & Telegra
     expect(connectedDefault.handle).toBe('@ants_tg_member');
 
     // Or captures explicit distinct Telegram handle returned by webhook
-    const connectedCustom = completeTelegramVerification(pending, '@linn_tg_verified');
+    const connectedCustom = completeTelegramVerification(pending, '@lynn_tg_verified');
     expect(connectedCustom.status).toBe('connected');
-    expect(connectedCustom.handle).toBe('@linn_tg_verified');
+    expect(connectedCustom.handle).toBe('@lynn_tg_verified');
     expect(connectedCustom.linkedAt).toBeDefined();
 
     // Unlink resets status and clears stored Telegram handle cleanly
@@ -122,77 +122,77 @@ describe('@ants/ui [ZYY-3.4] Account Settings, Portfolio, Slot Painter & Telegra
     expect(unlinked.handle).toBe('');
     expect(unlinked.linkedAt).toBeUndefined();
 
-    const inquiry = buildTelegramInquiryUrl('@zyy_ants', 'Zyy Linn Htet', 'Mon · 19:00–20:00');
-    expect(inquiry).toContain('https://t.me/zyy_ants?text=');
+    const inquiry = buildTelegramInquiryUrl('@zay_ants', 'Zay Lynn Htet', 'Mon · 19:00–20:00');
+    expect(inquiry).toContain('https://t.me/zay_ants?text=');
     expect(decodeURIComponent(inquiry)).toContain('Mon · 19:00–20:00');
   });
 
   it('validates & renames ANTs @usernames independently without losing persona or Telegram handle', () => {
-    expect(sanitizeAccountUsernameInput('@Zyy_Studio!! ')).toBe('zyy_studio');
+    expect(sanitizeAccountUsernameInput('@Zay_Studio!! ')).toBe('zay_studio');
 
     expect(
-      validateAccountUsername('settings', ['zyylinnhtet', 'thawyezaw'], 'zyylinnhtet').valid
+      validateAccountUsername('settings', ['zaylynnhtet', 'thawyezaw'], 'zaylynnhtet').valid
     ).toBe(false);
     expect(
-      validateAccountUsername('thawyezaw', ['zyylinnhtet', 'thawyezaw'], 'zyylinnhtet').valid
+      validateAccountUsername('thawyezaw', ['zaylynnhtet', 'thawyezaw'], 'zaylynnhtet').valid
     ).toBe(false);
     expect(
-      validateAccountUsername('ab', ['zyylinnhtet', 'thawyezaw'], 'zyylinnhtet').valid
+      validateAccountUsername('ab', ['zaylynnhtet', 'thawyezaw'], 'zaylynnhtet').valid
     ).toBe(false);
     expect(
-      validateAccountUsername('zyy_studio', ['zyylinnhtet', 'thawyezaw'], 'zyylinnhtet')
-    ).toEqual({ valid: true, normalized: 'zyy_studio' });
+      validateAccountUsername('zay_studio', ['zaylynnhtet', 'thawyezaw'], 'zaylynnhtet')
+    ).toEqual({ valid: true, normalized: 'zay_studio' });
 
-    const initial = createInitialAccountStorageState('zyylinnhtet');
-    const linkedZyy = {
+    const initial = createInitialAccountStorageState('zaylynnhtet');
+    const linkedZay = {
       ...ZYY_PROFILE_MOCK,
-      username: 'zyy_studio',
+      username: 'zay_studio',
       telegram: completeTelegramVerification(
         startTelegramLinking(ZYY_PROFILE_MOCK.telegram),
-        '@zyy_ants'
+        '@zay_ants'
       ),
     };
-    const renamed = renameAccountStorageProfile(initial, 'zyylinnhtet', linkedZyy);
+    const renamed = renameAccountStorageProfile(initial, 'zaylynnhtet', linkedZay);
 
-    expect(renamed.activeUsername).toBe('zyy_studio');
+    expect(renamed.activeUsername).toBe('zay_studio');
     expect(Object.keys(renamed.profilesByUsername)).toEqual([
-      'zyy_studio',
+      'zay_studio',
       'thawyezaw',
       'minkhant',
     ]);
     // Linked Telegram @handle remains completely distinct from renamed ANTs handle
-    expect(renamed.profilesByUsername.zyy_studio?.telegram.handle).toBe('@zyy_ants');
+    expect(renamed.profilesByUsername.zay_studio?.telegram.handle).toBe('@zay_ants');
 
     // Reload sanitization preserves renamed profile & linked Telegram without resurrecting duplicate
     const sanitized = sanitizeAccountStorageState(renamed, MOCK_SHARED_PROFILES);
-    expect(sanitized?.activeUsername).toBe('zyy_studio');
+    expect(sanitized?.activeUsername).toBe('zay_studio');
     expect(Object.keys(sanitized?.profilesByUsername ?? {})).toEqual([
-      'zyy_studio',
+      'zay_studio',
       'thawyezaw',
       'minkhant',
     ]);
-    expect(sanitized?.profilesByUsername.zyy_studio?.telegram.handle).toBe('@zyy_ants');
+    expect(sanitized?.profilesByUsername.zay_studio?.telegram.handle).toBe('@zay_ants');
     expect(sanitized?.profilesByUsername.minkhant?.telegram.handle).toBe('');
   });
 
   it('normalizes @handles, computes completeness, and sanitizes persisted account storage', () => {
-    expect(normalizeProfileHandle('%40ZyyLinnHtet ')).toBe('zyylinnhtet');
+    expect(normalizeProfileHandle('%40ZayLynnHtet ')).toBe('zaylynnhtet');
     expect(normalizeProfileHandle('@@ThawYeZaw')).toBe('thawyezaw');
 
-    const zyyScoreUnlinked = computeProfileCompleteness(ZYY_PROFILE_MOCK);
-    expect(zyyScoreUnlinked.percent).toBe(80);
-    expect(zyyScoreUnlinked.missingItems).toEqual(['Telegram Bot link']);
+    const zayScoreUnlinked = computeProfileCompleteness(ZYY_PROFILE_MOCK);
+    expect(zayScoreUnlinked.percent).toBe(80);
+    expect(zayScoreUnlinked.missingItems).toEqual(['Telegram Bot link']);
 
-    const zyyConnected = {
+    const zayConnected = {
       ...ZYY_PROFILE_MOCK,
       telegram: completeTelegramVerification(
         startTelegramLinking(ZYY_PROFILE_MOCK.telegram),
-        '@zyy_ants'
+        '@zay_ants'
       ),
     };
-    const zyyScoreLinked = computeProfileCompleteness(zyyConnected);
-    expect(zyyScoreLinked.percent).toBe(100);
-    expect(zyyScoreLinked.missingItems).toEqual([]);
+    const zayScoreLinked = computeProfileCompleteness(zayConnected);
+    expect(zayScoreLinked.percent).toBe(100);
+    expect(zayScoreLinked.missingItems).toEqual([]);
 
     const studentScore = computeProfileCompleteness(STUDENT_PROFILE_MOCK);
     expect(studentScore.percent).toBe(75);
@@ -213,9 +213,29 @@ describe('@ants/ui [ZYY-3.4] Account Settings, Portfolio, Slot Painter & Telegra
     expect(saveAccountStorageState(initial, 'acc-test', fakeStorage)).toBe(true);
     const loaded = loadAccountStorageState(MOCK_SHARED_PROFILES, 'acc-test', fakeStorage);
     expect(loaded?.activeUsername).toBe('thawyezaw');
-    expect(loaded?.profilesByUsername.zyylinnhtet?.name).toBe('Zyy Linn Htet');
+    expect(loaded?.profilesByUsername.zaylynnhtet?.name).toBe('Zay Lynn Htet');
 
     expect(sanitizeAccountStorageState({ bad: true }, MOCK_SHARED_PROFILES)).toBeNull();
+
+    // Legacy cached demo profile (`zyylinnhtet` / `Zyy Linn Htet`) auto-migrates cleanly
+    const legacyMigrated = sanitizeAccountStorageState(
+      {
+        version: 1,
+        activeUsername: 'zyylinnhtet',
+        profilesByUsername: {
+          zyylinnhtet: {
+            ...ZYY_PROFILE_MOCK,
+            username: 'zyylinnhtet',
+            name: 'Zyy Linn Htet',
+            tutorTelegramUsername: '@zyy_ants',
+          },
+        },
+      },
+      MOCK_SHARED_PROFILES
+    );
+    expect(legacyMigrated?.activeUsername).toBe('zaylynnhtet');
+    expect(legacyMigrated?.profilesByUsername.zaylynnhtet?.name).toBe('Zay Lynn Htet');
+    expect(legacyMigrated?.profilesByUsername.zaylynnhtet?.tutorTelegramUsername).toBe('@zay_ants');
   });
 });
 

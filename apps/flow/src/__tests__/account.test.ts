@@ -7,6 +7,7 @@ import {
 } from '@ants/ui';
 import { FlowProfilePageView } from '../components/account/views/FlowProfilePageView';
 import { FlowSettingsPageView } from '../components/account/views/FlowSettingsPageView';
+import { FlowAuthPageView } from '../components/auth/views/FlowAuthPageView';
 import {
   syncTelegramToTimetableStorage,
   toUserMenuProfile,
@@ -14,18 +15,19 @@ import {
 import { loadTimetableState } from '../lib/timetable/storage';
 
 describe('@ants/flow [ZYY-3.4] Shared Profile & Settings Mounting + Telegram Sync', () => {
-  it('exports Flow settings & public handle page views cleanly', () => {
+  it('exports Flow auth, settings & public handle page views cleanly', () => {
+    expect(FlowAuthPageView).toBeDefined();
     expect(FlowSettingsPageView).toBeDefined();
     expect(FlowProfilePageView).toBeDefined();
 
     const menuProfile = toUserMenuProfile(ZYY_PROFILE_MOCK);
-    expect(menuProfile.username).toBe('zyylinnhtet');
+    expect(menuProfile.username).toBe('zaylynnhtet');
     expect(menuProfile.telegramConnected).toBe(false);
     expect(menuProfile.roles).toContain('tutor');
 
     const linkedProfile = toUserMenuProfile({
       ...ZYY_PROFILE_MOCK,
-      telegram: completeTelegramVerification(startTelegramLinking(ZYY_PROFILE_MOCK.telegram), '@zyy_tg'),
+      telegram: completeTelegramVerification(startTelegramLinking(ZYY_PROFILE_MOCK.telegram), '@zay_tg'),
     });
     expect(linkedProfile.telegramConnected).toBe(true);
   });

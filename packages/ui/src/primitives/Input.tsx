@@ -62,7 +62,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           disabled={disabled}
           aria-invalid={hasError || undefined}
           className={cn(
-            'w-full rounded-lg border bg-surface-card px-3.5 py-2 text-sm text-foreground transition-all duration-150',
+            'w-full rounded-lg border bg-surface-card px-3.5 py-2 text-sm text-foreground transition-[border-color,box-shadow,background-color] duration-150',
             'placeholder:text-foreground-subtle',
             'focus:outline-none focus:border-primary focus:ring-2 focus:ring-ring',
             'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-surface-inset',

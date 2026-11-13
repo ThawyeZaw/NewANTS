@@ -9,7 +9,7 @@
 ## Key Governance & Dual-Developer Docs (Read First)
 - [`AGENTS.md`](./AGENTS.md) — Shared rules, file ownership locks, verification gates, and mandatory end-of-session updates.
 - [`AGENTS.thaw.md`](./AGENTS.thaw.md) — **Thaw Ye Zaw (Thorin)**: Main Full-Stack Developer & Platform Admin (`[THAW]` track).
-- [`AGENTS.zyy.md`](./AGENTS.zyy.md) — **Zyy Linn Htet**: Front-End Prototype & UI Polishing Lead (`[ZYY]` track).
+- [`AGENTS.zyy.md`](./AGENTS.zyy.md) — **Zay Lynn Htet**: Front-End Prototype & UI Polishing Lead (`[ZYY]` track).
 - [`spec.md`](./spec.md) — Authoritative system specification, feature requirements, auth/guest matrix, and D1 database blueprint.
 - [`progress.md`](./progress.md) — Dual-track (`[ZYY]` & `[THAW]`) component build tracker and session history log.
 - [`docs/design/README.md`](./docs/design/README.md) — Paired Stitch Academic Design System (Light + Amber Dark).

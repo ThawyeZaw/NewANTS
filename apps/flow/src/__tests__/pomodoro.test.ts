@@ -41,6 +41,12 @@ import {
 } from '../lib/pomodoro/stats';
 import { playClockTick, playClockTickSample } from '../lib/pomodoro/sound';
 import {
+  APPEARANCE_BOOTSTRAP_SCRIPT,
+  registerPomodoroServiceWorker,
+  resolveThemeMode,
+  unregisterDevServiceWorkers,
+} from '../lib/pomodoro/browser';
+import {
   loadPomodoroState,
   sanitizeSettings,
   savePomodoroState,
@@ -232,6 +238,21 @@ describe('@ants/flow [ZYY-3.1] Pomodoro Timer Studio & App Shell', () => {
     expect(() => playClockTick('tock', 0.35)).not.toThrow();
     expect(() => playClockTick('tick', 0)).not.toThrow();
     expect(() => playClockTickSample(0.35)).not.toThrow();
+  });
+
+  it('defaults appearance mode to light and normalizes legacy system mode to light so section switches never flip to dark mode', async () => {
+    expect(DEFAULT_POMODORO_SETTINGS.appearance.mode).toBe('light');
+    expect(sanitizeSettings({ appearance: { mode: 'system' } }).appearance.mode).toBe('light');
+    expect(sanitizeSettings({ appearance: { mode: 'light' } }).appearance.mode).toBe('light');
+    expect(sanitizeSettings({ appearance: { mode: 'dark' } }).appearance.mode).toBe('dark');
+    expect(resolveThemeMode('light')).toBe('light');
+    expect(resolveThemeMode('system')).toBe('light');
+    expect(resolveThemeMode('dark')).toBe('dark');
+    expect(() => new Function(APPEARANCE_BOOTSTRAP_SCRIPT)).not.toThrow();
+    expect(APPEARANCE_BOOTSTRAP_SCRIPT).toContain('ants_theme');
+    expect(APPEARANCE_BOOTSTRAP_SCRIPT).toContain('.the-ants.org');
+    expect(() => registerPomodoroServiceWorker()).not.toThrow();
+    await expect(unregisterDevServiceWorkers()).resolves.toBeUndefined();
   });
 });
 

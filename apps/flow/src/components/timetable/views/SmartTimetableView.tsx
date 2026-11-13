@@ -9,7 +9,7 @@ import {
   Plus,
   RotateCcw,
 } from 'lucide-react';
-import { Badge, Button, ThemeToggle, cn, type MockUserProfile } from '@ants/ui';
+import { Badge, Button, ThemeToggle, cn, useSlidingIndicator, type MockUserProfile } from '@ants/ui';
 import {
   addDaysIso,
   computeDayAllocations,
@@ -84,7 +84,7 @@ export function SmartTimetableView({
   exams = MOCK_SYNCED_EXAMS,
   persistToLocalStorage = true,
   storageKey = TIMETABLE_STORAGE_KEY,
-  user = null,
+  user,
   onStateChange,
   onBlockSaved,
   onBlockDeleted,
@@ -101,6 +101,26 @@ export function SmartTimetableView({
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorDraft, setEditorDraft] = useState<BlockEditorDraft | null>(null);
   const [reminderBlockId, setReminderBlockId] = useState<string | null>(null);
+
+  const viewTabsRef = useRef<HTMLDivElement | null>(null);
+  const {
+    rect: viewTabsRect,
+    ready: viewTabsReady,
+    animate: viewTabsAnimate,
+  } = useSlidingIndicator(viewTabsRef, state.viewMode, {
+    activeSelector: '[role="tab"][aria-selected="true"]',
+  });
+  const viewTabsIndicatorReady = viewTabsReady && viewTabsRect.visible;
+
+  const presetTabsRef = useRef<HTMLDivElement | null>(null);
+  const {
+    rect: presetTabsRect,
+    ready: presetTabsReady,
+    animate: presetTabsAnimate,
+  } = useSlidingIndicator(presetTabsRef, state.presetId, {
+    activeSelector: '[aria-pressed="true"]',
+  });
+  const presetTabsIndicatorReady = presetTabsReady && presetTabsRect.visible;
 
   const commit = useCallback(
     (next: TimetablePersistedState) => {
@@ -368,7 +388,7 @@ export function SmartTimetableView({
       headerActions={<ThemeToggle />}
     >
       {/* Top Timetable Toolbar */}
-      <div className="flex flex-col gap-3 border-b border-border pb-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="ants-workspace-enter flex flex-col gap-3 border-b border-border pb-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             Smart Timetable
@@ -408,10 +428,23 @@ export function SmartTimetableView({
         <div className="flex flex-wrap items-center gap-2">
           {/* Week / Day / Month Mode Switcher */}
           <div
+            ref={viewTabsRef}
             role="tablist"
             aria-label="Timetable view mode"
-            className="inline-flex rounded-lg bg-surface-inset p-1"
+            data-gliding-ready={viewTabsIndicatorReady ? 'true' : 'false'}
+            className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
           >
+            <span
+              aria-hidden="true"
+              data-animate={viewTabsAnimate ? 'true' : 'false'}
+              className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
+              style={{
+                transform: `translate3d(${viewTabsRect.x}px, ${viewTabsRect.y}px, 0)`,
+                width: `${viewTabsRect.width}px`,
+                height: `${viewTabsRect.height}px`,
+                opacity: viewTabsIndicatorReady ? 1 : 0,
+              }}
+            />
             {VIEW_TABS.map((t) => {
               const active = state.viewMode === t.id;
               return (
@@ -420,9 +453,10 @@ export function SmartTimetableView({
                   type="button"
                   role="tab"
                   aria-selected={active}
+                  data-active={active ? 'true' : 'false'}
                   onClick={() => commit({ ...stateRef.current, viewMode: t.id })}
                   className={cn(
-                    'rounded-md px-3 py-1 text-xs font-semibold transition-colors',
+                    'ants-glide-item relative z-10 rounded-md px-3 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
                     active
                       ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]'
                       : 'text-foreground-muted hover:text-foreground'
@@ -480,24 +514,43 @@ export function SmartTimetableView({
 
           {/* Demo Preset Switcher */}
           <div className="inline-flex items-center rounded-lg border border-border bg-surface-card p-0.5">
-            {PRESET_OPTIONS.map((p) => {
-              const active = state.presetId === p.id;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => switchPreset(p.id)}
-                  className={cn(
-                    'rounded-md px-2.5 py-1 text-xs font-semibold transition-colors',
-                    active
-                      ? 'bg-surface-inset text-foreground'
-                      : 'text-foreground-muted hover:text-foreground'
-                  )}
-                >
-                  {p.label}
-                </button>
-              );
-            })}
+            <div
+              ref={presetTabsRef}
+              data-gliding-ready={presetTabsIndicatorReady ? 'true' : 'false'}
+              className="ants-glide-host relative inline-flex items-center"
+            >
+              <span
+                aria-hidden="true"
+                data-animate={presetTabsAnimate ? 'true' : 'false'}
+                className="ants-glide-indicator z-0 rounded-md bg-surface-inset"
+                style={{
+                  transform: `translate3d(${presetTabsRect.x}px, ${presetTabsRect.y}px, 0)`,
+                  width: `${presetTabsRect.width}px`,
+                  height: `${presetTabsRect.height}px`,
+                  opacity: presetTabsIndicatorReady ? 1 : 0,
+                }}
+              />
+              {PRESET_OPTIONS.map((p) => {
+                const active = state.presetId === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    aria-pressed={active}
+                    data-active={active ? 'true' : 'false'}
+                    onClick={() => switchPreset(p.id)}
+                    className={cn(
+                      'ants-glide-item relative z-10 rounded-md px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
+                      active
+                        ? 'bg-surface-inset text-foreground'
+                        : 'text-foreground-muted hover:text-foreground'
+                    )}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
             <button
               type="button"
               title="Reset active preset"
@@ -563,7 +616,7 @@ export function SmartTimetableView({
 
       {/* Main Split Workspace: 24h Calendar Grid + Today Focus Rail */}
       <div className="mt-4 grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <section aria-label="Timetable schedule" className="min-w-0">
+        <section key={state.viewMode} aria-label="Timetable schedule" className="ants-fade-enter min-w-0">
           {state.viewMode === 'week' && (
             <TimetableWeekGridView
               weekDates={weekDates}

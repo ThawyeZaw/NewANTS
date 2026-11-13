@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Bell, BellOff, Image as ImageIcon, Minus, Monitor, Moon, Palette, Play, Plus, Shield, Sun, Timer, Volume2, VolumeX } from 'lucide-react';
-import { Button, Modal, cn } from '@ants/ui';
+import React, { useRef, useState } from 'react';
+import { Bell, BellOff, Image as ImageIcon, Minus, Moon, Palette, Play, Plus, Shield, Sun, Timer, Volume2, VolumeX } from 'lucide-react';
+import { Button, Modal, cn, useSlidingIndicator } from '@ants/ui';
 import {
   DEFAULT_POMODORO_SETTINGS,
   DURATION_LIMITS,
@@ -56,7 +56,6 @@ export const FONT_OPTIONS: { id: FontId; label: string; sample: string }[] = [
 const MODE_OPTIONS: { id: ThemeModePreference; label: string; icon: React.ReactNode }[] = [
   { id: 'light', label: 'Light', icon: <Sun className="h-4 w-4" aria-hidden="true" /> },
   { id: 'dark', label: 'Dark', icon: <Moon className="h-4 w-4" aria-hidden="true" /> },
-  { id: 'system', label: 'System', icon: <Monitor className="h-4 w-4" aria-hidden="true" /> },
 ];
 
 function NumberField({
@@ -222,6 +221,15 @@ export function PomodoroSettingsView({
   initialTab = 'timer',
 }: PomodoroSettingsViewProps) {
   const [tab, setTab] = useState<SettingsTab>(initialTab);
+  const settingsTabsRef = useRef<HTMLDivElement | null>(null);
+  const {
+    rect: settingsTabRect,
+    ready: settingsTabReady,
+    animate: settingsTabAnimate,
+  } = useSlidingIndicator(settingsTabsRef, `${open}-${tab}`, {
+    activeSelector: '[role="tab"][aria-selected="true"]',
+  });
+  const settingsTabIndicatorReady = settingsTabReady && settingsTabRect.visible;
   const L = DURATION_LIMITS;
   const update = (patch: Partial<PomodoroSettings>) => onChange?.({ ...settings, ...patch });
   const updateSound = (patch: Partial<PomodoroSettings['sound']>) =>
@@ -265,25 +273,46 @@ export function PomodoroSettingsView({
         </>
       }
     >
-      <div className="-mx-1 mb-5 flex gap-1 overflow-x-auto rounded-lg bg-surface-inset p-1" role="tablist" aria-label="Settings sections">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            onClick={() => setTab(t.id)}
-            className={cn(
-              'inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-xs font-semibold transition-colors',
-              tab === t.id
-                ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]'
-                : 'text-foreground-muted hover:text-foreground'
-            )}
-          >
-            {t.icon}
-            {t.label}
-          </button>
-        ))}
+      <div
+        ref={settingsTabsRef}
+        data-gliding-ready={settingsTabIndicatorReady ? 'true' : 'false'}
+        className="ants-glide-host relative -mx-1 mb-5 flex gap-1 overflow-x-auto rounded-lg bg-surface-inset p-1"
+        role="tablist"
+        aria-label="Settings sections"
+      >
+        <span
+          aria-hidden="true"
+          data-animate={settingsTabAnimate ? 'true' : 'false'}
+          className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
+          style={{
+            transform: `translate3d(${settingsTabRect.x}px, ${settingsTabRect.y}px, 0)`,
+            width: `${settingsTabRect.width}px`,
+            height: `${settingsTabRect.height}px`,
+            opacity: settingsTabIndicatorReady ? 1 : 0,
+          }}
+        />
+        {TABS.map((t) => {
+          const active = tab === t.id;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              data-active={active ? 'true' : 'false'}
+              onClick={() => setTab(t.id)}
+              className={cn(
+                'ants-glide-item relative z-10 inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-xs font-semibold transition-colors active:scale-[0.98]',
+                active
+                  ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]'
+                  : 'text-foreground-muted hover:text-foreground'
+              )}
+            >
+              {t.icon}
+              {t.label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="max-h-[56vh] space-y-5 overflow-y-auto pr-1">
@@ -565,24 +594,27 @@ export function PomodoroSettingsView({
           <>
             <fieldset>
               <legend className="mb-2 text-xs font-semibold text-foreground-muted">Mode</legend>
-              <div className="grid grid-cols-3 gap-2">
-                {MODE_OPTIONS.map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    aria-pressed={settings.appearance.mode === m.id}
-                    onClick={() => updateAppearance({ mode: m.id })}
-                    className={cn(
-                      'flex h-11 items-center justify-center gap-2 rounded-lg border text-sm font-semibold transition-colors',
-                      settings.appearance.mode === m.id
-                        ? 'border-primary bg-primary-tint text-on-primary-tint'
-                        : 'border-border bg-surface-card text-foreground-muted hover:border-border-hover hover:text-foreground'
-                    )}
-                  >
-                    {m.icon}
-                    {m.label}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 gap-2">
+                {MODE_OPTIONS.map((m) => {
+                  const activeMode = settings.appearance.mode === 'dark' ? 'dark' : 'light';
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      aria-pressed={activeMode === m.id}
+                      onClick={() => updateAppearance({ mode: m.id })}
+                      className={cn(
+                        'flex h-11 items-center justify-center gap-2 rounded-lg border text-sm font-semibold transition-colors',
+                        activeMode === m.id
+                          ? 'border-primary bg-primary-tint text-on-primary-tint'
+                          : 'border-border bg-surface-card text-foreground-muted hover:border-border-hover hover:text-foreground'
+                      )}
+                    >
+                      {m.icon}
+                      {m.label}
+                    </button>
+                  );
+                })}
               </div>
             </fieldset>
             <fieldset>

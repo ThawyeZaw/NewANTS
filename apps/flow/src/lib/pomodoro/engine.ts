@@ -167,7 +167,7 @@ export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {
     showSceneOnTimer: true,
   },
   appearance: {
-    mode: 'system',
+    mode: 'light',
     accent: 'amber',
     font: 'jakarta',
   },

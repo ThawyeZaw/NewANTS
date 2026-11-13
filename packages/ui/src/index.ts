@@ -3,8 +3,17 @@
 export { cn } from './utils/cn';
 
 export {
+  THEME_CHANGE_EVENT,
+  THEME_COOKIE_KEY,
+  THEME_STORAGE_KEY,
   ThemeToggle,
+  applyThemeToDocument,
+  parseThemeCookieValue,
+  persistThemeMode,
+  readStoredThemeMode,
+  serializeThemeCookieValue,
   type ThemeMode,
+  type ThemeStorageLike,
   type ThemeToggleProps,
 } from './primitives/ThemeToggle';
 
@@ -62,6 +71,23 @@ export {
 } from './primitives/Modal';
 
 export {
+  NavigationProgressView,
+  type NavigationProgressVariant,
+  type NavigationProgressViewProps,
+} from './primitives/NavigationProgressView';
+
+export {
+  ScrollReveal,
+  type ScrollRevealProps,
+} from './primitives/ScrollReveal';
+
+export {
+  useSlidingIndicator,
+  type IndicatorRect,
+  type UseSlidingIndicatorOptions,
+} from './primitives/SlidingHighlight';
+
+export {
   MOCK_DESIGN_SYSTEM_DATA,
   type DesignSystemShowcaseMockData,
   type MockSyllabusChecklistItem,
@@ -91,11 +117,68 @@ export {
 
 export {
   AuthFormView,
+  DEFAULT_AUTH_DEMO_PERSONAS,
   type AcademicTrackOption,
+  type AuthDemoPersonaOption,
   type AuthFormMode,
   type AuthFormSubmitPayload,
   type AuthFormViewProps,
 } from './views/AuthFormView';
+
+export {
+  AuthStudioView,
+  type AuthStudioCapabilityRow,
+  type AuthStudioViewProps,
+} from './views/AuthStudioView';
+
+export {
+  AuthShowcaseVideoView,
+  FLOW_VIDEO_CHAPTERS,
+  STUDY_VIDEO_CHAPTERS,
+  type AuthShowcaseVideoViewProps,
+  type AuthVideoChapter,
+} from './views/AuthShowcaseVideoView';
+
+export {
+  WorkspaceAuthGateView,
+  type WorkspaceAuthGateViewProps,
+} from './views/WorkspaceAuthGateView';
+
+export {
+  ANTS_AUTH_SESSION_EVENT,
+  ANTS_AUTH_STORAGE_KEY,
+  ANTS_SSO_COOKIE_KEY,
+  CONTRIBUTOR_ROLES,
+  authenticateDemoPersona,
+  authenticateOAuthProvider,
+  authenticateSignIn,
+  authenticateSignUp,
+  createAuthenticatedSessionForProfile,
+  createGuestSession,
+  createProfileFromSignUp,
+  evaluatePasswordStrength,
+  getAccessMatrixPolicy,
+  hasContributorRole,
+  loadAuthSession,
+  parseSsoCookieValue,
+  profileToMockUser,
+  sanitizeAuthSession,
+  sanitizeRedirectPath,
+  saveAuthSession,
+  serializeSsoCookieValue,
+  signOutEverywhere,
+  validateAuthEmail,
+  validateSignInIdentifier,
+  type AccessMatrixFeatureId,
+  type AccessMatrixPolicy,
+  type AntsSsoSessionState,
+  type AuthFieldErrors,
+  type AuthMethodId,
+  type AuthOperationResult,
+  type AuthSessionStatus,
+  type GuestAccessLevel,
+  type PasswordStrengthReport,
+} from './lib/auth';
 
 export {
   UserMenuView,

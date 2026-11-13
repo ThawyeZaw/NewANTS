@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useRef, useState } from 'react';
 import { cn } from '../utils/cn';
+import { useSlidingIndicator } from './SlidingHighlight';
 
 export type TabsVariant = 'segmented' | 'underline';
 
@@ -106,12 +107,20 @@ export function TabsList({
   children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const { variant } = useTabsContext();
+  const { activeValue, variant } = useTabsContext();
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const { rect, ready, animate } = useSlidingIndicator(listRef, activeValue, {
+    activeSelector: '[role="tab"][aria-selected="true"]',
+  });
+  const indicatorReady = ready && rect.visible;
 
   return (
     <div
+      ref={listRef}
       role="tablist"
+      data-gliding-ready={indicatorReady ? 'true' : 'false'}
       className={cn(
+        'ants-glide-host relative',
         variant === 'segmented'
           ? 'inline-flex items-center gap-1 rounded-xl border border-border bg-surface-inset p-1'
           : 'flex items-center gap-6 border-b border-border',
@@ -119,6 +128,31 @@ export function TabsList({
       )}
       {...props}
     >
+      {variant === 'segmented' ? (
+        <span
+          aria-hidden="true"
+          data-animate={animate ? 'true' : 'false'}
+          className="ants-glide-indicator z-0 rounded-lg bg-primary shadow-xs"
+          style={{
+            transform: `translate3d(${rect.x}px, ${rect.y}px, 0)`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            opacity: indicatorReady ? 1 : 0,
+          }}
+        />
+      ) : (
+        <span
+          aria-hidden="true"
+          data-animate={animate ? 'true' : 'false'}
+          className="ants-glide-indicator z-0 rounded-full bg-primary"
+          style={{
+            transform: `translate3d(${rect.x}px, ${Math.max(0, rect.y + rect.height - 2)}px, 0)`,
+            width: `${rect.width}px`,
+            height: '2px',
+            opacity: indicatorReady ? 1 : 0,
+          }}
+        />
+      )}
       {children}
     </div>
   );
@@ -147,11 +181,12 @@ export function TabsTrigger({
       type="button"
       role="tab"
       aria-selected={isActive}
+      data-active={isActive ? 'true' : 'false'}
       disabled={disabled}
       onClick={() => !disabled && setActiveValue(value)}
       className={cn(
-        'inline-flex items-center justify-center gap-2 text-xs font-semibold transition-all duration-150 select-none',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40 disabled:pointer-events-none',
+        'ants-glide-item relative z-10 inline-flex items-center justify-center gap-2 text-xs font-semibold transition-colors duration-150 select-none',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none',
         variant === 'segmented'
           ? cn(
               'rounded-lg px-3 py-1.5',
@@ -193,8 +228,9 @@ export function TabsContent({
 
   return (
     <div
+      key={value}
       role="tabpanel"
-      className={cn('mt-4 focus:outline-none', className)}
+      className={cn('mt-4 ants-panel-enter focus:outline-none', className)}
       {...props}
     >
       {children}

@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+@import '@ants/ui/styles/tokens.css';
+@source '../../../../packages/ui/src';
+@source '../../../../packages/calculator/src';
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    caret-color: var(--primary-solid);
+    scrollbar-color: var(--border-hover) transparent;
+    scrollbar-width: thin;
+  }
+
+  ::selection {
+    background-color: var(--primary-tint);
+    color: var(--on-primary-tint);
+  }
+}
+

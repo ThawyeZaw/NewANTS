@@ -42,7 +42,7 @@ export interface UserProfileViewProps {
   requestedHandle?: string;
   /** Highlights quick edit button when viewing your own active account */
   isOwnProfile?: boolean;
-  /** Optional quick links to jump between demo profiles (`@zyylinnhtet`, `@thawyezaw`, `@minkhant`) */
+  /** Optional quick links to jump between demo profiles (`@zaylynnhtet`, `@thawyezaw`, `@minkhant`) */
   availableProfiles?: PublicProfileSwitchItem[];
   /** Optional SPA navigation handler for internal `<a href>` links */
   onNavigate?: (path: string) => void;

@@ -66,7 +66,7 @@ export function Modal({
     >
       {/* Translucent backdrop with blur */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm ants-modal-backdrop-in"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -74,7 +74,7 @@ export function Modal({
       {/* Tier-3 Elevated Modal Surface */}
       <div
         className={cn(
-          'relative z-10 w-full rounded-2xl border border-border-hover bg-surface-elevated text-foreground shadow-[var(--shadow-tier-3)] transition-all',
+          'relative z-10 w-full rounded-2xl border border-border-hover bg-surface-elevated text-foreground shadow-[var(--shadow-tier-3)] ants-modal-panel-in',
           sizeClasses[size],
           className
         )}

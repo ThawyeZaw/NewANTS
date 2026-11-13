@@ -32,19 +32,6 @@ export interface OrgProductCardMock {
   ctaLabel: string;
 }
 
-export interface OrgHackathonSpotlightMock {
-  badge: string;
-  title: string;
-  subtitle: string;
-  dateLabel: string;
-  locationLabel: string;
-  participantCount: string;
-  prizePoolLabel: string;
-  tracks: string[];
-  externalWebsiteUrl: string;
-  showcaseRoute: string;
-}
-
 export interface OrgFeaturedMemberPreview {
   username: string;
   name: string;
@@ -56,7 +43,7 @@ export interface OrgFeaturedMemberPreview {
 
 export interface OrgActivityPreview {
   slug: string;
-  category: 'Tutoring' | "Student's Meet" | 'Exam Venue Visit';
+  category: 'Tutoring' | "Student's Meet" | 'Exam Venue Visit' | 'Hackathon';
   title: string;
   dateLabel: string;
   location: string;
@@ -73,7 +60,6 @@ export interface OrgHomeLandingMockData {
   impactStats: OrgImpactStat[];
   missionPillars: OrgMissionPillar[];
   products: OrgProductCardMock[];
-  hackathon: OrgHackathonSpotlightMock;
   featuredMembers: OrgFeaturedMemberPreview[];
   recentActivities: OrgActivityPreview[];
 }
@@ -83,65 +69,64 @@ export const MOCK_ORG_NAV_LINKS: OrgNavLink[] = [
   { label: 'Team & Tutors', href: '/team' },
   { label: 'Activities', href: '/activities' },
   { label: 'Articles', href: '/articles' },
-  { label: 'Hackathon', href: '/hackathon', badge: 'SPOTLIGHT' },
 ];
 
 export const MOCK_ORG_HOME_DATA: OrgHomeLandingMockData = {
-  heroBadge: 'THE ANTS · ACADEMIC NETWORK & TUTORS',
-  heroTitle: 'Rigorous Scholarship Meets',
-  heroHighlight: 'Communal Momentum.',
+  heroBadge: 'The ANTs · Academic Network & Tutors',
+  heroTitle: 'ACE With Us — open study tools, past papers and peer tutoring.',
+  heroHighlight: '',
   heroDescription:
-    'The ANTs is a student-and-educator-led academic organization building open-access IGCSE & IAL study ecosystems, peer tutoring networks, community meetups, and student hackathons.',
+    'Check Cambridge IGCSE and Edexcel IAL grade boundaries with zero login walls, track past papers and book verified Sun–Sat tutors.',
   missionStatement:
-    'We believe every ambitious IGCSE and A-Level student deserves structured syllabus clarity, transparent grade calculation tools, and accessible mentorship—without paywalls or academic clutter.',
+    'Students preparing for Cambridge and Pearson Edexcel exams often spend hours digging through scattered PDFs and inconsistent mark schemes. We keep boundary calculators, syllabus checklists, and tutor schedules open in one quiet place.',
   navLinks: MOCK_ORG_NAV_LINKS,
   impactStats: [
     {
       id: 'students',
       value: '4,800+',
-      label: 'Students Reached',
-      detail: 'Across Cambridge IGCSE, AS/A-Level & Pearson Edexcel IAL',
+      label: 'Candidates using our calculators',
+      detail: 'Cambridge IGCSE, AS/A-Level & Edexcel IAL',
     },
     {
       id: 'tutors',
       value: '35+',
-      label: 'Verified Tutors & Mentors',
-      detail: 'A* achievers & university scholars with live weekly schedules',
+      label: 'Tutors with live weekly hours',
+      detail: 'Verified instructors listing Sun–Sat slots',
     },
     {
       id: 'papers',
       value: '1,250+',
-      label: 'Indexed Past Papers & Boundaries',
-      detail: 'Real-time UMS & raw mark conversion matrices',
+      label: 'Paper boundary tables indexed',
+      detail: 'January, May/June, and Oct/Nov series',
     },
     {
       id: 'events',
       value: '28',
-      label: 'Community Activities & Meets',
-      detail: 'Peer tutoring cohorts, Student Meets & Exam Venue Visits',
+      label: 'In-person meets and venue walks',
+      detail: 'Revision clinics, Student Meets, and hall briefings',
     },
   ],
   missionPillars: [
     {
       id: 'pillar-mentorship',
-      code: 'PILLAR 01',
-      title: 'Peer & Expert Academic Tutoring',
+      code: 'Tutoring',
+      title: 'Direct weekly tutor schedules',
       description:
-        'Connect directly with verified IGCSE and IAL tutors. Inspect live Sun–Sat availability grids, subject specializations, and inquire in one click via Telegram.',
+        'Check each tutor’s open Sun–Sat hours, see the exact unit codes they teach, and send a prefilled Telegram message from the schedule drawer.',
     },
     {
       id: 'pillar-tools',
-      code: 'PILLAR 02',
-      title: 'Purpose-Built Study & Focus Software',
+      code: 'Software',
+      title: 'Calculators, topic trackers, and timers',
       description:
-        'From our modular Edexcel UMS Grade Calculator to Study (Topic & Past Paper Tracker) and Flow (24h Smart Timetable & Pomodoro), our tools are crafted for deep focus.',
+        'Run instant raw-to-UMS conversions here on the-ants.org, track syllabus units in Study, or plan your revision week inside Flow.',
     },
     {
       id: 'pillar-community',
-      code: 'PILLAR 03',
-      title: 'Student Meetups, Venue Visits & Hackathons',
+      code: 'Community',
+      title: 'Venue briefings and Student Meets',
       description:
-        'We guide students beyond the textbook—hosting pre-exam venue walkthroughs, collaborative study meets, and flagship student engineering hackathons.',
+        'Before each exam series, mentors walk new private candidates through centre check-in routines, lab benches, and timing checkpoints.',
     },
   ],
   products: [
@@ -152,17 +137,16 @@ export const MOCK_ORG_HOME_DATA: OrgHomeLandingMockData = {
       domainLabel: 'study.the-ants.org',
       href: 'https://study.the-ants.org',
       localHref: 'http://localhost:3001',
-      badge: 'IGCSE & IAL ACADEMIC HUB',
-      headline: 'Master Every Syllabus Topic & Past Paper Variant.',
+      badge: 'Academic Tracker',
+      headline: 'Syllabus checklists and past-paper matrices by exam board.',
       description:
-        'Built specifically for Cambridge IGCSE, AS/A-Level, and Pearson Edexcel IAL students—including full support for the 14-unit Edexcel Modular Maths Suite (WMA11).',
+        'Tracks Cambridge IGCSE, Cambridge AS/A-Level, and Pearson Edexcel IAL topics alongside historical series grade boundaries, including the 14-unit WMA11 Maths suite.',
       highlights: [
-        'Interactive Syllabus Topic Tracker with confidence pills & notes',
-        'Excel-style Past Paper Variant × Series Matrix with auto UMS derivation',
-        'Live Exam Countdowns synced directly to your Flow calendar',
-        'Spaced-Repetition Flashcards, Topical Quizzes & Scholar XP Leaderboard',
+        'Topic & subtopic confidence logs',
+        'Past paper series × variant matrix with UMS lookup',
+        'Exam countdowns synced into Flow',
       ],
-      ctaLabel: 'Launch Study Tracker',
+      ctaLabel: 'Open Study',
     },
     {
       id: 'flow',
@@ -171,90 +155,80 @@ export const MOCK_ORG_HOME_DATA: OrgHomeLandingMockData = {
       domainLabel: 'flow.the-ants.org',
       href: 'https://flow.the-ants.org',
       localHref: 'http://localhost:3002',
-      badge: 'SLEEK PRODUCTIVITY STUDIO',
-      headline: 'Time-Block Your Week, Crush P1–P4 Tasks & Stay Focused.',
+      badge: 'Daily Planner',
+      headline: '24-hour weekly timetable, P1–P4 tasks, and Pomodoro timer.',
       description:
-        'A tactile TickTick-inspired productivity workspace designed for students and everyday planners who want structure without distraction.',
+        'A straightforward time-blocking planner and Pomodoro clock that works offline in the browser, with optional Telegram reminders before scheduled blocks.',
       highlights: [
-        'Interactive Day, Week (24h grid) & Month Smart Timetable',
-        'Priority Task Planner (P1–P4) with subtasks & Today Focus side panel',
-        'Guest-accessible Pomodoro Timer with Amber progress arc & D1 sync',
-        'Automated 5-minute Telegram Bot reminders for classes & deadlines',
+        'Week, Day, and Month drag-and-drop scheduling',
+        'Priority task list with subtasks and Today Focus',
+        'Standalone Pomodoro timer and focus scenes',
       ],
-      ctaLabel: 'Open Flow Workspace',
+      ctaLabel: 'Open Flow',
     },
   ],
-  hackathon: {
-    badge: 'FLAGSHIP INITIATIVE · HACKATHON SHOWCASE',
-    title: 'The ANTs Student Builders Hackathon 2026',
-    subtitle:
-      '48 hours of rapid prototyping, mentorship, and live demos where secondary and university builders ship real tools for education, productivity, and community impact.',
-    dateLabel: 'NOV 2026 · 48H SPRINT',
-    locationLabel: 'Hybrid · Yangon & Global Discord',
-    participantCount: '320+ Builders',
-    prizePoolLabel: 'Awards, Cloud Credits & Mentorship',
-    tracks: [
-      'EdTech & AI Tutors',
-      'Student Productivity',
-      'Open Community Tools',
-      'First-Time Builders Track',
-    ],
-    externalWebsiteUrl: 'https://hackathon.the-ants.org',
-    showcaseRoute: '/hackathon',
-  },
   featuredMembers: [
     {
       username: 'thawyezaw',
       name: 'Thaw Ye Zaw (Thorin)',
-      roleBadge: 'Founder & Lead Architect',
-      title: 'Platform Admin & IAL Mathematics / Physics Mentor',
-      specialization: 'Edexcel IAL Further Maths · Full-Stack Systems',
-      availabilityLabel: 'Available Tue · Thu · Sat',
+      roleBadge: 'Founder · Lead Architect',
+      title: 'Platform Admin & IAL Further Maths Tutor',
+      specialization: 'Edexcel Further Pure & Mechanics',
+      availabilityLabel: 'Tue · Thu · Sat',
     },
     {
-      username: 'zyylinnhtet',
-      name: 'Zyy Linn Htet',
-      roleBadge: 'Co-Founder & Design Lead',
-      title: 'UI Architecture & IGCSE / IAL Sciences Tutor',
-      specialization: 'Cambridge 9702 Physics · Design Systems',
-      availabilityLabel: 'Available Mon · Wed · Sat',
+      username: 'zaylynnhtet',
+      name: 'Zay Lynn Htet',
+      roleBadge: 'Co-Founder · Design Lead',
+      title: 'UI Systems & IGCSE / IAL Physics Tutor',
+      specialization: '9702 Physics & Pure Maths',
+      availabilityLabel: 'Mon · Wed · Sat',
     },
     {
       username: 'aungkhant',
       name: 'Aung Khant Kyaw',
-      roleBadge: 'Verified Senior Tutor',
-      title: 'Pearson Edexcel IAL Pure & Mechanics Specialist',
+      roleBadge: 'Senior Tutor',
+      title: 'Pearson Edexcel Pure & Mechanics',
       specialization: 'WMA11–WMA14 · WME01–WME03',
-      availabilityLabel: 'Available Wed · Fri · Sun',
+      availabilityLabel: 'Wed · Fri · Sun',
     },
   ],
   recentActivities: [
     {
+      slug: 'edtech-students-hackathon-2026',
+      category: 'Hackathon',
+      title: 'EdTech Students Hackathon 2026',
+      dateLabel: 'Nov 23 – Dec 6, 2026',
+      location: 'Hinthar International School & Online',
+      summary:
+        'A 2-week hybrid launchpad where student builders aged 14–20 build working AI prototypes. Free entry with workshops, campus catering, and certificates.',
+    },
+    {
       slug: 'oct-nov-exam-venue-visit-2025',
       category: 'Exam Venue Visit',
       title: 'Pre-Session Exam Venue Walkthrough & Candidate Briefing',
-      dateLabel: 'OCT 2025',
+      dateLabel: 'Oct 2025',
       location: 'British Council & Partner Centres',
       summary:
-        'Guided first-time IGCSE and IAL candidates through check-in protocols, lab seating, and calm exam-day routines.',
+        'Walked first-time private candidates through gate arrival windows, calculator checks, and lab seating prior to the October papers.',
     },
     {
       slug: 'ial-modular-maths-intensive-tutoring',
       category: 'Tutoring',
-      title: 'Edexcel WMA11 & WMA12 Past Paper Marathon Cohort',
-      dateLabel: 'SEP 2025',
-      location: 'Live Online & Hybrid Studio',
+      title: 'Edexcel WMA11 & WMA12 Past Paper Marathon',
+      dateLabel: 'Sep 2025',
+      location: 'Hybrid Study Room',
       summary:
-        'Solved 6 full series of P1 and P2 papers live with step-by-step mark scheme breakdowns and UMS target tracking.',
+        'Timed runs through six past series of Pure 1 and Pure 2 with line-by-line mark scheme review and UMS target planning.',
     },
     {
       slug: 'annual-ants-students-meet-2025',
       category: "Student's Meet",
-      title: "The ANTs Annual Scholars & Alumni Student's Meet",
-      dateLabel: 'AUG 2025',
-      location: 'Community Hall',
+      title: "The ANTs Annual Student's Meet & Subject Panels",
+      dateLabel: 'Aug 2025',
+      location: 'Yangon Study Hall',
       summary:
-        'Over 180 students, alumni, and tutors gathered for university application panels, subject study circles, and Q&A.',
+        'An afternoon gathering with 185 students, peer tutors, and alumni covering AS subject choices, university applications, and live Study demos.',
     },
   ],
 };

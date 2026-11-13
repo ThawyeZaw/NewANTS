@@ -93,9 +93,9 @@ export const MOCK_ECOSYSTEM_SHORTCUTS: EcosystemQuickShortcut[] = [
 
 export const MOCK_AUTHENTICATED_USER: MockUserProfile = {
   id: 'usr_zyy_01',
-  name: 'Zyy Linn Htet',
-  username: 'zyylinnhtet',
-  email: 'zyy@the-ants.org',
+  name: 'Zay Lynn Htet',
+  username: 'zaylynnhtet',
+  email: 'zay@the-ants.org',
   role: 'tutor',
   roles: ['student', 'tutor', 'contributor'],
   xp: 2840,

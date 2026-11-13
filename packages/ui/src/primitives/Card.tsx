@@ -20,7 +20,7 @@ const variantClasses: Record<CardVariant, string> = {
   inset:
     'bg-surface-inset text-foreground border border-border shadow-none',
   interactive:
-    'bg-surface-card text-foreground border border-border shadow-[var(--shadow-tier-1)] transition-all duration-200 hover:-translate-y-0.5 hover:border-border-hover hover:shadow-[var(--shadow-tier-2)] cursor-pointer',
+    'bg-surface-card text-foreground border border-border shadow-[var(--shadow-tier-1)] transition-[transform,border-color,box-shadow,background-color] duration-200 hover:-translate-y-0.5 hover:border-border-hover hover:shadow-[var(--shadow-tier-2)] cursor-pointer',
 };
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(

@@ -1,10 +1,5 @@
-const CACHE_NAME = 'ants-flow-pwa-v5';
+const CACHE_NAME = 'ants-flow-pwa-v7';
 const PRECACHE_URLS = [
-  '/pomodoro',
-  '/tasks',
-  '/timetable',
-  '/settings',
-  '/@zyylinnhtet',
   '/manifest.webmanifest',
   '/icons/icon.svg',
   '/scenes/rainy-study.jpg',
@@ -39,11 +34,45 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+  if (
+    url.pathname.startsWith('/_next/webpack-hmr') ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname === '/login' ||
+    url.pathname === '/signup'
+  ) {
+    return;
+  }
+
+  // Content-hashed static assets & media: network-first in dev or fallback to cache seamlessly.
+  if (
+    url.pathname.startsWith('/_next/static/') ||
+    url.pathname.startsWith('/scenes/') ||
+    url.pathname.startsWith('/icons/')
+  ) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response && response.ok && response.type === 'basic') {
+              const clone = response.clone();
+              caches
+                .open(CACHE_NAME)
+                .then((cache) => cache.put(request, clone))
+                .catch(() => undefined);
+            }
+            return response;
+          })
+          .catch(() => cached || new Response('', { status: 503 }));
+        return cached || networkFetch;
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     fetch(request)
       .then((response) => {
-        if (response && response.status === 200 && response.type === 'basic') {
+        if (response && response.ok && response.type === 'basic') {
           const clone = response.clone();
           caches
             .open(CACHE_NAME)

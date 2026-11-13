@@ -563,10 +563,15 @@ function sanitizeStoredProfile(
   const rawPrefs = isRecord(rawTg.preferences) ? rawTg.preferences : {};
   const rawVis = isRecord(candidate.visibility) ? candidate.visibility : {};
 
-  const sanitizedUsername =
+  const rawUsername =
     typeof candidate.username === 'string' && sanitizeAccountUsernameInput(candidate.username).length >= 3
       ? sanitizeAccountUsernameInput(candidate.username)
       : sanitizeAccountUsernameInput(fallbackKey) || fallbackProfile.username;
+
+  const sanitizedUsername =
+    rawUsername === 'zyylinnhtet' && fallbackProfile.id === 'usr_zyy_01'
+      ? fallbackProfile.username
+      : rawUsername;
 
   const tgStatus: TelegramConnectionStatus =
     rawTg.status === 'connected' || rawTg.status === 'pending' || rawTg.status === 'unlinked'
@@ -581,12 +586,42 @@ function sanitizeStoredProfile(
         : fallbackProfile.telegram.handle;
 
   const tutorHandleRaw = candidate.tutorTelegramUsername;
-  const sanitizedTutorTelegram =
+  const rawTutorTelegram =
     typeof tutorHandleRaw === 'string'
       ? tutorHandleRaw.trim()
         ? normalizeTelegramHandle(tutorHandleRaw, '')
         : ''
       : fallbackProfile.tutorTelegramUsername;
+  const sanitizedTutorTelegram =
+    rawTutorTelegram === '@zyy_ants' && fallbackProfile.id === 'usr_zyy_01'
+      ? fallbackProfile.tutorTelegramUsername
+      : rawTutorTelegram;
+
+  const rawName =
+    typeof candidate.name === 'string' && candidate.name.trim()
+      ? candidate.name.trim().slice(0, 80)
+      : fallbackProfile.name;
+  const sanitizedName =
+    rawName === 'Zyy Linn Htet' && fallbackProfile.id === 'usr_zyy_01'
+      ? fallbackProfile.name
+      : rawName;
+
+  const validRoles = Array.isArray(candidate.roles)
+    ? candidate.roles.filter(
+        (r): r is UserRole =>
+          r === 'student' ||
+          r === 'tutor' ||
+          r === 'teacher' ||
+          r === 'contributor' ||
+          r === 'main_contributor' ||
+          r === 'admin'
+      )
+    : fallbackProfile.roles;
+  const resolvedRoles: UserRole[] = validRoles.length > 0 ? validRoles : fallbackProfile.roles;
+  const resolvedRole: UserRole =
+    typeof candidate.role === 'string' && resolvedRoles.includes(candidate.role as UserRole)
+      ? (candidate.role as UserRole)
+      : (resolvedRoles[0] ?? fallbackProfile.role);
 
   return {
     ...fallbackProfile,
@@ -595,10 +630,31 @@ function sanitizeStoredProfile(
         ? candidate.id.trim().slice(0, 64)
         : fallbackProfile.id,
     username: sanitizedUsername,
-    name:
-      typeof candidate.name === 'string' && candidate.name.trim()
-        ? candidate.name.trim().slice(0, 80)
-        : fallbackProfile.name,
+    name: sanitizedName,
+    email:
+      typeof candidate.email === 'string' && candidate.email.trim().includes('@')
+        ? candidate.email.trim().toLowerCase().slice(0, 120)
+        : fallbackProfile.email,
+    memberSince:
+      typeof candidate.memberSince === 'string' && candidate.memberSince.trim()
+        ? candidate.memberSince.trim().slice(0, 20)
+        : fallbackProfile.memberSince,
+    role: resolvedRole,
+    roles: resolvedRoles,
+    xp: typeof candidate.xp === 'number' && Number.isFinite(candidate.xp) ? candidate.xp : fallbackProfile.xp,
+    streakDays:
+      typeof candidate.streakDays === 'number' && Number.isFinite(candidate.streakDays)
+        ? candidate.streakDays
+        : fallbackProfile.streakDays,
+    focusHoursThisMonth:
+      typeof candidate.focusHoursThisMonth === 'number' &&
+      Number.isFinite(candidate.focusHoursThisMonth)
+        ? candidate.focusHoursThisMonth
+        : fallbackProfile.focusHoursThisMonth,
+    completedSessions:
+      typeof candidate.completedSessions === 'number' && Number.isFinite(candidate.completedSessions)
+        ? candidate.completedSessions
+        : fallbackProfile.completedSessions,
     headline:
       typeof candidate.headline === 'string'
         ? candidate.headline.slice(0, 120)
@@ -743,14 +799,16 @@ export function sanitizeAccountStorageState(
     }
   }
 
-  const normalizedActive =
+  const rawNormalizedActive =
     typeof raw.activeUsername === 'string' ? sanitizeAccountUsernameInput(raw.activeUsername) : '';
+  const normalizedActive =
+    rawNormalizedActive === 'zyylinnhtet' ? 'zaylynnhtet' : rawNormalizedActive;
   const activeUsername =
     normalizedActive && profilesByUsername[normalizedActive]
       ? normalizedActive
       : typeof raw.activeUsername === 'string' && profilesByUsername[raw.activeUsername]
         ? raw.activeUsername
-        : Object.keys(profilesByUsername)[0] ?? 'zyylinnhtet';
+        : Object.keys(profilesByUsername)[0] ?? 'zaylynnhtet';
 
   return {
     version: 1,

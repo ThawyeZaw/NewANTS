@@ -65,7 +65,7 @@ export function Checkbox({
           handleToggle();
         }}
         className={cn(
-          'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border transition-all duration-150',
+          'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border transition-colors duration-150',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
           isActive
             ? 'border-primary bg-primary text-on-primary'

@@ -6,7 +6,6 @@ import {
   Calendar,
   CalendarPlus,
   Check,
-  ChevronDown,
   ChevronRight,
   Clock,
   Flag,
@@ -49,6 +48,8 @@ export interface TaskCardViewProps {
   onToggleTagFilter: (tag: string) => void;
   onScheduleTask: (task: PlannerTask) => void;
   onDeleteTask: (taskId: string) => void;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export function TaskCardView({
@@ -64,6 +65,8 @@ export function TaskCardView({
   onToggleTagFilter,
   onScheduleTask,
   onDeleteTask,
+  className,
+  style,
 }: TaskCardViewProps) {
   // Expand subtasks automatically on open tasks that already carry checklist items
   const [subtasksExpanded, setSubtasksExpanded] = useState(
@@ -93,11 +96,13 @@ export function TaskCardView({
   return (
     <article
       aria-label={`${task.priority} task: ${task.title}`}
+      style={style}
       className={cn(
         'group rounded-xl border p-4 transition-colors',
         task.done
           ? 'border-border bg-surface-inset/50'
-          : PRIORITY_CARD_CLASSES[task.priority]
+          : PRIORITY_CARD_CLASSES[task.priority],
+        className
       )}
     >
       {/* Top Row: Priority Completion Ring + Title + Priority Selector + Focus Pin */}
@@ -109,7 +114,7 @@ export function TaskCardView({
           aria-label={task.done ? `Mark "${task.title}" undone` : `Complete "${task.title}"`}
           onClick={() => onToggleTask(task.id)}
           className={cn(
-            'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border-[1.5px] transition-colors',
+            'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[6px] border-[1.5px] transition-colors sm:h-5 sm:w-5',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             task.done
               ? PRIORITY_CHECKED_CLASSES[task.priority]
@@ -159,7 +164,7 @@ export function TaskCardView({
                 title={task.inTodayFocus ? 'Pinned to Today Focus' : 'Pin to Today Focus'}
                 aria-label={task.inTodayFocus ? 'Remove from Today Focus' : 'Pin to Today Focus'}
                 className={cn(
-                  'inline-flex h-6 w-6 items-center justify-center rounded-md border transition-colors',
+                  'inline-flex h-7 w-7 items-center justify-center rounded-md border transition-colors sm:h-6 sm:w-6',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   task.inTodayFocus
                     ? 'border-primary-tint-border bg-primary-tint text-primary'
@@ -241,13 +246,12 @@ export function TaskCardView({
                 type="button"
                 aria-expanded={subtasksExpanded}
                 onClick={() => setSubtasksExpanded((prev) => !prev)}
-                className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-surface-card px-1.5 sm:px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-surface-card px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
               >
-                {subtasksExpanded ? (
-                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
-                ) : (
-                  <ChevronRight className="h-3 w-3" aria-hidden="true" />
-                )}
+                <ChevronRight
+                  className={cn('h-3 w-3 transition-transform duration-200', subtasksExpanded && 'rotate-90')}
+                  aria-hidden="true"
+                />
                 <span>Subtasks</span>
                 {progress.total > 0 && (
                   <span className="font-mono text-[10px] tabular-nums text-foreground">
@@ -261,7 +265,7 @@ export function TaskCardView({
                   type="button"
                   onClick={() => onScheduleTask(task)}
                   title="Schedule onto Smart Timetable"
-                  className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-surface-card px-1.5 sm:px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-surface-card px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
                 >
                   <CalendarPlus className="h-3 w-3" aria-hidden="true" />
                   <span>Schedule</span>
@@ -275,7 +279,7 @@ export function TaskCardView({
                     pomodoros: task.pomodorosPlanned,
                   })}
                   title="Launch in Pomodoro timer"
-                  className="inline-flex h-7 items-center gap-1 rounded-md border border-primary-tint-border bg-primary-tint px-1.5 sm:px-2 text-[11px] font-semibold text-on-primary-tint transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="inline-flex h-8 items-center gap-1 rounded-md border border-primary-tint-border bg-primary-tint px-2 text-[11px] font-semibold text-on-primary-tint transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
                 >
                   <Play className="h-3 w-3" aria-hidden="true" />
                   <span>Focus</span>
@@ -286,7 +290,7 @@ export function TaskCardView({
                 type="button"
                 onClick={() => onDeleteTask(task.id)}
                 aria-label={`Delete "${task.title}"`}
-                className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-foreground-subtle transition-colors hover:bg-destructive-tint hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-foreground-subtle transition-colors hover:bg-destructive-tint hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7 sm:w-7"
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
@@ -294,92 +298,102 @@ export function TaskCardView({
           </div>
 
           {/* Inline Subtasks Checklist (flat divider region inside the task card, zero nested cards) */}
-          {subtasksExpanded && (
-            <div className="mt-3 border-t border-border-subtle pt-2.5">
-              {progress.total > 0 && (
-                <div className="mb-2 flex items-center gap-2">
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-inset">
-                    <div
-                      className="h-full rounded-full bg-primary transition-all duration-200"
-                      style={{ width: `${progress.percent}%` }}
-                    />
+          <div
+            className="ants-accordion"
+            data-open={subtasksExpanded ? 'true' : 'false'}
+            aria-hidden={!subtasksExpanded}
+          >
+            <div className="ants-accordion-inner">
+              <div className="mt-3 border-t border-border-subtle pt-2.5">
+                {progress.total > 0 && (
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-inset">
+                      <div
+                        className="h-full rounded-full bg-primary transition-[width] duration-200"
+                        style={{ width: `${progress.percent}%` }}
+                      />
+                    </div>
+                    <span className="font-mono text-[10px] font-semibold tabular-nums text-foreground-muted">
+                      {progress.completed}/{progress.total} ({progress.percent}%)
+                    </span>
                   </div>
-                  <span className="font-mono text-[10px] font-semibold tabular-nums text-foreground-muted">
-                    {progress.completed}/{progress.total} ({progress.percent}%)
-                  </span>
-                </div>
-              )}
+                )}
 
-              {task.subtasks.length > 0 && (
-                <ul className="space-y-1">
-                  {task.subtasks.map((sub) => (
-                    <li
-                      key={sub.id}
-                      className="group/sub flex items-center gap-2 rounded-md px-1.5 py-1 text-xs transition-colors hover:bg-surface-inset/70"
-                    >
-                      <button
-                        type="button"
-                        role="checkbox"
-                        aria-checked={sub.done}
-                        aria-label={sub.done ? `Mark subtask "${sub.title}" undone` : `Complete subtask "${sub.title}"`}
-                        onClick={() => onToggleSubtask(task.id, sub.id)}
-                        className={cn(
-                          'inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                          sub.done
-                            ? 'border-success bg-success text-on-success'
-                            : 'border-border-hover bg-surface-card text-transparent hover:border-primary'
-                        )}
+                {task.subtasks.length > 0 && (
+                  <ul className="space-y-1">
+                    {task.subtasks.map((sub) => (
+                      <li
+                        key={sub.id}
+                        className="group/sub flex items-center gap-2 rounded-md px-1.5 py-1 text-xs transition-colors hover:bg-surface-inset/70"
                       >
-                        <Check className="h-2.5 w-2.5" strokeWidth={3} aria-hidden="true" />
-                      </button>
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-checked={sub.done}
+                          aria-label={sub.done ? `Mark subtask "${sub.title}" undone` : `Complete subtask "${sub.title}"`}
+                          tabIndex={subtasksExpanded ? undefined : -1}
+                          onClick={() => onToggleSubtask(task.id, sub.id)}
+                          className={cn(
+                            'inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors',
+                            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                            sub.done
+                              ? 'border-success bg-success text-on-success'
+                              : 'border-border-hover bg-surface-card text-transparent hover:border-primary'
+                          )}
+                        >
+                          <Check className="h-2.5 w-2.5" strokeWidth={3} aria-hidden="true" />
+                        </button>
 
-                      <span
-                        onClick={() => onToggleSubtask(task.id, sub.id)}
-                        className={cn(
-                          'min-w-0 flex-1 cursor-pointer select-none leading-snug',
-                          sub.done ? 'text-foreground-muted line-through' : 'text-foreground'
-                        )}
-                      >
-                        {sub.title}
-                      </span>
+                        <span
+                          onClick={() => onToggleSubtask(task.id, sub.id)}
+                          className={cn(
+                            'min-w-0 flex-1 cursor-pointer select-none leading-snug',
+                            sub.done ? 'text-foreground-muted line-through' : 'text-foreground'
+                          )}
+                        >
+                          {sub.title}
+                        </span>
 
-                      <button
-                        type="button"
-                        onClick={() => onDeleteSubtask(task.id, sub.id)}
-                        aria-label={`Remove subtask "${sub.title}"`}
-                        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-foreground-muted opacity-100 transition-opacity hover:bg-destructive-tint hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:opacity-0 sm:group-hover/sub:opacity-100 sm:group-focus-within/sub:opacity-100"
-                      >
-                        <X className="h-3 w-3" aria-hidden="true" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        <button
+                          type="button"
+                          tabIndex={subtasksExpanded ? undefined : -1}
+                          onClick={() => onDeleteSubtask(task.id, sub.id)}
+                          aria-label={`Remove subtask "${sub.title}"`}
+                          className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded text-foreground-muted opacity-100 transition-opacity hover:bg-destructive-tint hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:opacity-0 sm:group-hover/sub:opacity-100 sm:group-focus-within/sub:opacity-100"
+                        >
+                          <X className="h-3 w-3" aria-hidden="true" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
-              {/* Inline Add Subtask Row */}
-              <form onSubmit={handleAddSubtaskSubmit} className="mt-2 flex items-center gap-1.5">
-                <input
-                  type="text"
-                  value={newSubtaskTitle}
-                  onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                  maxLength={120}
-                  placeholder="Add subtask step..."
-                  aria-label={`Add subtask to "${task.title}"`}
-                  className="h-8 min-w-0 flex-1 rounded-md border border-border bg-surface-inset/50 px-2.5 text-xs text-foreground placeholder:text-foreground-muted focus:border-primary focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <button
-                  type="submit"
-                  disabled={!newSubtaskTitle.trim()}
-                  aria-label="Add subtask"
-                  className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-surface-card px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:border-border-hover hover:bg-surface-inset focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"
-                >
-                  <Plus className="h-3 w-3" aria-hidden="true" />
-                  <span>Step</span>
-                </button>
-              </form>
+                {/* Inline Add Subtask Row */}
+                <form onSubmit={handleAddSubtaskSubmit} className="mt-2 flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    value={newSubtaskTitle}
+                    onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                    maxLength={120}
+                    tabIndex={subtasksExpanded ? undefined : -1}
+                    placeholder="Add subtask step..."
+                    aria-label={`Add subtask to "${task.title}"`}
+                    className="h-8 min-w-0 flex-1 rounded-md border border-border bg-surface-inset/50 px-2.5 text-xs text-foreground placeholder:text-foreground-muted focus:border-primary focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newSubtaskTitle.trim()}
+                    tabIndex={subtasksExpanded ? undefined : -1}
+                    aria-label="Add subtask"
+                    className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-surface-card px-2.5 text-[11px] font-semibold text-foreground transition-colors hover:border-border-hover hover:bg-surface-inset focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40"
+                  >
+                    <Plus className="h-3 w-3" aria-hidden="true" />
+                    <span>Step</span>
+                  </button>
+                </form>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </article>

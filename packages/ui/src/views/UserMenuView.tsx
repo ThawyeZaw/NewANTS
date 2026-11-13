@@ -94,7 +94,7 @@ export function UserMenuView({
   if (!user) {
     return (
       <div className={cn('inline-flex shrink-0 items-center gap-1.5 sm:gap-2', className)}>
-        <span className="hidden sm:inline-flex">
+        <span className="hidden lg:inline-flex">
           <Badge variant="editorial" mono>
             GUEST MODE
           </Badge>
@@ -129,7 +129,7 @@ export function UserMenuView({
         aria-expanded={open}
         aria-haspopup="true"
         className={cn(
-          'inline-flex items-center gap-2.5 rounded-full border p-1 pr-3 text-left transition-all duration-150',
+          'inline-flex items-center gap-2.5 rounded-full border p-1 pr-3 text-left transition-[color,background-color,border-color,transform] duration-150',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
           open
             ? 'border-primary bg-primary-tint/50'
@@ -161,7 +161,7 @@ export function UserMenuView({
         <div
           role="menu"
           aria-label="User Account Menu"
-          className="absolute right-0 z-50 mt-2 w-72 origin-top-right rounded-2xl border border-border-hover bg-surface-elevated p-3.5 text-foreground shadow-[var(--shadow-tier-3)]"
+          className="ants-panel-enter absolute right-0 z-50 mt-2 w-72 origin-top-right rounded-2xl border border-border-hover bg-surface-elevated p-3.5 text-foreground shadow-[var(--shadow-tier-3)]"
         >
           {/* Identity & Multi-Role Header */}
           <div className="border-b border-border pb-3">

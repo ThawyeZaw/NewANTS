@@ -87,7 +87,7 @@ export function AppSwitcher({
         aria-label="Switch ANTs Ecosystem App"
         title="The ANTs Ecosystem Switcher (The ANTs · Flow · Study)"
         className={cn(
-          'inline-flex h-9 w-9 items-center justify-center rounded-lg border transition-all duration-150',
+          'inline-flex h-9 w-9 items-center justify-center rounded-lg border transition-[color,background-color,border-color,transform] duration-150',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.97]',
           open
             ? 'border-primary bg-primary-tint text-primary'
@@ -102,7 +102,7 @@ export function AppSwitcher({
         <div
           role="menu"
           aria-label="The ANTs Ecosystem Applications"
-          className="absolute right-0 z-50 mt-2 w-80 sm:w-96 origin-top-right rounded-2xl border border-border-hover bg-surface-elevated p-4 text-foreground shadow-[var(--shadow-tier-3)]"
+          className="ants-panel-enter absolute right-0 z-50 mt-2 w-80 sm:w-96 origin-top-right rounded-2xl border border-border-hover bg-surface-elevated p-4 text-foreground shadow-[var(--shadow-tier-3)]"
         >
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div>

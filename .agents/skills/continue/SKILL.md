@@ -1,13 +1,13 @@
 ---
 name: continue
 description: >-
-  Resume incremental development of The ANTs ecosystem by building, testing, and verifying the single next component in progress.md for either Thaw (Full-Stack) or Zyy (UI Prototypes).
+  Resume incremental development of The ANTs ecosystem by building, testing, and verifying the single next component in progress.md for either Thaw (Full-Stack) or Zay (UI Prototypes).
   Activate whenever the user types /continue or asks to pick up the next queued task from progress.md.
 ---
 
 # Continue Incremental Build (`/continue`)
 
-Executes the strict **one-component-at-a-time** AI development loop for The ANTs monorepo across our dual-developer tracks (**Thaw Ye Zaw** & **Zyy Linn Htet**).
+Executes the strict **one-component-at-a-time** AI development loop for The ANTs monorepo across our dual-developer tracks (**Thaw Ye Zaw** & **Zay Lynn Htet**).
 
 ## Step-by-Step Runbook
 

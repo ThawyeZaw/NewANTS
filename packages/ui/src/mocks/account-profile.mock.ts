@@ -11,9 +11,9 @@ import {
 
 export const ZYY_PROFILE_MOCK: SharedUserProfileData = {
   id: 'usr_zyy_01',
-  name: 'Zyy Linn Htet',
-  username: 'zyylinnhtet',
-  email: 'zyy@the-ants.org',
+  name: 'Zay Lynn Htet',
+  username: 'zaylynnhtet',
+  email: 'zay@the-ants.org',
   headline: 'Front-End & UI Lead · Pearson Edexcel IAL Peer Tutor',
   bio: 'Designing calm academic productivity tools at The ANTs and mentoring IGCSE & IAL students through structured weekly past-paper walkthroughs and problem-first intuition.',
   institution: 'The ANTs Academic Studio',
@@ -29,7 +29,7 @@ export const ZYY_PROFILE_MOCK: SharedUserProfileData = {
   focusHoursThisMonth: 42.5,
   completedSessions: 94,
   hourlyRateLabel: '25,000 MMK / hr',
-  tutorTelegramUsername: '@zyy_ants',
+  tutorTelegramUsername: '@zay_ants',
   taughtSubjects: ['WMA11 Pure 1', 'WMA12 Pure 2', '9702 AS Physics', '0580 IGCSE Maths'],
   tutorSchedule: applyTutorSchedulePreset('balanced-mentor'),
   portfolioItems: [
@@ -251,17 +251,17 @@ export const STUDENT_PROFILE_MOCK: SharedUserProfileData = {
 };
 
 export const MOCK_SHARED_PROFILES: Record<string, SharedUserProfileData> = {
-  zyylinnhtet: ZYY_PROFILE_MOCK,
+  zaylynnhtet: ZYY_PROFILE_MOCK,
   thawyezaw: THAW_PROFILE_MOCK,
   minkhant: STUDENT_PROFILE_MOCK,
 };
 
 export function createInitialAccountStorageState(
-  activeUsername: string = 'zyylinnhtet'
+  activeUsername: string = 'zaylynnhtet'
 ): AccountProfileStorageState {
   return {
     version: 1,
-    activeUsername: MOCK_SHARED_PROFILES[activeUsername] ? activeUsername : 'zyylinnhtet',
+    activeUsername: MOCK_SHARED_PROFILES[activeUsername] ? activeUsername : 'zaylynnhtet',
     profilesByUsername: structuredClone(MOCK_SHARED_PROFILES),
   };
 }

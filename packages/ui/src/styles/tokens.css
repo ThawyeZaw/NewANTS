@@ -119,6 +119,16 @@
   --space-2xl: 3rem;
   --space-3xl: 4rem;
   --container-max: 1280px;
+
+  /* Web Transition & Micro-Interaction Choreography (Signature Studio timing & expo curves) */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-instant: 150ms;
+  --duration-normal: 280ms;
+  --duration-route: 460ms;
+  --duration-reveal: 520ms;
+  --duration-workspace: 260ms;
 }
 
 .dark,
@@ -334,5 +344,488 @@ a {
 .metric-mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+ * Web Transitions, Masked Curtain Sweep, Staggered Waterfalls & Gliding Chrome
+ * Sticky-safe: entry classes finish at transform: none; filter: none;
+ * ============================================================================ */
+@keyframes antsMainEnter {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(22px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@keyframes antsHeroEnter {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(26px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@keyframes antsClipReveal {
+  from {
+    opacity: 0.25;
+    clip-path: inset(0 0 100% 0);
+    transform: scale(1.045);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+
+@keyframes antsStaggerIn {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(22px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@keyframes antsWorkspaceEnter {
+  from {
+    opacity: 0.15;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes antsFadeEnter {
+  from {
+    opacity: 0.12;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes antsBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes antsModalPanelIn {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: scale(0.93) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@keyframes antsDrawerRightIn {
+  from {
+    opacity: 0.25;
+    transform: translateX(36px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes antsDrawerLeftIn {
+  from {
+    opacity: 0.25;
+    transform: translateX(-36px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes antsBottomSheetIn {
+  from {
+    opacity: 0.15;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes antsPanelEnter {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+.ants-main-enter {
+  animation: antsMainEnter var(--duration-route, 460ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.ants-hero-enter {
+  animation: antsHeroEnter 540ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.ants-clip-reveal {
+  animation: antsClipReveal 580ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.ants-stagger-item {
+  animation: antsStaggerIn 460ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  animation-delay: min(calc(var(--stagger-index, 0) * 60ms), 480ms);
+}
+
+.ants-workspace-enter {
+  animation: antsWorkspaceEnter var(--duration-workspace, 260ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.ants-fade-enter {
+  animation: antsFadeEnter var(--duration-workspace, 260ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.ants-modal-backdrop-in {
+  animation: antsBackdropIn 220ms ease-out;
+}
+
+.ants-modal-panel-in {
+  animation: antsModalPanelIn 320ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.ants-drawer-right-in {
+  animation: antsDrawerRightIn 340ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.ants-drawer-left-in {
+  animation: antsDrawerLeftIn 320ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.ants-bottom-sheet-in {
+  animation: antsBottomSheetIn 340ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+.ants-panel-enter {
+  animation: antsPanelEnter 300ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+/* Tactile Card Elevation & Gliding Active Pill/Underline Indicator */
+.ants-card-interactive {
+  transition:
+    transform 280ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color 220ms ease,
+    box-shadow 280ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    background-color 220ms ease;
+}
+
+.ants-card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-tier-2);
+}
+
+.ants-card-interactive:active {
+  transform: translateY(-1px) scale(0.992);
+}
+
+.ants-glide-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform, width, height;
+}
+
+.ants-glide-indicator[data-animate='true'] {
+  transition:
+    transform 300ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1)),
+    width 280ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    height 280ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 160ms ease;
+}
+
+.ants-glide-host[data-gliding-ready='true'] .ants-glide-item[data-active='true'] {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  text-decoration-line: none;
+}
+
+/* CSS Grid Accordion (0fr -> 1fr): layout-safe height reveal + tab-order isolation */
+.ants-accordion {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    grid-template-rows var(--duration-normal, 280ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 220ms ease,
+    visibility 0s linear 280ms;
+}
+
+.ants-accordion[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    grid-template-rows var(--duration-normal, 280ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 220ms ease,
+    visibility 0s linear 0s;
+}
+
+.ants-accordion-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* One-shot Scroll Reveal + Cascading Child Waterfall */
+.ants-reveal {
+  transition:
+    opacity 440ms ease-out,
+    filter 460ms ease-out,
+    transform var(--duration-reveal, 520ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+  transition-delay: var(--ants-reveal-delay, 0ms);
+}
+
+.ants-reveal[data-reveal-state='pending'] {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(30px) scale(0.975);
+}
+
+.ants-reveal[data-reveal-state='visible'],
+.ants-reveal[data-reveal-state='ready'] {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+.ants-reveal[data-reveal-state='pending'] .ants-reveal-item {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(22px) scale(0.975);
+}
+
+.ants-reveal[data-reveal-state='visible'] .ants-reveal-item {
+  animation: antsStaggerIn 480ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  animation-delay: min(calc(var(--stagger-index, 0) * 65ms), 480ms);
+}
+
+/* Top Hairline Route Progress + Non-Blocking Masked Curtain Sweep */
+.ants-route-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.ants-route-bar[data-variant='showcase'] {
+  height: 3px;
+}
+
+.ants-route-bar[data-variant='workspace'] {
+  height: 2.5px;
+}
+
+.ants-route-bar-indicator {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  background-color: var(--primary);
+  opacity: 0;
+  transform: scaleX(0);
+  transition: none;
+}
+
+.ants-route-bar[data-variant='showcase'] .ants-route-bar-indicator {
+  box-shadow: 0 0 14px var(--ring);
+}
+
+.ants-route-bar-indicator[data-state='sweeping'] {
+  opacity: 1;
+  transform: scaleX(0.74);
+  transition:
+    transform 650ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 120ms ease-out;
+}
+
+.ants-route-bar-indicator[data-state='finishing'] {
+  opacity: 1;
+  transform: scaleX(1);
+  transition:
+    transform 180ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 120ms ease-out;
+}
+
+.ants-route-bar-indicator[data-state='fading'] {
+  opacity: 0;
+  transform: scaleX(1);
+  transition: opacity 260ms ease-out;
+}
+
+.ants-route-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+  transition: none;
+}
+
+.ants-route-curtain[data-variant='showcase'] {
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    var(--surface-card) 14%,
+    var(--background) 84%,
+    var(--primary-tint) 99%,
+    var(--primary) 100%
+  );
+  box-shadow: inset -6px 0 24px var(--ring);
+}
+
+.ants-route-curtain[data-variant='workspace'] {
+  height: 56px;
+  bottom: auto;
+  background: linear-gradient(180deg, var(--primary-tint) 0%, transparent 100%);
+}
+
+.ants-route-curtain[data-state='sweeping'] {
+  opacity: 0.94;
+  clip-path: inset(0 14% 0 0);
+  transition:
+    clip-path 380ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 150ms ease-out;
+}
+
+.ants-route-curtain[data-state='finishing'] {
+  opacity: 0.96;
+  clip-path: inset(0 0% 0 0);
+  transition:
+    clip-path 180ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 120ms ease-out;
+}
+
+.ants-route-curtain[data-state='fading'] {
+  opacity: 0;
+  clip-path: inset(0 0% 0 100%);
+  transition:
+    clip-path 420ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 320ms ease-out 90ms;
+}
+
+/* Transient manual theme-switch cross-fade (added briefly inside persistThemeMode) */
+:where(.ants-theme-transitioning),
+:where(.ants-theme-transitioning *:not(.ants-accordion):not(.ants-reveal):not(.ants-route-bar-indicator):not(.ants-route-curtain):not(.ants-glide-indicator):not(svg):not(svg *)) {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 240ms;
+  transition-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .ants-main-enter,
+  .ants-hero-enter,
+  .ants-clip-reveal,
+  .ants-stagger-item,
+  .ants-workspace-enter,
+  .ants-fade-enter,
+  .ants-modal-backdrop-in,
+  .ants-modal-panel-in,
+  .ants-drawer-right-in,
+  .ants-drawer-left-in,
+  .ants-bottom-sheet-in,
+  .ants-panel-enter {
+    animation: none;
+  }
+
+  .ants-card-interactive,
+  .ants-card-interactive:hover,
+  .ants-card-interactive:active {
+    transform: none;
+    transition-duration: 1ms;
+  }
+
+  .ants-glide-indicator,
+  .ants-glide-indicator[data-animate='true'] {
+    transition-duration: 1ms;
+  }
+
+  .ants-reveal,
+  .ants-reveal[data-reveal-state='pending'],
+  .ants-reveal[data-reveal-state='visible'],
+  .ants-reveal[data-reveal-state='ready'],
+  .ants-reveal[data-reveal-state='pending'] .ants-reveal-item,
+  .ants-reveal[data-reveal-state='visible'] .ants-reveal-item {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    animation: none;
+    transition: opacity 150ms ease;
+    transition-delay: 0ms;
+  }
+
+  .ants-accordion,
+  .ants-accordion[data-open='true'] {
+    transition-duration: 1ms;
+    transition-delay: 0ms;
+  }
+
+  .ants-route-bar-indicator,
+  .ants-route-bar-indicator[data-state='sweeping'],
+  .ants-route-bar-indicator[data-state='finishing'],
+  .ants-route-bar-indicator[data-state='fading'] {
+    transition-duration: 80ms;
+  }
+
+  .ants-route-curtain,
+  .ants-route-curtain[data-state='sweeping'],
+  .ants-route-curtain[data-state='finishing'],
+  .ants-route-curtain[data-state='fading'] {
+    display: none;
+  }
+
+  :where(.ants-theme-transitioning),
+  :where(.ants-theme-transitioning *:not(.ants-accordion):not(.ants-reveal):not(.ants-route-bar-indicator):not(.ants-route-curtain):not(.ants-glide-indicator):not(svg):not(svg *)) {
+    transition-duration: 1ms;
+  }
 }
 

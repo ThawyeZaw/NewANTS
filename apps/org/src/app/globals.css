@@ -2,3 +2,240 @@
 @import '@ants/ui/styles/tokens.css';
 @source '../../../../packages/ui/src';
 @source '../../../../packages/calculator/src';
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    caret-color: var(--primary-solid);
+    scrollbar-color: var(--border-hover) transparent;
+    scrollbar-width: thin;
+  }
+
+  ::selection {
+    background-color: var(--primary-tint);
+    color: var(--on-primary-tint);
+  }
+}
+
+/* ============================================================================
+ * Stage Z2.1 Visual Landing Animations — Orbit Diagram, Bento Hover & Timeline
+ * ============================================================================ */
+@keyframes antsOrbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes antsPulseGlow {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes antsSprintProgress {
+  0% {
+    transform: scaleX(0.82);
+  }
+  50% {
+    transform: scaleX(0.94);
+  }
+  100% {
+    transform: scaleX(0.82);
+  }
+}
+
+.ants-orbit-ring-slow {
+  transform-origin: center;
+  animation: antsOrbitSpin 38s linear infinite;
+}
+
+.ants-orbit-ring-reverse {
+  transform-origin: center;
+  animation: antsOrbitSpin 28s linear infinite reverse;
+}
+
+.ants-pulse-node {
+  transform-origin: center;
+  animation: antsPulseGlow 3.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.ants-bento-tile {
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ants-bento-tile:hover {
+  transform: translateY(-2px);
+}
+
+.ants-bento-tile:hover .ants-bento-bar {
+  transform: scaleX(1.05);
+}
+
+.ants-bento-bar {
+  transform-origin: left center;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ants-sprint-fill {
+  transform-origin: left center;
+  animation: antsSprintProgress 5s ease-in-out infinite;
+}
+
+/* ============================================================================
+ * Stage Z2.4 Editorial Magazine Articles (/articles) — Glass Toolbar,
+ * Typographic SVG Covers, Hover-to-Reveal Summaries & Author Avatar Chips
+ * ============================================================================ */
+.ants-article-toolbar-glass {
+  background-color: color-mix(in srgb, var(--surface-card) 86%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.ants-article-card {
+  transition:
+    transform 280ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color 220ms ease,
+    box-shadow 280ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    background-color 220ms ease;
+}
+
+.ants-article-card:hover,
+.ants-article-card:focus-within {
+  transform: translateY(-3px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-tier-2);
+}
+
+.ants-article-cover {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      120% 95% at 88% 12%,
+      color-mix(in srgb, var(--primary-tint) 65%, transparent) 0%,
+      transparent 68%
+    ),
+    var(--surface-inset);
+}
+
+.ants-article-cover-svg {
+  transform-origin: center;
+  transition:
+    transform 420ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    opacity 280ms ease;
+}
+
+.ants-article-card:hover .ants-article-cover-svg,
+.ants-article-card:focus-within .ants-article-cover-svg {
+  transform: scale(1.035);
+}
+
+/* Hover-to-reveal summary drawer: expands smoothly on desktop hover/focus,
+ * stays visible on touch/coarse pointers so mobile readers never lose context */
+.ants-article-summary-reveal {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: none;
+}
+
+.ants-article-summary-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ants-article-summary-reveal[data-reveal-mode='hover'] {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(6px);
+    transition:
+      grid-template-rows 300ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+      opacity 220ms ease,
+      transform 280ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+  }
+
+  .ants-article-card:hover .ants-article-summary-reveal[data-reveal-mode='hover'],
+  .ants-article-card:focus-within .ants-article-summary-reveal[data-reveal-mode='hover'],
+  .ants-article-summary-reveal[data-pinned='true'] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ants-author-chip {
+  transition:
+    transform 220ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1)),
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 220ms ease;
+}
+
+.ants-author-chip:hover,
+.ants-author-chip:focus-visible {
+  transform: translateY(-1px);
+  border-color: var(--primary-tint-border);
+  background-color: var(--surface-inset);
+}
+
+.ants-author-avatar {
+  transition:
+    transform 240ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1)),
+    box-shadow 240ms ease;
+}
+
+.ants-author-chip:hover .ants-author-avatar,
+.ants-article-card:hover .ants-author-avatar {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.ants-author-arrow {
+  transition:
+    transform 220ms var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1)),
+    color 180ms ease;
+}
+
+.ants-author-chip:hover .ants-author-arrow {
+  transform: translate(1.5px, -1.5px);
+  color: var(--primary-solid);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ants-orbit-ring-slow,
+  .ants-orbit-ring-reverse,
+  .ants-pulse-node,
+  .ants-sprint-fill {
+    animation: none;
+  }
+
+  .ants-bento-tile:hover,
+  .ants-article-card:hover,
+  .ants-article-card:focus-within,
+  .ants-article-card:hover .ants-article-cover-svg,
+  .ants-author-chip:hover,
+  .ants-author-chip:hover .ants-author-avatar,
+  .ants-article-card:hover .ants-author-avatar {
+    transform: none;
+  }
+
+  .ants-article-summary-reveal[data-reveal-mode='hover'] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

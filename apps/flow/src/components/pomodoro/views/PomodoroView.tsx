@@ -2,7 +2,16 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Image as ImageIcon, Maximize2, Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
-import { cn, type MockUserProfile } from '@ants/ui';
+import {
+  THEME_CHANGE_EVENT,
+  THEME_STORAGE_KEY,
+  ThemeToggle,
+  cn,
+  persistThemeMode,
+  readStoredThemeMode,
+  useSlidingIndicator,
+  type MockUserProfile,
+} from '@ants/ui';
 import {
   PHASE_LABELS,
   abandonInterval,
@@ -73,7 +82,7 @@ export function PomodoroView({
   initialState,
   persistToLocalStorage = true,
   storageKey = POMODORO_STORAGE_KEY,
-  user = null,
+  user,
   onSessionLogged,
   onSettingsChange,
   onTasksChange,
@@ -104,6 +113,19 @@ export function PomodoroView({
     if (persistToLocalStorage) {
       const saved = loadPomodoroState(storageKey);
       if (saved) baseState = saved;
+    }
+    const currentTheme = readStoredThemeMode('light');
+    if (baseState.settings.appearance.mode !== currentTheme) {
+      baseState = {
+        ...baseState,
+        settings: {
+          ...baseState.settings,
+          appearance: {
+            ...baseState.settings.appearance,
+            mode: currentTheme,
+          },
+        },
+      };
     }
     if (typeof window !== 'undefined' && window.location.search) {
       const params = new URLSearchParams(window.location.search);
@@ -144,14 +166,50 @@ export function PomodoroView({
   }, [state, hydrated, persistToLocalStorage, storageKey]);
 
   useEffect(() => {
+    if (!hydrated) return;
     const { mode, accent, font } = state.settings.appearance;
     applyAppearance(mode, accent, font);
-    if (mode !== 'system' || typeof window === 'undefined' || !window.matchMedia) return;
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = () => applyAppearance(mode, accent, font);
-    media.addEventListener('change', onChange);
-    return () => media.removeEventListener('change', onChange);
-  }, [state.settings.appearance]);
+  }, [hydrated, state.settings.appearance]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncExternalTheme = () => {
+      const nextMode = readStoredThemeMode('light');
+      const current = stateRef.current;
+      if (resolveThemeMode(current.settings.appearance.mode) === nextMode) return;
+      commit(
+        applySettings(current, {
+          ...current.settings,
+          appearance: {
+            ...current.settings.appearance,
+            mode: nextMode,
+          },
+        })
+      );
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === null || event.key === THEME_STORAGE_KEY) {
+        syncExternalTheme();
+      }
+    };
+    const onVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncExternalTheme();
+      }
+    };
+    window.addEventListener(THEME_CHANGE_EVENT, syncExternalTheme);
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('focus', syncExternalTheme);
+    window.addEventListener('pageshow', syncExternalTheme);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, syncExternalTheme);
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('focus', syncExternalTheme);
+      window.removeEventListener('pageshow', syncExternalTheme);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [commit]);
 
   const alertTransition = useCallback((endedPhase: PomodoroPhase, nextPhase: PomodoroPhase, settings: PomodoroSettings) => {
     if (settings.sound.enabled) {
@@ -337,6 +395,10 @@ export function PomodoroView({
 
   const updateSettings = useCallback(
     (next: PomodoroSettings) => {
+      const nextResolvedMode = resolveThemeMode(next.appearance.mode);
+      if (resolveThemeMode(stateRef.current.settings.appearance.mode) !== nextResolvedMode) {
+        persistThemeMode(nextResolvedMode);
+      }
       commit(applySettings(stateRef.current, next));
       onSettingsChange?.(next);
     },
@@ -489,6 +551,26 @@ export function PomodoroView({
         ? state.settings.shortBreakMinutes
         : state.settings.longBreakMinutes;
 
+  const sectionTabsRef = useRef<HTMLDivElement | null>(null);
+  const {
+    rect: sectionRect,
+    ready: sectionReady,
+    animate: sectionAnimate,
+  } = useSlidingIndicator(sectionTabsRef, tab, {
+    activeSelector: '[role="tab"][aria-selected="true"]',
+  });
+  const sectionIndicatorReady = sectionReady && sectionRect.visible;
+
+  const intervalTabsRef = useRef<HTMLDivElement | null>(null);
+  const {
+    rect: intervalRect,
+    ready: intervalReady,
+    animate: intervalAnimate,
+  } = useSlidingIndicator(intervalTabsRef, state.timer.phase, {
+    activeSelector: '[role="tab"][aria-selected="true"]',
+  });
+  const intervalIndicatorReady = intervalReady && intervalRect.visible;
+
   const startLabel = isRunning ? 'Pause' : state.timer.status === 'paused' ? 'Resume' : 'Start';
   const atmosphereLabel = [
     activeScene.id !== 'none' ? activeScene.label : null,
@@ -500,19 +582,102 @@ export function PomodoroView({
   return (
     <>
       <FlowShellView
-        activeTab={tab}
-        onTabChange={setTab}
+        activeSection="pomodoro"
+        tabs={[]}
         timerBadge={state.timer.status !== 'idle' ? timeLabel : null}
         backgroundImageSrc={
           tab === 'timer' && state.settings.ambient.showSceneOnTimer ? activeScene.imageSrc : null
         }
         user={user}
         onOpenSettings={() => openSettings()}
+        headerActions={
+          <ThemeToggle
+            theme={hydrated ? resolveThemeMode(state.settings.appearance.mode) : undefined}
+            onThemeChange={(nextTheme) =>
+              updateSettings({
+                ...stateRef.current.settings,
+                appearance: {
+                  ...stateRef.current.settings.appearance,
+                  mode: nextTheme,
+                },
+              })
+            }
+          />
+        }
       >
+      <div
+        ref={sectionTabsRef}
+        role="tablist"
+        aria-label="Pomodoro sections"
+        data-gliding-ready={sectionIndicatorReady ? 'true' : 'false'}
+        className="ants-glide-host relative mx-auto mb-6 flex max-w-xl items-center justify-center gap-6 border-b border-border sm:mb-8"
+      >
+        <span
+          aria-hidden="true"
+          data-animate={sectionAnimate ? 'true' : 'false'}
+          className="ants-glide-indicator z-0 rounded-full bg-primary"
+          style={{
+            transform: `translate3d(${sectionRect.x}px, ${Math.max(0, sectionRect.y + sectionRect.height - 2)}px, 0)`,
+            width: `${sectionRect.width}px`,
+            height: '2px',
+            opacity: sectionIndicatorReady ? 1 : 0,
+          }}
+        />
+        {(
+          [
+            { id: 'timer', label: 'Timer' },
+            { id: 'stats', label: 'Stats' },
+          ] as const
+        ).map((item) => {
+          const active = tab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              data-active={active ? 'true' : 'false'}
+              onClick={() => setTab(item.id)}
+              className={cn(
+                'ants-glide-item relative z-10 -mb-px inline-flex min-h-[40px] items-center gap-2 border-b-2 px-2 pb-2.5 text-sm font-semibold transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
+                active
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-foreground-muted hover:text-foreground'
+              )}
+            >
+              <span>{item.label}</span>
+              {item.id === 'timer' && !active && state.timer.status !== 'idle' && (
+                <span className="rounded-full bg-primary-tint px-1.5 py-0.5 font-mono text-[11px] font-semibold tabular-nums text-on-primary-tint">
+                  {timeLabel}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {tab === 'timer' ? (
-        <div className="mx-auto max-w-xl">
+        <div key="timer" className="ants-panel-enter mx-auto max-w-xl">
           <section aria-label="Timer" className="flex flex-col items-center">
-            <div role="tablist" aria-label="Interval" className="inline-flex rounded-lg bg-surface-inset p-1">
+            <div
+              ref={intervalTabsRef}
+              role="tablist"
+              aria-label="Interval"
+              data-gliding-ready={intervalIndicatorReady ? 'true' : 'false'}
+              className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
+            >
+              <span
+                aria-hidden="true"
+                data-animate={intervalAnimate ? 'true' : 'false'}
+                className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
+                style={{
+                  transform: `translate3d(${intervalRect.x}px, ${intervalRect.y}px, 0)`,
+                  width: `${intervalRect.width}px`,
+                  height: `${intervalRect.height}px`,
+                  opacity: intervalIndicatorReady ? 1 : 0,
+                }}
+              />
               {PHASES.map((phase) => {
                 const active = state.timer.phase === phase;
                 return (
@@ -521,10 +686,11 @@ export function PomodoroView({
                     type="button"
                     role="tab"
                     aria-selected={active}
+                    data-active={active ? 'true' : 'false'}
                     onClick={() => selectPhase(phase)}
                     className={cn(
-                      'rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors sm:px-4',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'ants-glide-item relative z-10 min-h-[38px] rounded-md px-3 py-1.5 text-sm font-medium transition-colors sm:px-4',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
                       active ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]' : 'text-foreground-muted hover:text-foreground'
                     )}
                   >
@@ -536,7 +702,7 @@ export function PomodoroView({
             </div>
 
             <TimerRingView
-              className="mt-10"
+              className="mt-7 sm:mt-9"
               progress={progress}
               timeLabel={timeLabel}
               remainingMs={remainingMs}
@@ -547,7 +713,7 @@ export function PomodoroView({
               longBreakInterval={state.settings.longBreakInterval}
             />
 
-            <div className="mt-10 flex items-center gap-6">
+            <div className="mt-8 flex items-center gap-6 sm:mt-10">
               <button type="button" onClick={reset} aria-label="Reset" title="Reset (R)" className={roundButton}>
                 <RotateCcw className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -603,13 +769,15 @@ export function PomodoroView({
           />
         </div>
       ) : (
-        <PomodoroStatsView
-          history={state.history}
-          dailyGoal={state.settings.dailyGoal}
-          workMinutes={state.settings.workMinutes}
-          now={now}
-          onClearHistory={() => commit({ ...stateRef.current, history: [] })}
-        />
+        <div key="stats" className="ants-panel-enter">
+          <PomodoroStatsView
+            history={state.history}
+            dailyGoal={state.settings.dailyGoal}
+            workMinutes={state.settings.workMinutes}
+            now={now}
+            onClearHistory={() => commit({ ...stateRef.current, history: [] })}
+          />
+        </div>
       )}
       </FlowShellView>
 

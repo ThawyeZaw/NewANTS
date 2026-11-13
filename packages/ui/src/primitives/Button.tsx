@@ -66,7 +66,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={isDisabled}
       className={cn(
-        'inline-flex items-center justify-center font-semibold transition-all duration-150 select-none',
+        'inline-flex items-center justify-center font-semibold transition-[background-color,border-color,color,box-shadow,transform] duration-150 select-none',
         'active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         'disabled:pointer-events-none disabled:bg-surface-inset disabled:text-foreground-muted disabled:border-border disabled:shadow-none disabled:opacity-100',
         variantClasses[variant],
@@ -81,7 +81,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ) : (
         leftIcon && <span className="inline-flex shrink-0">{leftIcon}</span>
       )}
-      {children && <span>{children}</span>}
+      {children && <span className="inline-flex items-center gap-1.5 leading-none">{children}</span>}
       {!isLoading && rightIcon && <span className="inline-flex shrink-0">{rightIcon}</span>}
     </button>
   );

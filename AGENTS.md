@@ -12,21 +12,21 @@ Identify which developer is running the current session and **read your correspo
 | Developer | Role | Branch Prefix | Dedicated Role Manual | Track in `progress.md` |
 | :--- | :--- | :--- | :--- | :--- |
 | **Thaw Ye Zaw (Thorin)** | **Main Full-Stack Developer & Platform Admin** (DB, Hono API, Auth, Server Actions, Business Logic, Smart Containers, Admin CMS) | `feat/*` | [`AGENTS.thaw.md`](./AGENTS.thaw.md) | **`[THAW]`** |
-| **Zyy Linn Htet** | **Front-End & UI Polishing Lead** (Builds **UI Prototypes first** with mock props, Stitch Light/Dark styling, animations, `the-ants.org` showcase UI) | `ui/*` | [`AGENTS.zyy.md`](./AGENTS.zyy.md) | **`[ZYY]`** |
+| **Zay Lynn Htet** | **Front-End & UI Polishing Lead** (Builds **UI Prototypes first** with mock props, Stitch Light/Dark styling, animations, `the-ants.org` showcase UI) | `ui/*` | [`AGENTS.zyy.md`](./AGENTS.zyy.md) | **`[ZYY]`** |
 
 ---
 
-## 2. How Thaw & Zyy Work in Parallel Without Breaking the App
+## 2. How Thaw & Zay Work in Parallel Without Breaking the App
 
-We follow a strict **UI-Prototype-First (`Zyy`) → Full-Stack Wiring (`Thaw`)** separation pattern:
+We follow a strict **UI-Prototype-First (`Zay` · `[ZYY]`) → Full-Stack Wiring (`Thaw` · `[THAW]`)** separation pattern:
 
 1. **Presentational (`*View.tsx`) vs. Smart Container (`*Container.tsx` / `page.tsx`) Split:**
-   - **Zyy Linn Htet** builds and polishes **pure presentational UI components** (`src/components/**/views/*View.tsx`) and mock fixtures (`src/mocks/*.mock.ts`).
+   - **Zay Lynn Htet** builds and polishes **pure presentational UI components** (`src/components/**/views/*View.tsx`) and mock fixtures (`src/mocks/*.mock.ts`).
    - Every `*View.tsx` starts with `'use client';`, accepts strictly typed props (with default mock data so it renders standalone), and **NEVER imports `@ants/db`, server actions, or live API fetchers**.
-   - **Thaw Ye Zaw** builds the D1 database schema (`@ants/db`), Hono API (`apps/api`), Server Actions (`src/actions/**`), hooks (`src/hooks/**`), and Smart Containers (`*Container.tsx`) that pass real data and callbacks into Zyy's `*View.tsx` components.
+   - **Thaw Ye Zaw** builds the D1 database schema (`@ants/db`), Hono API (`apps/api`), Server Actions (`src/actions/**`), hooks (`src/hooks/**`), and Smart Containers (`*Container.tsx`) that pass real data and callbacks into Zay's `*View.tsx` components.
 2. **Strict File Ownership Lock (Zero Merge Conflicts):**
-   - **Zyy NEVER edits:** `packages/db/**`, `apps/api/**`, `packages/auth-client/**`, `packages/shared-types/**`, `**/actions/**`, `**/hooks/**`, `**/*Container.tsx`, or `/admin/**`.
-   - **Thaw NEVER overwrites Zyy's visual Tailwind styling** inside `*View.tsx` when wiring backend data—Thaw passes real props into `<FeatureView {...data} />`.
+   - **Zay NEVER edits:** `packages/db/**`, `apps/api/**`, `packages/auth-client/**`, `packages/shared-types/**`, `**/actions/**`, `**/hooks/**`, `**/*Container.tsx`, or `/admin/**`.
+   - **Thaw NEVER overwrites Zay's visual Tailwind styling** inside `*View.tsx` when wiring backend data—Thaw passes real props into `<FeatureView {...data} />`.
 
 ---
 
@@ -34,7 +34,7 @@ We follow a strict **UI-Prototype-First (`Zyy`) → Full-Stack Wiring (`Thaw`)**
 
 | Workspace Package | Directory | Port | Production URL | Purpose & Key Features |
 | :--- | :--- | :---: | :--- | :--- |
-| `@ants/org` | `apps/org` | `3000` | `https://the-ants.org` | **Pure Organization Showcase:** Mission, Members, Tutors & weekly availability, Activities (Tutoring, Student's Meet, Exam Venue Visit), Articles, Hackathon Showcase (external link), `/admin` CMS, **+ `/calculator` route** (zero student login/profiles here). |
+| `@ants/org` | `apps/org` | `3000` | `https://the-ants.org` | **Pure Organization Showcase:** Mission, Members, Tutors & weekly availability, Activities (Tutoring, Student's Meet, Exam Venue Visit, Hackathon with external link), Articles, `/admin` CMS, **+ `/calculator` route** (zero student login/profiles here). |
 | `@ants/study` | `apps/study` | `3001` | `https://study.the-ants.org` | **Study** *(by The ANTs)*: IGCSE & IAL **Topic Tracker**, **Past Paper Tracker** (Excel matrix + UMS), **Exam Countdown**, **Grade Calculator (`/calculator`)**, Notes, Flashcards, Quizzes, Auth & Student Profile/Settings. |
 | `@ants/flow` | `apps/flow` | `3002` | `https://flow.the-ants.org` | **Flow** *(by The ANTs)*: Sleek Productivity App for everyone — **Smart Timetable**, **Task Planner**, **Telegram Reminders**, **Pomodoro Timer** (guest + synced), synced Exam Countdowns, Auth & Profile/Settings. |
 | `@ants/api` | `apps/api` | `8787` | `https://api.the-ants.org` | **Headless Hono Worker:** Better Auth (`.the-ants.org` cross-subdomain SSO between `flow` & `study` + `org/admin`), private R2 proxy, Telegram webhook & `*/5 * * * *` Cron queue. |

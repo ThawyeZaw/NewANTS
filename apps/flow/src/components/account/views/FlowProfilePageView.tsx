@@ -4,11 +4,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ACCOUNT_PROFILE_STORAGE_KEY,
+  ANTS_AUTH_SESSION_EVENT,
   MOCK_SHARED_PROFILES,
   ThemeToggle,
   UserProfileView,
   createInitialAccountStorageState,
   loadAccountStorageState,
+  loadAuthSession,
   normalizeProfileHandle,
   type AccountProfileStorageState,
   type PublicProfileSwitchItem,
@@ -32,18 +34,30 @@ export function FlowProfilePageView({
 }: FlowProfilePageViewProps) {
   const router = useRouter();
   const [state, setState] = useState<AccountProfileStorageState>(
-    () => initialState ?? createInitialAccountStorageState('zyylinnhtet')
+    () => initialState ?? createInitialAccountStorageState('zaylynnhtet')
   );
+  const [isGuest, setIsGuest] = useState(false);
 
   const normalizedHandle = useMemo(() => normalizeProfileHandle(handle), [handle]);
 
   useEffect(() => {
-    if (persistToLocalStorage) {
-      const saved = loadAccountStorageState(MOCK_SHARED_PROFILES, storageKey);
-      if (saved) {
-        setState(saved);
+    const syncAll = () => {
+      if (persistToLocalStorage) {
+        const session = loadAuthSession({ accountStorageKey: storageKey });
+        setIsGuest(session.status === 'guest');
+        const saved = loadAccountStorageState(MOCK_SHARED_PROFILES, storageKey);
+        if (saved) {
+          setState(saved);
+        }
       }
-    }
+    };
+    syncAll();
+    window.addEventListener(ANTS_AUTH_SESSION_EVENT, syncAll);
+    window.addEventListener('storage', syncAll);
+    return () => {
+      window.removeEventListener(ANTS_AUTH_SESSION_EVENT, syncAll);
+      window.removeEventListener('storage', syncAll);
+    };
   }, [persistToLocalStorage, storageKey]);
 
   const matchedProfile = state.profilesByUsername[normalizedHandle] ?? null;
@@ -56,7 +70,7 @@ export function FlowProfilePageView({
 
   const activeSessionProfile =
     state.profilesByUsername[state.activeUsername] ??
-    state.profilesByUsername.zyylinnhtet ??
+    state.profilesByUsername.zaylynnhtet ??
     null;
 
   const availableProfiles: PublicProfileSwitchItem[] = useMemo(
@@ -86,18 +100,23 @@ export function FlowProfilePageView({
       activeSection="profile"
       tabs={[]}
       contentWidth="wide"
-      user={activeSessionProfile ? toUserMenuProfile(activeSessionProfile) : null}
+      user={
+        !isGuest && activeSessionProfile
+          ? toUserMenuProfile(activeSessionProfile)
+          : null
+      }
       onUserMenuNavigate={handleNavigate}
       headerActions={<ThemeToggle />}
     >
       <UserProfileView
         profile={matchedProfile}
         requestedHandle={normalizedHandle}
-        isOwnProfile={Boolean(matchedProfile && matchedProfile.username === state.activeUsername)}
+        isOwnProfile={Boolean(
+          !isGuest && matchedProfile && matchedProfile.username === state.activeUsername
+        )}
         availableProfiles={availableProfiles}
         onNavigate={handleNavigate}
       />
     </FlowShellView>
   );
 }
-

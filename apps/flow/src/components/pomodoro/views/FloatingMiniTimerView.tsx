@@ -40,7 +40,7 @@ export function FloatingMiniTimerView({
     <aside
       aria-label="Mini timer"
       className={cn(
-        'fixed bottom-4 right-4 z-30 w-[calc(100vw-2rem)] max-w-[280px] overflow-hidden rounded-xl border border-border bg-surface-elevated shadow-[var(--shadow-tier-3)] sm:bottom-6 sm:right-6',
+        'ants-bottom-sheet-in fixed bottom-20 right-4 z-30 w-[calc(100vw-2rem)] max-w-[280px] overflow-hidden rounded-xl border border-border bg-surface-elevated shadow-[var(--shadow-tier-3)] md:bottom-6 md:right-6',
         className
       )}
     >

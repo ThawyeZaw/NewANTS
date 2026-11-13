@@ -150,7 +150,7 @@ export function FocusModeView({
       aria-modal="true"
       aria-label="Focus mode"
       className={cn(
-        'fixed inset-0 z-40 flex flex-col overflow-y-auto motion-safe:animate-[flow-fade-in_200ms_ease-out]',
+        'ants-fade-enter fixed inset-0 z-40 flex flex-col overflow-y-auto',
         hasPhoto ? 'bg-zinc-950 text-white' : 'bg-background text-foreground'
       )}
     >
@@ -251,7 +251,7 @@ export function FocusModeView({
 
           {/* Scene popover */}
           {openMenu === 'scene' && onChangeScene && (
-            <div className="absolute right-0 top-11 z-30 max-h-[75vh] w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-border bg-surface-elevated p-3 text-foreground shadow-[var(--shadow-tier-3)]">
+            <div className="ants-panel-enter absolute right-0 top-11 z-30 max-h-[75vh] w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-border bg-surface-elevated p-3 text-foreground shadow-[var(--shadow-tier-3)]">
               <p className="mb-2 text-xs font-semibold text-foreground-muted">Background scene</p>
               <div className="grid grid-cols-2 gap-2">
                 {FOCUS_SCENES.map((item) => {
@@ -285,7 +285,7 @@ export function FocusModeView({
 
           {/* Sound popover */}
           {openMenu === 'sound' && onChangeAmbientSound && (
-            <div className="absolute right-0 top-11 z-30 max-h-[75vh] w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-border bg-surface-elevated p-3 text-foreground shadow-[var(--shadow-tier-3)]">
+            <div className="ants-panel-enter absolute right-0 top-11 z-30 max-h-[75vh] w-72 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-border bg-surface-elevated p-3 text-foreground shadow-[var(--shadow-tier-3)]">
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-xs font-semibold text-foreground-muted">Focus sound</p>
                 <span className="font-mono text-xs tabular-nums text-foreground">
