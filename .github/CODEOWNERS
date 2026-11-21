@@ -1,7 +1,7 @@
 # ============================================================================
-# .github/CODEOWNERS — Dual-Developer Guardrail (Thaw Ye Zaw & Zyy Linn Htet)
+# .github/CODEOWNERS — Dual-Developer Guardrail (Thaw Ye Zaw & Zay Lynn Htet)
 # Prevents accidental edits to backend, database, or full-stack wiring in UI PRs.
-# Replace @thawyezaw and @zyylinnhtet with exact GitHub handles if different.
+# Replace @thawyezaw and @zaylynnhtet with exact GitHub handles if different.
 # ============================================================================
 
 # Default repository owner & final reviewer
@@ -17,11 +17,11 @@
 /**/*Container.tsx                  @thawyezaw
 /apps/org/src/app/admin/            @thawyezaw
 
-# UI Prototypes, Design Tokens & Presentational Views (Zyy Linn Htet + Thaw Ye Zaw)
-/packages/ui/                       @zyylinnhtet @thawyezaw
-/packages/calculator/src/views/     @zyylinnhtet @thawyezaw
-/apps/org/                          @zyylinnhtet @thawyezaw
-/**/*View.tsx                       @zyylinnhtet @thawyezaw
-/**/mocks/                          @zyylinnhtet @thawyezaw
-/docs/design/                       @zyylinnhtet @thawyezaw
+# UI Prototypes, Design Tokens & Presentational Views (Zay Lynn Htet + Thaw Ye Zaw)
+/packages/ui/                       @zaylynnhtet @thawyezaw
+/packages/calculator/src/views/     @zaylynnhtet @thawyezaw
+/apps/org/                          @zaylynnhtet @thawyezaw
+/**/*View.tsx                       @zaylynnhtet @thawyezaw
+/**/mocks/                          @zaylynnhtet @thawyezaw
+/docs/design/                       @zaylynnhtet @thawyezaw
 
