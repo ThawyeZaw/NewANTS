@@ -263,3 +263,17 @@ export {
   type PublicProfileSwitchItem,
   type UserProfileViewProps,
 } from './views/UserProfileView';
+
+export {
+  ANT_MASCOT_PRESETS,
+  AntMascot,
+  AntMascotView,
+  resolveMascotPropVariant,
+  resolveMascotSize,
+  type AntMascotApp,
+  type AntMascotMood,
+  type AntMascotPreset,
+  type AntMascotProps,
+  type AntMascotPropVariant,
+  type AntMascotSize,
+} from './views/AntMascotView';

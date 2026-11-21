@@ -39,7 +39,7 @@ We follow a strict **UI-Prototype-First (`Zay` · `[ZYY]`) → Full-Stack Wiring
 | `@ants/flow` | `apps/flow` | `3002` | `https://flow.the-ants.org` | **Flow** *(by The ANTs)*: Sleek Productivity App for everyone — **Smart Timetable**, **Task Planner**, **Telegram Reminders**, **Pomodoro Timer** (guest + synced), synced Exam Countdowns, Auth & Profile/Settings. |
 | `@ants/api` | `apps/api` | `8787` | `https://api.the-ants.org` | **Headless Hono Worker:** Better Auth (`.the-ants.org` cross-subdomain SSO between `flow` & `study` + `org/admin`), private R2 proxy, Telegram webhook & `*/5 * * * *` Cron queue. |
 | `@ants/calculator` | `packages/calculator` | — | *(Mounted in `org` & `study`)* | **Shared Grade Calculator Package:** Guest-accessible calculator rendered at BOTH `the-ants.org/calculator` and `study.the-ants.org/calculator`. |
-| `@ants/ui` | `packages/ui` | — | *(Shared across all 3 apps)* | Stitch Design System tokens (`tokens.css` Light + Amber Dark), shared primitives, 9-dot `AppSwitcher`, shared Auth/Settings views. |
+| `@ants/ui` | `packages/ui` | — | *(Shared across all 3 apps)* | Stitch Design System tokens (`tokens.css` Light + Amber Dark), shared primitives, `<AntMascot />` brand mascot, 9-dot `AppSwitcher`, shared Auth/Settings views. |
 | `@ants/db` | `packages/db` | — | *(Bound as `env.DB`)* | Drizzle ORM + Cloudflare D1 (SQLite) schema, relations, and migrations (**Thaw only**). |
 | `@ants/shared-types` | `packages/shared-types` | — | — | Shared Zod schemas, role constants, and TypeScript UI/API contracts (**Thaw only**). |
 | `@ants/auth-client` | `packages/auth-client` | — | — | Shared Better Auth client, `useSession()`, and `useRole()` hooks (**Thaw only**). |
@@ -61,6 +61,11 @@ Build **one atomic item per session** from your track (`[ZYY]` or `[THAW]`) in `
 3. **Automated Tests:** `pnpm test` (Vitest) passes.
 4. **Local Dev Smoke Check:** Relevant dev server (`pnpm dev:org`, `pnpm dev:study`, `pnpm dev:flow`, or `pnpm dev:api`) renders/responds with zero runtime errors.
 5. **Developer Manual Sign-Off:** Present verification steps to the developer. Keep the item marked `[~]` until manually confirmed, then mark `[x]`.
+
+### Brand Mascot Standard (`<AntMascot />` & `docs/design/mascot.md`)
+- **Always reuse the official ANTs brand mascot** (`import { AntMascot, ANT_MASCOT_PRESETS } from '@ants/ui'`) for **streaks, empty states, Pomodoro focus/break states, onboarding/auth, 404/loading states, landing highlights, and Telegram reminder visuals**—never invent ad-hoc mascot illustrations or generic clip-art.
+- **Canonical Reference & Art Direction:** Follow [`docs/design/mascot.md`](./docs/design/mascot.md) and the visual reference sheets in [`docs/design/assets/mascot-hero-sheet.jpg`](./docs/design/assets/mascot-hero-sheet.jpg) and [`docs/design/assets/mascot-expressions-grid.jpg`](./docs/design/assets/mascot-expressions-grid.jpg) — lighter sunlit-gold (`#FBBF24` / `#FEF08A`), Playful Geometric Vector style, **warm, cheeky & positive/energetic** tone (never grumpy or harsh), keeping the iconic golden pencil + app-specific props (`headphones`/`timer` in Flow, `scholar` glasses in Study, `bell` in Telegram).
+- **Accessibility & Motion:** Pass `ariaLabel=""` when decorative; rely on the built-in `ants-mascot-*` CSS animations which automatically respect `prefers-reduced-motion`.
 
 ### Mandatory End-of-Session File Updates (NEVER SKIP)
 At the end of **EVERY** session, AI agents **MUST** review and update:

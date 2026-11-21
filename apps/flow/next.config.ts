@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@ants/ui', '@ants/shared-types'],
+  transpilePackages: ['@ants/ui', '@ants/shared-types', '@ants/auth-client'],
   async headers() {
     return [
       {
