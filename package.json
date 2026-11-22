@@ -14,6 +14,7 @@
     "dev:flow": "pnpm --filter @ants/flow dev",
     "dev:api": "pnpm --filter @ants/api dev",
     "build": "turbo run build",
+    "clean:next": "node -e \"for (const d of ['apps/org/.next','apps/study/.next','apps/flow/.next']) require('fs').rmSync(d,{recursive:true,force:true})\"",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",

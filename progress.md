@@ -13,8 +13,8 @@
 ## Next Up
 
 ### 👉 Next Up for `[THAW]` (Thaw Ye Zaw — Full-Stack, DB, API & Wiring)
-- **`[THAW-1.1]` Toolchain, ESLint, Vitest & Runnable Empty App Bootstrapping:** Verify and bootstrap workspace dependencies (`next`, `react`, `tailwindcss` v4, `hono`, `drizzle-orm`, `zod`, `lucide-react`, `eslint`, `vitest`, `@opennextjs/cloudflare`) and runnable shells for `apps/org` (`:3000`), `apps/study` (`:3001`), `apps/flow` (`:3002`), and `apps/api` (`:8787`) on branch `feat/*`.
-- **`[THAW-1.2]` `@ants/shared-types` Foundation:** Define domain Zod schemas, roles, Edexcel 14-unit math structures, and shared API/UI contracts.
+- **Approved (`[x]`):** `[THAW-1.1]`–`[THAW-1.7]` (Stage T1 complete: Toolchain, `:8787` Hono Worker, `@ants/shared-types`, 55-table `@ants/db` D1 schema + migration, `.dev.vars`/`.env.local` setup, `/api/auth/*` cross-subdomain SSO, `/api/storage/*` private R2 proxy, `/api/telegram/*` webhook suite, `*/5 * * * *` `notification_queue` Cron, and `@ants/auth-client` shared `<AuthProvider />`, `useSession()`, `useRole()`, `<AuthGuard />`, `getServerSession()`, Access Matrix guards & cross-subdomain redirect helpers).
+- **`[THAW-2.1]` `@ants/calculator` Engine & Public API Wiring:** Raw mark → percentage / UMS / composite grade (`A*`–`U`, `9`–`1`) engine + public D1 boundary API wired into `<GradeCalculatorContainer />` on both `the-ants.org/calculator` and `study.the-ants.org/calculator`.
 
 ### 👉 Next Up for `[ZYY]` (Zay Lynn Htet — UI Prototypes & Polishing)
 - **Track A (`[ZYY]`) Complete & 100% Approved (`[x]`):** All Stage Z1–Z4 UI prototypes (`@ants/ui`, `@ants/calculator`, `apps/org` Showcase & `/cms`, `apps/flow` Productivity Suite, and `apps/study` Academic Trackers) are fully implemented, verified, and signed off. Ready to support Thaw with Smart Container wiring (`*Container.tsx`), responsive edge polishing, and animation choreography.
@@ -71,13 +71,13 @@
 > **Rule for `[THAW]` tasks:** Own 100% of `@ants/db`, `apps/api`, `@ants/shared-types`, `@ants/auth-client`, calculation engines, Server Actions, hooks, Admin CMS, and `*Container.tsx` wiring into Zyy's `*View.tsx` components.
 
 ### Stage T1: Monorepo Toolchain, D1 Schema, Hono API & SSO (`packages/*` & `apps/api`)
-- [ ] **`[THAW-1.1]`** Toolchain, ESLint, Vitest & Runnable Empty App Bootstrapping (`:3000`, `:3001`, `:3002`, `:8787` healthcheck).
-- [ ] **`[THAW-1.2]`** `@ants/shared-types`: Role constants, domain config, Zod schemas, Edexcel 14-unit/cash-in types, and shared `*ViewProps` contracts.
-- [ ] **`[THAW-1.3]`** `@ants/db` (Part A — Identity, Org & System): Drizzle D1 SQLite helpers + `auth.ts`, `profiles.ts` (with `tutor_profiles`), `organization.ts`, and `system.ts` schemas + Vitest tests.
-- [ ] **`[THAW-1.4]`** `@ants/db` (Part B — Academic & Planner): `curriculums.ts`, `study_tools.ts`, `learning.ts`, `planner.ts` (`timetable_events`, `tasks`, `pomodoro_*`), `relations.ts`, and initial D1 SQL migration.
-- [ ] **`[THAW-1.5]`** `@ants/api` Auth & Cross-Subdomain SSO: Hono server + Better Auth with Drizzle D1 adapter, `.the-ants.org` cookies (`flow` + `study` + `org/admin`), CORS allowlist, and automatic `profiles` creation on signup + API tests.
-- [ ] **`[THAW-1.6]`** `@ants/api` Private R2 Proxy & 5-Min Telegram Cron: `/api/storage/*` upload/stream routes + Telegram Bot `/start` webhook & `*/5 * * * *` `notification_queue` processor + unit tests.
-- [ ] **`[THAW-1.7]`** `@ants/auth-client`: Shared `useSession()`, `useRole()`, auth route guards, and cross-subdomain redirect helpers.
+- [x] **`[THAW-1.1]`** Toolchain, ESLint, Vitest & Runnable Empty App Bootstrapping (`:3000`, `:3001`, `:3002`, `:8787` healthcheck).
+- [x] **`[THAW-1.2]`** `@ants/shared-types`: Role constants, domain config, Zod schemas, Edexcel 14-unit/cash-in types, and shared `*ViewProps` contracts.
+- [x] **`[THAW-1.3]`** `@ants/db` (Part A — Identity, Org & System): Drizzle D1 SQLite helpers + `auth.ts`, `profiles.ts` (with `tutor_profiles`), `organization.ts`, and `system.ts` schemas + Vitest tests.
+- [x] **`[THAW-1.4]`** `@ants/db` (Part B — Academic & Planner): `curriculums.ts`, `study_tools.ts`, `learning.ts`, `planner.ts` (`timetable_events`, `tasks`, `pomodoro_*`), `relations.ts`, and initial D1 SQL migration.
+- [x] **`[THAW-1.5]`** `@ants/api` Auth & Cross-Subdomain SSO: Hono server + Better Auth with Drizzle D1 adapter, `.the-ants.org` cookies (`flow` + `study` + `org/admin`), CORS allowlist, and automatic `profiles` creation on signup + API tests.
+- [x] **`[THAW-1.6]`** `@ants/api` Private R2 Proxy & 5-Min Telegram Cron: `/api/storage/*` upload/stream routes + Telegram Bot `/start` webhook & `*/5 * * * *` `notification_queue` processor + unit tests.
+- [x] **`[THAW-1.7]`** `@ants/auth-client`: Shared `useSession()`, `useRole()`, auth route guards, and cross-subdomain redirect helpers.
 
 ### Stage T2: Shared Grade Calculator Engine & `the-ants.org` Backend/CMS (`@ants/calculator` & `apps/org`)
 - [ ] **`[THAW-2.1]`** `@ants/calculator` Engine & Public API Wiring: Raw mark → percentage / UMS / composite grade (`A*`–`U`, `9`–`1`) engine + public D1 boundary API wired into `<GradeCalculatorContainer />` on both `the-ants.org/calculator` and `study.the-ants.org/calculator`.
@@ -608,3 +608,79 @@
     - `pnpm turbo run test --concurrency=1` passed with 29/29 tests in `@ants/flow` (including new `extendTimer` test) and all monorepo suites passing.
     - `pnpm --filter @ants/flow build` compiled all 11 Next.js routes cleanly with zero static generation or bundling errors.
 - **Next Session Target:** Developer manual sign-off on the minimal-step Pomodoro & Flow workflow on `http://localhost:3002/pomodoro`.
+### Session T1.1 & T1.2 — 2026-11-21 (`[THAW]` Backend Toolchain, `@ants/api` Hono Worker & `@ants/shared-types` Foundation)
+- **In Review (`[~]`):** Items **`[THAW-1.1]`** and **`[THAW-1.2]`** on branch `main`.
+- **Summary:**
+  - **Toolchain & Dependencies (`[THAW-1.1]`):** Configured dependencies and flat ESLint configs (`eslint.config.mjs`) across `@ants/shared-types` (`zod`), `@ants/db` (`drizzle-orm`, `drizzle-kit`, `@cloudflare/workers-types`), `@ants/auth-client` (`react`, `react-dom`), and `@ants/api` (`hono`, `zod`, `@cloudflare/workers-types`), and ran `pnpm install` cleanly across all workspace packages.
+  - **`@ants/shared-types` Foundation (`[THAW-1.2]`):** Implemented modular domain contracts in `packages/shared-types/src/`:
+    - `roles.ts`: `USER_ROLES` (`student`, `tutor`, `teacher`, `contributor`, `main_contributor`, `admin`), `ROLE_HIERARCHY_WEIGHT`, `normalizeUserRoles`, `parseRolesJson`, `serializeRolesJson`, and union capability checks (`hasContributorAccess`, `hasMainContributorAccess`, `hasAdminAccess`, `isEducatorRole`).
+    - `ecosystem.ts`: `ECOSYSTEM_APPS`, `ECOSYSTEM_PORTS` (`3000`/`3001`/`3002`/`8787`), `ALLOWED_CORS_ORIGINS`, `isAllowedCorsOrigin`, `ApiHealthResponseSchema`, `ApiErrorResponseSchema`, and `createApiSuccessSchema`.
+    - `edexcel-maths.ts`: All 14 Edexcel IAL Modular Mathematics units (`WMA11`–`WDM11`), 4 cash-in awards (`XMA01`, `YMA01`, `XFM01`, `YFM01`), all 5 `YMA01` applied pairs, and deterministic `validateEdexcelMathsCashIn` covering `CHOOSE_N_FROM_SET`, `EXACT_COMBINATION_PAIRS`, `AT_LEAST_ONE_OF`, and cross-award overlap prevention.
+    - `contracts.ts`: Cross-app Zod validation schemas for Study/Calculator (`GradeCalculationSnapshotSchema`, `PastPaperAttemptInputSchema`, `ExamCountdownItemSchema`), Flow (`FlowTaskItemSchema`, `TimetableEventItemSchema`, `PomodoroSettingsSchema`, `PomodoroSessionRecordSchema`, `TelegramNotificationPrefsSchema`), and Org (`OrgMemberCategorySchema`, `OrgActivityCategorySchema`, `OrgArticleSummarySchema`).
+  - **`@ants/api` Headless Hono Worker (`[THAW-1.1]`):** Created `apps/api/wrangler.jsonc` (D1 `DB`, R2 `ASSETS`, `*/5 * * * *` cron trigger) and `apps/api/src/index.ts` with CORS middleware (`isAllowedCorsOrigin`, `credentials: true`), `GET /`, `GET /api/health`, `GET /api/ecosystem`, structured 404/error envelopes, and `scheduled` / `runScheduledTick` cron entrypoint.
+  - **Verification:** `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), `pnpm turbo run test --concurrency=1` (`14/14` tasks including `11/11` in `@ants/shared-types` and `6/6` in `@ants/api`), `pnpm build` (`9/9` tasks including Next.js production builds for `@ants/org`, `@ants/study`, `@ants/flow`), and live `wrangler dev --port 8787` smoke check (`GET /api/health` + `GET /api/ecosystem` returning HTTP 200 with D1/R2 bindings active and CORS header echoed).
+- **Next Session Target (`[THAW]`):** Verify `:8787/api/health` and `:8787/api/ecosystem` locally, mark `[THAW-1.1]` and `[THAW-1.2]` as `[x]`, and run `/continue` for **`[THAW-1.3]`** (`@ants/db` Part A — Identity, Org & System Drizzle D1 schemas).
+
+### Session T1.3 & T1.4 — 2026-11-21 (`[THAW]` Complete `@ants/db` Drizzle D1 Schema, Relations & Initial SQL Migration)
+- **Approved (`[x]`):** Items **`[THAW-1.1]`** and **`[THAW-1.2]`**.
+- **In Review (`[~]`):** Items **`[THAW-1.3]`** and **`[THAW-1.4]`** on branch `main`.
+- **Summary:**
+  - **Drizzle D1 Helpers & Registry (`packages/db/src/`):** Built `schema/helpers.ts` (`nowIso`, `createdAtColumn`, `updatedAtColumn`, `isoTimestamps`, `booleanFlag`), `schema/relations.ts` across all table groups, canonical `schema` object in `schema/index.ts`, and `createDb(d1)` (`AntsDatabase`) in `src/index.ts`.
+  - **Part A Schemas (`[THAW-1.3]`):**
+    - `auth.ts`: `user`, `session`, `account`, `verification` (Better Auth core columns with `integer({ mode: 'timestamp' })` + ANTs `username`, `role`, `roles`).
+    - `profiles.ts`: `profiles`, `student_profiles`, `tutor_profiles`, `contributor_profiles`, `certifications`, `role_upgrade_requests`.
+    - `organization.ts`: `org_settings`, `org_team_members`, `org_activities`, `org_articles`.
+    - `system.ts`: `notifications`, `notification_queue`, `notification_preferences`, `review_queue`, `version_history`, `activity_feed`.
+  - **Part B Schemas (`[THAW-1.4]`):**
+    - `curriculums.ts`: `curriculums`, `subjects`, `topics`, `user_curriculums`, `topic_progress`.
+    - `study_tools.ts`: All 18 academic/gamification tables (`exams`, `exam_schedules`, `exam_countdowns`, `user_enrollments`, `user_exam_overrides`, `user_exam_history`, `subject_component_routes`, `user_cash_in_enrollments`, `user_component_selections`, `past_papers`, `subject_grade_boundaries`, `paper_grade_boundaries`, `user_past_paper_records`, `grade_entries`, `exam_data_audit_log`, `user_xp_ledger`, `user_badges`, `user_streaks`).
+    - `learning.ts`: `study_notes`, `flashcard_decks`, `flashcards`, `flashcard_reviews`, `quizzes`, `quiz_questions`, `quiz_attempts`, `quiz_live_sessions`.
+    - `planner.ts`: `timetable_events`, `tasks`, `pomodoro_user_settings`, `pomodoro_sessions`.
+  - **Drizzle Kit & Local D1 Migration:** Added `packages/db/drizzle.config.ts`, generated `packages/db/migrations/0000_romantic_marvex.sql` (55 SQLite tables), wired `migrations_dir` in `apps/api/wrangler.jsonc` + `db:migrate:local` / `db:migrate:remote` in `apps/api/package.json`, and applied & verified all 55 domain tables against local Miniflare D1 (`wrangler d1 migrations apply the-ants-db --local`).
+  - **Verification:** `packages/db/src/__tests__/schema.test.ts` (`4/4` tests passing covering all 55 tables, `nowIso()`, `.toSQL()` statements, and SQL migration checks), `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), and `pnpm turbo run test --concurrency=1` (`14/14` tasks).
+- **Next Session Target (`[THAW]`):** Verify local D1 tables via `pnpm db:migrate:local` / `wrangler d1 execute`, confirm `[THAW-1.3]` & `[THAW-1.4]` sign-off (`[x]`), and run `/continue` for **`[THAW-1.5]`** (`@ants/api` Better Auth & `.the-ants.org` Cross-Subdomain SSO).
+
+### Session T1.3/T1.4 Audit & Next.js Dev Cache Recovery — 2026-11-21 (`[THAW]`)
+- **Approved (`[x]`):** Verified completeness of **`[THAW-1.3]`** and **`[THAW-1.4]`** (all 55 tables across 8 schema modules, `relations.ts`, `0000_romantic_marvex.sql`, and `56` local SQLite tables in `.wrangler/state/v3/d1`), marking both `[x]`.
+- **Runtime Fix (`Cannot find module './634.js'`):** Cleared stale `next build` webpack chunks from `apps/{org,study,flow}/.next` left over while `next dev` was running, added root `clean:next` script in `package.json`, restarted dev servers on `:3000`, `:3001`, and `:3002`, and verified HTTP `200` on `:3000/`, `:3000/calculator`, `:3001/`, `:3001/calculator`, `:3002/pomodoro`, and `:8787/api/health` with zero runtime/chunk errors.
+- **Next Session Target (`[THAW]`):** Run `/continue` to build **`[THAW-1.5]`** (`@ants/api` Better Auth + `.the-ants.org` Cross-Subdomain SSO).
+
+### Session Brand Mascot Concept Pack & `@ants/ui` `<AntMascot />` — 2026-11-21
+- **Summary:**
+  - **Visual Concept Pack:** Generated Playful Geometric Vector (Duolingo-inspired) mascot character turnaround + app-icon badge and a 6-panel expression & ecosystem prop sheet evolving The ANTs golden pencil-holding ant logo.
+  - **Design Bible:** Documented personality (*Warm, Cheeky & Encouraging Study Buddy*), top 5 name proposals (`Pip`, `Nib`, `Otto`, `Milo`, `Zest`), Light/Dark color harmony, and voice/microcopy guidelines in `docs/design/mascot.md`.
+  - **Reusable `@ants/ui` Component:** Built theme-aware animated SVG `<AntMascot />` / `<AntMascotView />` (`packages/ui/src/views/AntMascotView.tsx`) with 8 moods (`idle`, `happy`, `celebrating`, `studying`, `focus`, `nudge`, `sleeping`, `curious`), context-aware app props (`pencil`, `headphones`, `scholar`, `timer`, `bell`, `none`), optional speech bubbles & status badges, `ANT_MASCOT_PRESETS`, and reduced-motion-safe keyframes in `packages/ui/src/styles/tokens.css`.
+  - **Verification:** Added 7 Vitest tests in `packages/ui/src/__tests__/mascot.test.ts` (`24/24` passing in `@ants/ui`), clean `pnpm --filter @ants/ui lint`, and full monorepo `pnpm typecheck`.
+
+### Session T1.5 — 2026-11-21 (`[THAW]` `@ants/api` Auth & Cross-Subdomain SSO)
+- **Approved (`[x]`):** Item **`[THAW-1.5]`** on branch `main`.
+- **Summary:**
+  - **Shared Auth Contracts (`packages/shared-types/src/contracts.ts`):** Added `ACADEMIC_TRACK_OPTIONS`, `AuthSignUpInputSchema`, `AuthSignInEmailInputSchema` (strict email-only sign-in rejecting `@username` identifiers), `AuthUserDtoSchema`, `AuthSessionDtoSchema`, `AuthProfileSummaryDtoSchema`, and `AuthSessionBundleSchema` + unit test coverage in `packages/shared-types/src/__tests__/shared-types.test.ts` (`12/12` passing).
+  - **Drizzle Helper Exports (`packages/db/src/index.ts`):** Re-exported Drizzle query operators (`and`, `eq`, `or`, `desc`, `asc`, `sql`, etc.) from `@ants/db` so `@ants/api` shares the exact same `drizzle-orm` instance cleanly in pnpm strict workspaces.
+  - **Web-Crypto & Cross-Subdomain SSO (`apps/api/src/auth/`):**
+    - `crypto.ts`: Web-Crypto PBKDF2-HMAC-SHA256 (`100_000` iterations, 16-byte random salt) password hashing/verification, cryptographically random entity IDs & 256-bit session tokens, HMAC-SHA256 cookie signing/verification, and `resolveAuthSecret`.
+    - `cookies.ts`: Emits dual SSO cookies (`better-auth.session_token` `HttpOnly` + `ants_sso_session` readable v1 JSON bridge matching `@ants/ui` `AntsSsoSessionState`), switching automatically between `Domain=.the-ants.org; Secure; SameSite=Lax` in production and host-only `SameSite=Lax` cookies in localhost development.
+    - `service.ts`: Implements atomic `signUpWithEmail` provisioning `user`, `account`, `session`, `profiles`, `student_profiles`, `notification_preferences`, and `user_streaks` (plus `tutor_profiles` on the `tutor` track via `db.batch()`), strict email-only `signInWithEmail` (without any `/api/auth/demo` endpoint), `getSessionByToken` (with expired session cleanup), and `signOutByToken`.
+    - `routes.ts` & `src/index.ts`: Mounted `POST /api/auth/sign-up/email`, `POST /api/auth/sign-in/email`, `GET /api/auth/get-session` (`+ /api/auth/session`), and `POST /api/auth/sign-out` behind CORS allowlist (`credentials: true`), keeping `src/index.ts` Worker exports free of primitive constant exports required by Cloudflare `workerd`.
+  - **Local Secrets & Verification:** Provisioned git-ignored `apps/api/.dev.vars` (generated 32-byte hex `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL="http://localhost:8787"`, `COOKIE_DOMAIN="localhost"`) and `.env.local` (`NEXT_PUBLIC_*_URL`), restarted `:8787` Wrangler worker confirming `Using secrets defined in .dev.vars`, and passed both Vitest (`14/14` Turbo tasks; `@ants/api` `12/12`) and live `:8787` D1 sign-up → sign-in → session → sign-out smoke checks.
+- **Next Session Target (`[THAW]`):** Run `/continue` for **`[THAW-1.6]`** (`@ants/api` Private R2 Proxy & 5-Min Telegram Cron).
+
+### Session T1.6 — 2026-11-21 (`[THAW]` `@ants/api` Private R2 Proxy, Telegram Bot Webhook & 5-Min Cron)
+- **In Review (`[~]`):** Item **`[THAW-1.6]`** on branch `main`.
+- **Summary:**
+  - **Shared Contracts (`packages/shared-types/src/contracts.ts`):** Added `STORAGE_BUCKET_PREFIXES`, `StoragePrefixSchema`, `StorageUploadDataUrlInputSchema`, `StorageFileMetadataDtoSchema`, `TELEGRAM_VERIFICATION_CODE_REGEX`, `TelegramLinkStartInputSchema`, `TelegramPreferencesUpdateInputSchema`, `TelegramTestPingInputSchema`, `TelegramStatusDtoSchema`, `TelegramWebhookUpdateSchema`, and `TelegramLeadMinutes`, with unit tests in `packages/shared-types/src/__tests__/shared-types.test.ts` (`13/13` passing).
+  - **Private R2 Proxy (`apps/api/src/storage/` & `apps/api/src/http/context.ts`):** Built `/api/storage/file/*` (`GET`/`HEAD` public for `org`/`articles`/`activities`/`avatars`/`study` with `ETag`/`304` and `X-Content-Type-Options: nosniff`; session owner/admin authorization for `private/*`), role-gated `POST /api/storage/upload` supporting both `multipart/form-data` and JSON base64 Data-URLs, and `DELETE /api/storage/file/*` with path traversal guards.
+  - **Telegram Webhook & Linking Suite (`apps/api/src/telegram/`):** Implemented `POST /api/telegram/webhook` (secret header verification via `TELEGRAM_WEBHOOK_SECRET`, `/start ANT-XXXX` parsing, 15-minute expiry validation, distinct Telegram `@username` capture + `telegramChatId` binding + in-app notification), plus authenticated `GET /api/telegram/status`, `POST /api/telegram/link/start`, `PUT`/`PATCH /api/telegram/preferences`, `POST /api/telegram/test-ping`, and `POST /api/telegram/unlink`.
+  - **5-Min Cron Queue Processor (`apps/api/src/cron/notification-runner.ts` & `apps/api/src/index.ts`):** Wired `processDueNotificationQueue` into `runScheduledTick` (`*/5 * * * *`) to drain due `pending` `notification_queue` rows, enforce per-channel `notification_preferences`, simulate Telegram sends locally (mirroring into `notifications`) when `TELEGRAM_BOT_TOKEN` is unset, dispatch live Bot API sends when set, and retry failed deliveries up to 3 attempts before marking `failed`.
+  - **Verification:** Added `apps/api/src/__tests__/storage-telegram-cron.test.ts` (`@ants/api` `15/15` tests passing), passed `pnpm typecheck` (`14/14` Turbo tasks), `pnpm lint` (`14/14` Turbo tasks), `pnpm turbo run test --concurrency=1` (`14/14` Turbo tasks), and verified live `:8787` Miniflare D1+R2 upload/stream/delete and Telegram `/link/start` -> `/webhook` -> `/test-ping` -> `/unlink` smoke checks.
+- **Next Session Target (`[THAW]`):** Confirm manual sign-off for **`[THAW-1.6]`** (`[x]`) and run `/continue` for **`[THAW-1.7]`** (`@ants/auth-client`).
+
+### Session T1.7 — 2026-11-21 (`[THAW]` `@ants/auth-client` Cross-Subdomain SSO SDK & Route Guards)
+- **Approved (`[x]`):** Items **`[THAW-1.6]`** and **`[THAW-1.7]`** on branch `main`.
+- **Summary:**
+  - **Cross-Subdomain Redirect & Origin Helpers (`packages/auth-client/src/redirects.ts`):** Built `resolveApiBaseUrl`, `resolveAppOrigin`, `isTrustedEcosystemOrigin`, `sanitizeRedirectTarget` (accepting relative paths and trusted `*.the-ants.org` / localhost origins while blocking open redirects, dangerous schemes, and `/login`/`/signup` loops), `buildCrossSubdomainAppUrl`, `buildCrossSubdomainLoginUrl` (supporting `the-ants.org/admin` → `flow.the-ants.org/login?redirect=...` bounce-back), and `resolvePostAuthRedirect`.
+  - **Typed Credentialed HTTP Client (`packages/auth-client/src/client.ts`):** Implemented `createAuthClient` / `authClient` (`getSession`, client-validated email-only `signInWithEmail`, `signUpWithEmail`, `signOut`) using `credentials: 'include'` and dispatching `ants-auth-session-change` events cleanly.
+  - **Multi-Role Capabilities, Access Matrix & SSR Server Helper (`packages/auth-client/src/guards.ts`, `src/server.ts`):** Implemented `computeRoleCapabilities` (union role helpers + `meetsMinRole`), `getEcosystemRouteRequirement` across all 6 Access Matrix rows (`org`, `flow`, `study`), `evaluateRouteAccess`, `getServerSession` (short-circuiting without `better-auth.session_token` cookie, supporting `Headers` / `Request` / Next.js `cookies()` stores), and `evaluateServerRouteAccess`.
+  - **React Provider, Hooks & `<AuthGuard />` (`packages/auth-client/src/provider.tsx`):** Built `'use client'` `<AuthProvider />` (initial hydration, focus/visibility/tab sync), standalone-safe `useSession()`, `useRole()`, and `<AuthGuard />`, exposed granular subpath exports (`.`, `./client`, `./guards`, `./redirects`, `./server`) in `packages/auth-client/package.json`, and added `'@ants/auth-client'` to `transpilePackages` in `apps/{org,study,flow}/next.config.ts`.
+  - **Verification:** Created `packages/auth-client/src/__tests__/auth-client.test.ts` (`7/7` passing), passed `pnpm typecheck` (`14/14` Turbo tasks), `pnpm lint` (`14/14` Turbo tasks), `pnpm turbo run test --concurrency=1` (`14/14` Turbo tasks; 151 tests passing across workspace packages), and verified HTTP `200` on all 4 running dev servers (`:3000`, `:3001`, `:3002`, `:8787`).
+- **Next Session Target (`[THAW]`):** Run `/continue` for **`[THAW-2.1]`** (`@ants/calculator` Engine & Public API Wiring).

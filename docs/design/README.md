@@ -4,10 +4,11 @@ Canonical UI token and component design specifications for **The ANTs** (`the-an
 
 Light and dark themes form **one paired semantic token system** mapped into `packages/ui/src/styles/tokens.css` and consumed across all three Next.js 16 applications.
 
-| Theme | Aesthetic | Specification |
+| Theme / Guide | Aesthetic | Specification |
 | :--- | :--- | :--- |
 | **Light** | Modern Editorial Academic (`#f8fafc` Slate canvas, `#d97706` Amber 600 primary) | [`the_ants_academic_system.md`](./the_ants_academic_system.md) |
 | **Dark** | Amber Academic Studio (`#0B0C0E` / `#121316` Obsidian canvas, `#F59E0B` Amber 500 primary) | [`amber_academic_studio.md`](./amber_academic_studio.md) |
+| **Brand Mascot** | Lighter Sunlit-Gold Playful Geometric Vector (`#FBBF24` / `#FEF08A`, warm & energetic) | [`mascot.md`](./mascot.md) · [`mascot-hero-sheet.jpg`](./assets/mascot-hero-sheet.jpg) · [`mascot-expressions-grid.jpg`](./assets/mascot-expressions-grid.jpg) |
 
 ## Non-Negotiable Token Rules
 1. **Semantic classes only:** Components must use semantic Tailwind v4 tokens (`bg-background`, `bg-surface-card`, `border-border`, `text-foreground`, `text-foreground-muted`, `bg-primary`, `text-on-primary`, etc.) rather than hardcoded hex values so Light and Dark modes switch cleanly.
@@ -15,5 +16,6 @@ Light and dark themes form **one paired semantic token system** mapped into `pac
    - **UI & Editorial Copy:** `Plus Jakarta Sans`
    - **Timers, Syllabus Codes, Scores, Durations & Metrics:** `JetBrains Mono` (`font-mono tabular-nums`)
 3. **Icons:** `lucide-react` exclusively.
-4. **Endorsement Styling:** Standalone product headers display **Scholar** and **Flow** cleanly with a subtle *"by The ANTs"* badge linking to `https://the-ants.org`.
+4. **Brand Mascot (`<AntMascot />`):** Always use `<AntMascot />` and `ANT_MASCOT_PRESETS` from `@ants/ui` (documented in [`mascot.md`](./mascot.md)) for Study streaks/empty states, Flow Pomodoro focus/break states, Auth/404 screens, Org highlights, and Telegram reminder visuals rather than inventing one-off illustrations.
+5. **Endorsement Styling:** Standalone product headers display **Study** and **Flow** cleanly with a subtle *"by The ANTs"* badge linking to `https://the-ants.org`.
 

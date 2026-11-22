@@ -757,6 +757,89 @@ a {
   transition-timing-function: ease-out;
 }
 
+/* Brand Mascot Choreography (@ants/ui <AntMascot />) */
+@keyframes ants-mascot-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes ants-mascot-celebrate {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  35% {
+    transform: translateY(-9px) scale(1.04);
+  }
+  65% {
+    transform: translateY(-2px) scale(0.98);
+  }
+}
+
+@keyframes ants-mascot-antenna-wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes ants-mascot-zzz {
+  0% {
+    opacity: 0;
+    transform: translate(0px, 4px) scale(0.8);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(8px, -14px) scale(1.1);
+  }
+}
+
+@keyframes ants-mascot-sparkle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.ants-mascot-float {
+  animation: ants-mascot-float 3.2s ease-in-out infinite;
+}
+
+.ants-mascot-celebrate {
+  animation: ants-mascot-celebrate 1.4s var(--ease-spring) infinite;
+}
+
+.ants-mascot-antenna {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: ants-mascot-antenna-wiggle 2.8s ease-in-out infinite;
+}
+
+.ants-mascot-zzz {
+  animation: ants-mascot-zzz 2.6s ease-out infinite;
+}
+
+.ants-mascot-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ants-mascot-sparkle 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -773,7 +856,12 @@ a {
   .ants-drawer-right-in,
   .ants-drawer-left-in,
   .ants-bottom-sheet-in,
-  .ants-panel-enter {
+  .ants-panel-enter,
+  .ants-mascot-float,
+  .ants-mascot-celebrate,
+  .ants-mascot-antenna,
+  .ants-mascot-zzz,
+  .ants-mascot-sparkle {
     animation: none;
   }
 
