@@ -193,10 +193,10 @@ export function TaskCardView({
                   className={cn(
                     'inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums',
                     dueChip.tone === 'danger'
-                      ? 'border-destructive-border bg-destructive-tint text-on-destructive-tint'
+                      ? 'border-destructive-border/80 bg-destructive-tint text-on-destructive-tint'
                       : dueChip.tone === 'primary'
-                        ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                        : 'border-border bg-surface-inset text-foreground-muted'
+                        ? 'border-primary-tint-border/80 bg-primary-tint text-on-primary-tint'
+                        : 'border-border/60 bg-surface-inset/60 text-foreground-muted'
                   )}
                 >
                   <Calendar className="h-2.5 w-2.5" aria-hidden="true" />
@@ -204,7 +204,7 @@ export function TaskCardView({
                 </span>
               )}
 
-              <span className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-inset/70 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-foreground-muted">
+              <span className="inline-flex items-center gap-1 rounded-md border border-border/50 bg-surface-inset/50 px-1.5 py-0.5 font-mono text-[10px] font-medium tabular-nums text-foreground-muted">
                 <Clock className="h-2.5 w-2.5" aria-hidden="true" />
                 {formatDurationCompact(task.estimatedMinutes)}
                 {supportsPomodoro && ` · ${task.pomodorosPlanned}×25m`}
@@ -213,7 +213,7 @@ export function TaskCardView({
               {task.scheduledSlotLabel && (
                 <Link
                   href="/timetable"
-                  className="inline-flex items-center gap-1 rounded-md border border-success-border bg-success-tint px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums text-on-success-tint transition-opacity hover:opacity-85"
+                  className="inline-flex items-center gap-1 rounded-md border border-success-border/70 bg-success-tint px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums text-on-success-tint transition-opacity hover:opacity-85"
                 >
                   {task.scheduledSlotLabel}
                 </Link>
@@ -228,11 +228,11 @@ export function TaskCardView({
                     aria-pressed={isActive}
                     onClick={() => onToggleTagFilter(tag)}
                     className={cn(
-                      'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold transition-colors',
+                      'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium transition-colors',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       isActive
-                        ? 'border-primary bg-primary-tint text-on-primary-tint'
-                        : 'border-border bg-surface-inset/60 text-foreground-muted hover:border-border-hover hover:text-foreground'
+                        ? 'border-primary bg-primary-tint text-on-primary-tint font-semibold'
+                        : 'border-border/40 bg-surface-inset/40 text-foreground-muted hover:border-border-hover hover:text-foreground'
                     )}
                   >
                     #{tag}
@@ -241,12 +241,12 @@ export function TaskCardView({
               })}
             </div>
 
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1 opacity-100 transition-opacity sm:opacity-60 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
               <button
                 type="button"
                 aria-expanded={subtasksExpanded}
                 onClick={() => setSubtasksExpanded((prev) => !prev)}
-                className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-surface-card px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
+                className="inline-flex h-8 items-center gap-1 rounded-md border border-border/70 bg-surface-card px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
               >
                 <ChevronRight
                   className={cn('h-3 w-3 transition-transform duration-200', subtasksExpanded && 'rotate-90')}
@@ -265,7 +265,7 @@ export function TaskCardView({
                   type="button"
                   onClick={() => onScheduleTask(task)}
                   title="Schedule onto Smart Timetable"
-                  className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-surface-card px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
+                  className="inline-flex h-8 items-center gap-1 rounded-md border border-border/70 bg-surface-card px-2 text-[11px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7"
                 >
                   <CalendarPlus className="h-3 w-3" aria-hidden="true" />
                   <span>Schedule</span>

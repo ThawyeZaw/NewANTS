@@ -584,6 +584,7 @@ export function PomodoroView({
       <FlowShellView
         activeSection="pomodoro"
         tabs={[]}
+        contentWidth="wide"
         timerBadge={state.timer.status !== 'idle' ? timeLabel : null}
         backgroundImageSrc={
           tab === 'timer' && state.settings.ambient.showSceneOnTimer ? activeScene.imageSrc : null
@@ -658,115 +659,126 @@ export function PomodoroView({
       </div>
 
       {tab === 'timer' ? (
-        <div key="timer" className="ants-panel-enter mx-auto max-w-xl">
-          <section aria-label="Timer" className="flex flex-col items-center">
-            <div
-              ref={intervalTabsRef}
-              role="tablist"
-              aria-label="Interval"
-              data-gliding-ready={intervalIndicatorReady ? 'true' : 'false'}
-              className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
+        <div key="timer" className="ants-panel-enter mx-auto max-w-5xl lg:max-w-6xl">
+          <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:gap-8 lg:items-stretch lg:h-[calc(100dvh-11.5rem)] lg:min-h-[560px] lg:max-h-[760px] landscape:grid landscape:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] landscape:gap-6">
+            {/* Left Column: Timer & Controls (1-screen viewport) */}
+            <section
+              aria-label="Timer"
+              className="flex flex-col items-center justify-between rounded-2xl border border-border/60 bg-surface-card/85 p-5 sm:p-7 backdrop-blur-sm shadow-[var(--shadow-tier-1)] lg:h-full"
             >
-              <span
-                aria-hidden="true"
-                data-animate={intervalAnimate ? 'true' : 'false'}
-                className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
-                style={{
-                  transform: `translate3d(${intervalRect.x}px, ${intervalRect.y}px, 0)`,
-                  width: `${intervalRect.width}px`,
-                  height: `${intervalRect.height}px`,
-                  opacity: intervalIndicatorReady ? 1 : 0,
-                }}
+              <div
+                ref={intervalTabsRef}
+                role="tablist"
+                aria-label="Interval"
+                data-gliding-ready={intervalIndicatorReady ? 'true' : 'false'}
+                className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
+              >
+                <span
+                  aria-hidden="true"
+                  data-animate={intervalAnimate ? 'true' : 'false'}
+                  className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
+                  style={{
+                    transform: `translate3d(${intervalRect.x}px, ${intervalRect.y}px, 0)`,
+                    width: `${intervalRect.width}px`,
+                    height: `${intervalRect.height}px`,
+                    opacity: intervalIndicatorReady ? 1 : 0,
+                  }}
+                />
+                {PHASES.map((phase) => {
+                  const active = state.timer.phase === phase;
+                  return (
+                    <button
+                      key={phase}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      data-active={active ? 'true' : 'false'}
+                      onClick={() => selectPhase(phase)}
+                      className={cn(
+                        'ants-glide-item relative z-10 min-h-[38px] rounded-md px-3 py-1.5 text-sm font-medium transition-colors sm:px-4',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
+                        active ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]' : 'text-foreground-muted hover:text-foreground'
+                      )}
+                    >
+                      {PHASE_LABELS[phase]}
+                      <span className="sr-only">, {minutesFor(phase)} minutes</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <TimerRingView
+                className="my-3 sm:my-5"
+                progress={progress}
+                timeLabel={timeLabel}
+                remainingMs={remainingMs}
+                phase={state.timer.phase}
+                status={state.timer.status}
+                caption={isWork ? activeTask?.title ?? 'No task selected' : 'Take a break'}
+                cycleCount={state.timer.cycleCount}
+                longBreakInterval={state.settings.longBreakInterval}
               />
-              {PHASES.map((phase) => {
-                const active = state.timer.phase === phase;
-                return (
+
+              <div className="flex flex-col items-center gap-3.5 sm:gap-4">
+                <div className="flex items-center gap-5 sm:gap-6">
+                  <button type="button" onClick={reset} aria-label="Reset" title="Reset (R)" className={roundButton}>
+                    <RotateCcw className="h-5 w-5" aria-hidden="true" />
+                  </button>
                   <button
-                    key={phase}
                     type="button"
-                    role="tab"
-                    aria-selected={active}
-                    data-active={active ? 'true' : 'false'}
-                    onClick={() => selectPhase(phase)}
+                    onClick={toggleStartPause}
+                    title={`${startLabel} (Space)`}
                     className={cn(
-                      'ants-glide-item relative z-10 min-h-[38px] rounded-md px-3 py-1.5 text-sm font-medium transition-colors sm:px-4',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
-                      active ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]' : 'text-foreground-muted hover:text-foreground'
+                      'inline-flex h-13 min-w-36 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-semibold text-on-primary transition-[background-color,transform] hover:bg-primary-hover active:scale-[0.98] sm:h-14 sm:min-w-40 sm:px-8',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
                     )}
                   >
-                    {PHASE_LABELS[phase]}
-                    <span className="sr-only">, {minutesFor(phase)} minutes</span>
+                    {isRunning ? <Pause className="h-5 w-5" aria-hidden="true" /> : <Play className="h-5 w-5" aria-hidden="true" />}
+                    {startLabel}
                   </button>
-                );
-              })}
+                  <button type="button" onClick={skip} aria-label="Skip to next interval" title="Skip (S)" className={roundButton}>
+                    <SkipForward className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5">
+                  <button
+                    type="button"
+                    onClick={openFocusMode}
+                    className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    Focus mode
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openSettings('atmosphere')}
+                    className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                    {atmosphereLabel || 'Scene & sound'}
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* Right Column: Tasks Panel (1-screen viewport) */}
+            <div className="flex flex-col rounded-2xl border border-border/60 bg-surface-card/85 p-5 sm:p-6 backdrop-blur-sm shadow-[var(--shadow-tier-1)] lg:h-full lg:min-h-0 landscape:h-full landscape:min-h-0">
+              <TaskListView
+                className="flex flex-col h-full min-h-0"
+                tasks={state.tasks}
+                activeTaskId={state.activeTaskId}
+                finishEstimate={hydrated ? finishEstimate : null}
+                newTaskInputId={NEW_TASK_INPUT_ID}
+                onAddTask={addTask}
+                onToggleTask={toggleTask}
+                onDeleteTask={deleteTask}
+                onSelectTask={(id) => commit({ ...stateRef.current, activeTaskId: id })}
+                onChangeEstimate={changeEstimate}
+                onClearCompleted={() => updateTasks(stateRef.current.tasks.filter((t) => !t.done))}
+              />
             </div>
-
-            <TimerRingView
-              className="mt-7 sm:mt-9"
-              progress={progress}
-              timeLabel={timeLabel}
-              remainingMs={remainingMs}
-              phase={state.timer.phase}
-              status={state.timer.status}
-              caption={isWork ? activeTask?.title ?? 'No task selected' : 'Take a break'}
-              cycleCount={state.timer.cycleCount}
-              longBreakInterval={state.settings.longBreakInterval}
-            />
-
-            <div className="mt-8 flex items-center gap-6 sm:mt-10">
-              <button type="button" onClick={reset} aria-label="Reset" title="Reset (R)" className={roundButton}>
-                <RotateCcw className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={toggleStartPause}
-                title={`${startLabel} (Space)`}
-                className={cn(
-                  'inline-flex h-14 min-w-40 items-center justify-center gap-2 rounded-full bg-primary px-8 text-base font-semibold text-on-primary transition-[background-color,transform] hover:bg-primary-hover active:scale-[0.98]',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
-                )}
-              >
-                {isRunning ? <Pause className="h-5 w-5" aria-hidden="true" /> : <Play className="h-5 w-5" aria-hidden="true" />}
-                {startLabel}
-              </button>
-              <button type="button" onClick={skip} aria-label="Skip to next interval" title="Skip (S)" className={roundButton}>
-                <SkipForward className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-5">
-              <button
-                type="button"
-                onClick={openFocusMode}
-                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
-                Focus mode
-              </button>
-              <button
-                type="button"
-                onClick={() => openSettings('atmosphere')}
-                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                {atmosphereLabel || 'Scene & sound'}
-              </button>
-            </div>
-          </section>
-
-          <TaskListView
-            className="mt-14 border-t border-border pt-8"
-            tasks={state.tasks}
-            activeTaskId={state.activeTaskId}
-            finishEstimate={hydrated ? finishEstimate : null}
-            newTaskInputId={NEW_TASK_INPUT_ID}
-            onAddTask={addTask}
-            onToggleTask={toggleTask}
-            onDeleteTask={deleteTask}
-            onSelectTask={(id) => commit({ ...stateRef.current, activeTaskId: id })}
-            onChangeEstimate={changeEstimate}
-            onClearCompleted={() => updateTasks(stateRef.current.tasks.filter((t) => !t.done))}
-          />
+          </div>
         </div>
       ) : (
         <div key="stats" className="ants-panel-enter">

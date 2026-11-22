@@ -388,7 +388,7 @@ export function StudyTopicTrackerView({
               role="tablist"
               aria-label="Subject workspace tabs"
               data-gliding-ready={subTabIndicatorReady ? 'true' : 'false'}
-              className="ants-glide-host relative inline-flex rounded-md border border-border bg-surface-card p-1"
+              className="ants-glide-host relative inline-flex rounded-md border border-border/60 bg-surface-card/85 p-1"
             >
               <span
                 aria-hidden="true"
@@ -438,7 +438,7 @@ export function StudyTopicTrackerView({
 
             <Link
               href="/calculator"
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-surface-card px-2.5 text-xs font-semibold text-foreground hover:border-border-hover hover:bg-surface-inset"
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border/60 bg-surface-card/85 px-2.5 text-xs font-semibold text-foreground hover:border-border hover:bg-surface-inset"
             >
               <Calculator className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
               <span>Calculator</span>
@@ -472,7 +472,7 @@ export function StudyTopicTrackerView({
               data-testid="topic-subject-select"
               value={currentSubject.id}
               onChange={(e) => handleSelectSubject(e.target.value)}
-              className="h-9 max-w-[280px] truncate rounded-md border border-border bg-surface-card px-3 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
+              className="h-9 max-w-[280px] truncate rounded-md border border-border/60 bg-surface-card px-3 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
             >
               {subjects.map((subj) => (
                 <option key={subj.id} value={subj.id}>
@@ -484,7 +484,7 @@ export function StudyTopicTrackerView({
         </div>
 
         {/* Hairline Mastery & Telemetry Strip + 6px Progress Track */}
-        <div className="space-y-3 border-y border-border py-3.5">
+        <div className="space-y-3 border-y border-border/60 py-3.5">
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6">
               <div>
@@ -502,7 +502,7 @@ export function StudyTopicTrackerView({
                 </span>
               </div>
 
-              <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+              <div className="hidden h-7 w-px bg-border/60 sm:block" aria-hidden="true" />
 
               <div>
                 <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
@@ -516,7 +516,7 @@ export function StudyTopicTrackerView({
                 </span>
               </div>
 
-              <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+              <div className="hidden h-7 w-px bg-border/60 sm:block" aria-hidden="true" />
 
               <div>
                 <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
@@ -530,7 +530,7 @@ export function StudyTopicTrackerView({
                 </span>
               </div>
 
-              <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+              <div className="hidden h-7 w-px bg-border/60 sm:block" aria-hidden="true" />
 
               <div>
                 <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
@@ -549,7 +549,7 @@ export function StudyTopicTrackerView({
             <div
               ref={layoutTabsRef}
               data-gliding-ready={layoutIndicatorReady ? 'true' : 'false'}
-              className="ants-glide-host relative flex items-center gap-1"
+              className="ants-glide-host relative flex items-center gap-1 rounded-md border border-border/60 bg-surface-card/85 p-1"
             >
               <span
                 aria-hidden="true"
@@ -664,7 +664,7 @@ export function StudyTopicTrackerView({
                     'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 font-mono text-xs font-semibold transition-colors active:scale-[0.98]',
                     unitFilter === 'all'
                       ? 'border-primary bg-primary-solid text-on-primary'
-                      : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                      : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                   )}
                 >
                   All Units ({subjectStats.totalTopics})
@@ -684,7 +684,7 @@ export function StudyTopicTrackerView({
                         'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 font-mono text-xs font-semibold transition-colors active:scale-[0.98]',
                         active
                           ? 'border-primary bg-primary-solid text-on-primary'
-                          : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                          : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                       )}
                     >
                       {unit.shortCode} ({unit.code})
@@ -706,7 +706,7 @@ export function StudyTopicTrackerView({
                     'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-mono text-xs font-semibold transition-colors',
                     onlyMyCashInUnits
                       ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                      : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                      : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                   )}
                 >
                   <Filter className="h-3 w-3" aria-hidden="true" />
@@ -749,8 +749,8 @@ export function StudyTopicTrackerView({
                         className={cn(
                           'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
                           active
-                            ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                            : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                            ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-bold'
+                            : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                         )}
                       >
                         {st.label}
@@ -768,7 +768,7 @@ export function StudyTopicTrackerView({
                       e.target.value as 'all' | TopicDifficultyLevel
                     )
                   }
-                  className="h-8 rounded-md border border-border bg-surface-card px-2.5 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
+                  className="h-8 rounded-md border border-border/60 bg-surface-card px-2.5 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
                 >
                   {DIFFICULTY_FILTERS.map((df) => (
                     <option key={df.id} value={df.id}>
@@ -790,7 +790,7 @@ export function StudyTopicTrackerView({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search code, subtopic, formula..."
                     aria-label="Search syllabus topics"
-                    className="h-8 w-full rounded-md border border-border bg-surface-card pl-8 pr-3 text-xs text-foreground placeholder:text-foreground-subtle focus:border-primary focus:outline-none"
+                    className="h-8 w-full rounded-md border border-border/60 bg-surface-card pl-8 pr-3 text-xs text-foreground placeholder:text-foreground-subtle focus:border-primary focus:outline-none"
                   />
                 </div>
 
@@ -798,7 +798,7 @@ export function StudyTopicTrackerView({
                   <button
                     type="button"
                     onClick={handleExpandAll}
-                    className="h-8 shrink-0 rounded-md border border-border bg-surface-card px-2.5 text-xs font-semibold text-foreground-muted hover:text-foreground"
+                    className="h-8 shrink-0 rounded-md border border-border/60 bg-surface-card px-2.5 text-xs font-semibold text-foreground-muted hover:text-foreground"
                   >
                     {expandedTopicIds.length === filteredTopics.length
                       ? 'Collapse All'
@@ -868,7 +868,7 @@ export function StudyTopicTrackerView({
                             ? 'border-success-border bg-success-tint text-on-success-tint'
                             : st === 'in_progress'
                               ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                              : 'border-border bg-surface-card text-foreground-muted hover:border-border-hover hover:text-foreground'
+                              : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                         )}
                       >
                         <div className="flex items-center justify-between gap-1">
@@ -914,7 +914,7 @@ export function StudyTopicTrackerView({
               </div>
 
               {filteredTopics.length === 0 ? (
-                <div className="rounded-lg border border-border bg-surface-card p-8 text-center space-y-2">
+                <div className="rounded-lg border border-border/60 bg-surface-card p-8 text-center space-y-2">
                   <p className="text-sm font-semibold text-foreground">
                     No syllabus topics match your current filter.
                   </p>
@@ -935,7 +935,7 @@ export function StudyTopicTrackerView({
                   </Button>
                 </div>
               ) : (
-                <div className="divide-y divide-border border-y border-border bg-surface-card">
+                <div className="divide-y divide-border/60 border-y border-border/60 bg-surface-card">
                   {filteredTopics.map((topic) => {
                     const expanded = expandedTopicIds.includes(topic.id);
                     const status = deriveTopicStatus(

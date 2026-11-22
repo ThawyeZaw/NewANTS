@@ -19,6 +19,7 @@ import {
 import {
   CATEGORY_BLOCK_CLASSES,
   CATEGORY_DOT_CLASSES,
+  CATEGORY_PILL_CLASSES,
   PRIORITY_BADGE_CLASSES,
 } from './timetableStyles';
 
@@ -174,7 +175,12 @@ export function TimetableDayView({
                             {block.priority}
                           </span>
                         )}
-                        <span className="rounded bg-background/60 px-1.5 py-0.5 text-[10px] font-semibold text-foreground-muted">
+                        <span
+                          className={cn(
+                            'rounded border px-1.5 py-0.5 font-mono text-[10px] font-semibold leading-none',
+                            CATEGORY_PILL_CLASSES[block.category]
+                          )}
+                        >
                           {getCategoryLabel(block.category)}
                         </span>
                         {block.locked && (

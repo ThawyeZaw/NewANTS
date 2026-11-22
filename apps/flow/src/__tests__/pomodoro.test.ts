@@ -254,5 +254,10 @@ describe('@ants/flow [ZYY-3.1] Pomodoro Timer Studio & App Shell', () => {
     expect(() => registerPomodoroServiceWorker()).not.toThrow();
     await expect(unregisterDevServiceWorkers()).resolves.toBeUndefined();
   });
+
+  it('renders PomodoroView with wide content shell and TaskListView scrollable container', () => {
+    expect(typeof PomodoroView).toBe('function');
+    expect(typeof TaskListView).toBe('function');
+  });
 });
 

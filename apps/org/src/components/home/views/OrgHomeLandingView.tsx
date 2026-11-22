@@ -317,7 +317,7 @@ export function OrgHomeLandingView({
           <div className="lg:col-span-5">
             <div
               data-testid="hero-ecosystem-orbit"
-              className="ants-clip-reveal rounded-xl border border-border bg-surface-card p-5 divide-y divide-border"
+              className="ants-clip-reveal rounded-xl border border-border/60 bg-surface-card/90 p-5 divide-y divide-border/60"
             >
               {/* Interactive Orbital Diagram */}
               <div className="pb-4">
@@ -515,7 +515,7 @@ export function OrgHomeLandingView({
                           'ants-glide-item relative z-10 inline-flex h-8 xl:flex-auto items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-2.5 text-xs font-semibold transition-colors active:scale-[0.98]',
                           selected
                             ? 'border-primary bg-primary-tint text-on-primary-tint'
-                            : 'border-border bg-background text-foreground-muted hover:text-foreground'
+                            : 'border-border/60 bg-background text-foreground-muted hover:border-border hover:text-foreground'
                         )}
                       >
                         <OrbitNodePillIcon
@@ -585,7 +585,7 @@ export function OrgHomeLandingView({
           as="section"
           aria-labelledby="bento-products-heading"
           data-testid="bento-products-grid"
-          className="space-y-6 border-t border-border pt-14"
+          className="space-y-6 border-t border-border/60 pt-14"
         >
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-end sm:justify-between">
             <h2
@@ -613,7 +613,7 @@ export function OrgHomeLandingView({
         <ScrollReveal
           as="section"
           delayMs={40}
-          className="grid grid-cols-1 gap-10 border-t border-border pt-14 lg:grid-cols-12"
+          className="grid grid-cols-1 gap-10 border-t border-border/60 pt-14 lg:grid-cols-12"
         >
           {/* Left 6 Cols: Founders & Tutors Interactive Avatar Carousel */}
           <div className="space-y-4 lg:col-span-6">
@@ -626,7 +626,7 @@ export function OrgHomeLandingView({
                   type="button"
                   onClick={handlePrevTutor}
                   aria-label="Previous tutor"
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-surface-card text-foreground-muted hover:text-foreground"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border/60 bg-surface-card text-foreground-muted hover:text-foreground"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
@@ -634,7 +634,7 @@ export function OrgHomeLandingView({
                   type="button"
                   onClick={handleNextTutor}
                   aria-label="Next tutor"
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-surface-card text-foreground-muted hover:text-foreground"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border/60 bg-surface-card text-foreground-muted hover:text-foreground"
                 >
                   <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
@@ -688,7 +688,7 @@ export function OrgHomeLandingView({
                       'ants-glide-item relative z-10 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors',
                       selected
                         ? 'border-primary bg-primary-solid text-on-primary'
-                        : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                        : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                     )}
                   >
                     <span className="font-mono text-[11px] font-bold">
@@ -705,9 +705,9 @@ export function OrgHomeLandingView({
             {/* Active Tutor Visual Showcase Stage */}
             <div
               data-testid="active-tutor-carousel-card"
-              className="rounded-xl border border-border bg-surface-card p-5"
+              className="rounded-xl border border-border/60 bg-surface-card/90 p-5"
             >
-              <div key={activeMember.username} className="ants-panel-enter divide-y divide-border">
+              <div key={activeMember.username} className="ants-panel-enter divide-y divide-border/60">
                 <div className="pb-4 flex items-start justify-between gap-3">
                   <div className="space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -805,7 +805,7 @@ export function OrgHomeLandingView({
                     key={act.slug}
                     href={`/activities/${act.slug}`}
                     style={{ '--stagger-index': idx } as React.CSSProperties}
-                    className="ants-reveal-item ants-card-interactive group relative flex items-center justify-between gap-3.5 rounded-xl border border-border bg-surface-card p-3 transition-colors hover:border-border-hover hover:bg-surface-inset/40"
+                    className="ants-reveal-item ants-card-interactive group relative flex items-center justify-between gap-3.5 rounded-xl border border-border/60 bg-surface-card p-3 transition-colors hover:border-border hover:bg-surface-inset/40"
                   >
                     {/* Timeline Node Dot */}
                     <span

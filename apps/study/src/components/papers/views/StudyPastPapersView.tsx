@@ -479,7 +479,7 @@ export function StudyPastPapersView({
           </div>
 
           {/* All Enrolled Subjects Quick Switcher + Global Telemetry */}
-          <div className="rounded-lg border border-border bg-surface-card p-4 space-y-3">
+          <div className="rounded-lg border border-border/60 bg-surface-card/85 p-4 space-y-3">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
                 <div>
@@ -497,7 +497,7 @@ export function StudyPastPapersView({
                   </span>
                 </div>
 
-                <div className="hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
+                <div className="hidden h-6 w-px bg-border/60 sm:block" aria-hidden="true" />
 
                 <div>
                   <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
@@ -511,7 +511,7 @@ export function StudyPastPapersView({
                   </span>
                 </div>
 
-                <div className="hidden h-6 w-px bg-border sm:block" aria-hidden="true" />
+                <div className="hidden h-6 w-px bg-border/60 sm:block" aria-hidden="true" />
 
                 <div>
                   <span className="block text-[10px] font-bold uppercase tracking-wider text-foreground-muted">
@@ -555,7 +555,7 @@ export function StudyPastPapersView({
                         'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors',
                         active
                           ? 'border-primary bg-primary-solid text-on-primary'
-                          : 'border-border bg-background text-foreground-muted hover:border-border-hover hover:text-foreground'
+                          : 'border-border/60 bg-background text-foreground-muted hover:border-border hover:text-foreground'
                       )}
                     >
                       <span className="font-mono text-[11px] font-bold">
@@ -644,7 +644,7 @@ export function StudyPastPapersView({
             </h2>
           </div>
 
-          {/* Right Controls: Subject Dropdown, Matrix/Cards Toggle, Best/Latest Mode */}
+          {/* Right Controls: Subject Dropdown & Matrix/Cards Toggle */}
           <div className="flex flex-wrap items-center gap-2">
             {!embedded && (
               <div className="flex items-center gap-1.5">
@@ -659,7 +659,7 @@ export function StudyPastPapersView({
                   data-testid="paper-subject-select"
                   value={currentSubject.id}
                   onChange={(e) => handleSelectSubject(e.target.value)}
-                  className="h-9 max-w-[260px] truncate rounded-md border border-border bg-surface-card px-2.5 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
+                  className="h-9 max-w-[260px] truncate rounded-md border border-border/60 bg-surface-card px-2.5 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
                 >
                   {subjects.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -670,64 +670,13 @@ export function StudyPastPapersView({
               </div>
             )}
 
-            {/* Cell Display Mode: Best vs Latest */}
-            <div
-              ref={displayModeTabsRef}
-              role="group"
-              aria-label="Cell score aggregation mode"
-              data-gliding-ready={displayModeIndicatorReady ? 'true' : 'false'}
-              className="ants-glide-host relative inline-flex rounded-md border border-border bg-surface-card p-1"
-            >
-              <span
-                aria-hidden="true"
-                data-animate={displayModeAnimate ? 'true' : 'false'}
-                className="ants-glide-indicator z-0 rounded bg-primary-tint"
-                style={{
-                  transform: `translate3d(${displayModeRect.x}px, ${displayModeRect.y}px, 0)`,
-                  width: `${displayModeRect.width}px`,
-                  height: `${displayModeRect.height}px`,
-                  opacity: displayModeIndicatorReady ? 1 : 0,
-                }}
-              />
-              <button
-                type="button"
-                data-display-mode="best"
-                aria-pressed={state.cellDisplayMode === 'best'}
-                data-active={state.cellDisplayMode === 'best' ? 'true' : 'false'}
-                onClick={() => handleChangeDisplayMode('best')}
-                className={cn(
-                  'ants-glide-item relative z-10 rounded px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
-                  state.cellDisplayMode === 'best'
-                    ? 'bg-primary-tint text-on-primary-tint'
-                    : 'text-foreground-muted hover:text-foreground'
-                )}
-              >
-                Best Score
-              </button>
-              <button
-                type="button"
-                data-display-mode="latest"
-                aria-pressed={state.cellDisplayMode === 'latest'}
-                data-active={state.cellDisplayMode === 'latest' ? 'true' : 'false'}
-                onClick={() => handleChangeDisplayMode('latest')}
-                className={cn(
-                  'ants-glide-item relative z-10 rounded px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
-                  state.cellDisplayMode === 'latest'
-                    ? 'bg-primary-tint text-on-primary-tint'
-                    : 'text-foreground-muted hover:text-foreground'
-                )}
-              >
-                Latest Sit
-              </button>
-            </div>
-
             {/* View Toggle: Matrix vs Cards */}
             <div
               ref={layoutModeTabsRef}
               role="group"
               aria-label="Past paper layout mode"
               data-gliding-ready={layoutModeIndicatorReady ? 'true' : 'false'}
-              className="ants-glide-host relative inline-flex rounded-md border border-border bg-surface-card p-1"
+              className="ants-glide-host relative inline-flex rounded-md border border-border/60 bg-surface-card p-1"
             >
               <span
                 aria-hidden="true"
@@ -777,7 +726,7 @@ export function StudyPastPapersView({
         </div>
 
         {/* Hairline Subject Metrics + SVG Chronological Trajectory */}
-        <div className="flex flex-col gap-4 border-y border-border py-3.5 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-4 border-y border-border/60 py-3.5 xl:flex-row xl:items-center xl:justify-between">
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6">
             <div>
               <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
@@ -794,7 +743,7 @@ export function StudyPastPapersView({
               </span>
             </div>
 
-            <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+            <div className="hidden h-7 w-px bg-border/60 sm:block" aria-hidden="true" />
 
             <div>
               <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
@@ -808,7 +757,7 @@ export function StudyPastPapersView({
               </span>
             </div>
 
-            <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+            <div className="hidden h-7 w-px bg-border/60 sm:block" aria-hidden="true" />
 
             <div>
               <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
@@ -822,7 +771,7 @@ export function StudyPastPapersView({
               </span>
             </div>
 
-            <div className="hidden h-7 w-px bg-border sm:block" aria-hidden="true" />
+            <div className="hidden h-7 w-px bg-border/60 sm:block" aria-hidden="true" />
 
             <div>
               <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
@@ -835,7 +784,7 @@ export function StudyPastPapersView({
           </div>
 
           {/* Crisp SVG Chronological Series Trajectory */}
-          <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface-card px-3.5 py-2">
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-surface-card/75 px-3.5 py-2">
             <div className="space-y-0.5">
               <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-foreground-muted">
                 <TrendingUp className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
@@ -935,7 +884,7 @@ export function StudyPastPapersView({
                 'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 font-mono text-xs font-semibold transition-colors active:scale-[0.98]',
                 unitFilter === 'all'
                   ? 'border-primary bg-primary-solid text-on-primary'
-                  : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                  : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
               )}
             >
               All Units
@@ -955,7 +904,7 @@ export function StudyPastPapersView({
                     'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 font-mono text-xs font-semibold transition-colors active:scale-[0.98]',
                     active
                       ? 'border-primary bg-primary-solid text-on-primary'
-                      : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                      : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                   )}
                 >
                   {u.shortCode} ({u.code})
@@ -977,7 +926,7 @@ export function StudyPastPapersView({
                 'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-mono text-xs font-semibold transition-colors',
                 onlyMyCashInUnits
                   ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                  : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                  : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
               )}
             >
               <Filter className="h-3 w-3" aria-hidden="true" />
@@ -990,6 +939,57 @@ export function StudyPastPapersView({
 
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
+            {/* Cell Display Mode: Best vs Latest */}
+            <div
+              ref={displayModeTabsRef}
+              role="group"
+              aria-label="Cell score aggregation mode"
+              data-gliding-ready={displayModeIndicatorReady ? 'true' : 'false'}
+              className="ants-glide-host relative inline-flex rounded-md border border-border/60 bg-surface-card p-1"
+            >
+              <span
+                aria-hidden="true"
+                data-animate={displayModeAnimate ? 'true' : 'false'}
+                className="ants-glide-indicator z-0 rounded bg-primary-tint"
+                style={{
+                  transform: `translate3d(${displayModeRect.x}px, ${displayModeRect.y}px, 0)`,
+                  width: `${displayModeRect.width}px`,
+                  height: `${displayModeRect.height}px`,
+                  opacity: displayModeIndicatorReady ? 1 : 0,
+                }}
+              />
+              <button
+                type="button"
+                data-display-mode="best"
+                aria-pressed={state.cellDisplayMode === 'best'}
+                data-active={state.cellDisplayMode === 'best' ? 'true' : 'false'}
+                onClick={() => handleChangeDisplayMode('best')}
+                className={cn(
+                  'ants-glide-item relative z-10 rounded px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
+                  state.cellDisplayMode === 'best'
+                    ? 'bg-primary-tint text-on-primary-tint font-bold'
+                    : 'text-foreground-muted hover:text-foreground'
+                )}
+              >
+                Best Score
+              </button>
+              <button
+                type="button"
+                data-display-mode="latest"
+                aria-pressed={state.cellDisplayMode === 'latest'}
+                data-active={state.cellDisplayMode === 'latest' ? 'true' : 'false'}
+                onClick={() => handleChangeDisplayMode('latest')}
+                className={cn(
+                  'ants-glide-item relative z-10 rounded px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
+                  state.cellDisplayMode === 'latest'
+                    ? 'bg-primary-tint text-on-primary-tint font-bold'
+                    : 'text-foreground-muted hover:text-foreground'
+                )}
+              >
+                Latest Sit
+              </button>
+            </div>
+
             {/* Variant Filter Pills (Cambridge V1/V2/V3 or Edexcel IGCSE Standard/Regional) */}
             {variantOptions.length > 0 && (
               <div
@@ -1021,8 +1021,8 @@ export function StudyPastPapersView({
                       className={cn(
                         'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
                         active
-                          ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                          : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                          ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-bold'
+                          : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                       )}
                     >
                       {opt.label}
@@ -1062,8 +1062,8 @@ export function StudyPastPapersView({
                     className={cn(
                       'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
                       active
-                        ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                        : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
+                        ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-bold'
+                        : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                     )}
                   >
                     {af.label}
@@ -1084,7 +1084,7 @@ export function StudyPastPapersView({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search paper, topic, or note..."
               aria-label="Search past papers"
-              className="h-8 w-full rounded-md border border-border bg-surface-card pl-8 pr-3 text-xs text-foreground placeholder:text-foreground-subtle focus:border-primary focus:outline-none"
+              className="h-8 w-full rounded-md border border-border/60 bg-surface-card pl-8 pr-3 text-xs text-foreground placeholder:text-foreground-subtle focus:border-primary focus:outline-none"
             />
           </div>
         </div>

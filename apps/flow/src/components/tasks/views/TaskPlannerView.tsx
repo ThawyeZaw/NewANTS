@@ -677,54 +677,57 @@ export function TaskPlannerView({
               })}
             </div>
 
-            {/* Demo Preset Switcher */}
-            <div className="inline-flex w-fit items-center rounded-lg border border-border bg-surface-card p-0.5">
-              <div
-                ref={presetTabsRef}
-                data-gliding-ready={presetTabsIndicatorReady ? 'true' : 'false'}
-                className="ants-glide-host relative inline-flex items-center"
-              >
-                <span
-                  aria-hidden="true"
-                  data-animate={presetTabsAnimate ? 'true' : 'false'}
-                  className="ants-glide-indicator z-0 rounded-md bg-surface-inset"
-                  style={{
-                    transform: `translate3d(${presetTabsRect.x}px, ${presetTabsRect.y}px, 0)`,
-                    width: `${presetTabsRect.width}px`,
-                    height: `${presetTabsRect.height}px`,
-                    opacity: presetTabsIndicatorReady ? 1 : 0,
-                  }}
-                />
-                {PRESET_OPTIONS.map((p) => {
-                  const active = state.presetId === p.id;
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      aria-pressed={active}
-                      data-active={active ? 'true' : 'false'}
-                      onClick={() => switchPreset(p.id)}
-                      className={cn(
-                        'ants-glide-item relative z-10 min-h-[32px] rounded-md px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-0',
-                        active
-                          ? 'bg-surface-inset text-foreground'
-                          : 'text-foreground-muted hover:text-foreground'
-                      )}
-                    >
-                      {p.label}
-                    </button>
-                  );
-                })}
+            {/* Demo Preset Switcher (subordinated auxiliary control) */}
+            <div className="inline-flex items-center gap-1.5 text-xs text-foreground-muted">
+              <span className="hidden sm:inline text-[11px] text-foreground-subtle">Preset:</span>
+              <div className="inline-flex w-fit items-center rounded-lg border border-border/60 bg-surface-card p-0.5">
+                <div
+                  ref={presetTabsRef}
+                  data-gliding-ready={presetTabsIndicatorReady ? 'true' : 'false'}
+                  className="ants-glide-host relative inline-flex items-center"
+                >
+                  <span
+                    aria-hidden="true"
+                    data-animate={presetTabsAnimate ? 'true' : 'false'}
+                    className="ants-glide-indicator z-0 rounded-md bg-surface-inset"
+                    style={{
+                      transform: `translate3d(${presetTabsRect.x}px, ${presetTabsRect.y}px, 0)`,
+                      width: `${presetTabsRect.width}px`,
+                      height: `${presetTabsRect.height}px`,
+                      opacity: presetTabsIndicatorReady ? 1 : 0,
+                    }}
+                  />
+                  {PRESET_OPTIONS.map((p) => {
+                    const active = state.presetId === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        aria-pressed={active}
+                        data-active={active ? 'true' : 'false'}
+                        onClick={() => switchPreset(p.id)}
+                        className={cn(
+                          'ants-glide-item relative z-10 min-h-[32px] rounded-md px-2.5 py-1 text-xs font-medium transition-colors active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-0',
+                          active
+                            ? 'bg-surface-inset text-foreground font-semibold'
+                            : 'text-foreground-muted hover:text-foreground'
+                        )}
+                      >
+                        {p.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  title="Reset active preset"
+                  aria-label="Reset active preset"
+                  onClick={() => switchPreset(state.presetId)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground-muted hover:bg-surface-inset hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7 sm:w-7"
+                >
+                  <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                </button>
               </div>
-              <button
-                type="button"
-                title="Reset active preset"
-                aria-label="Reset active preset"
-                onClick={() => switchPreset(state.presetId)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-foreground-muted hover:bg-surface-inset hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-7 sm:w-7"
-              >
-                <RotateCcw className="h-3 w-3" aria-hidden="true" />
-              </button>
             </div>
           </div>
         </div>
@@ -735,7 +738,7 @@ export function TaskPlannerView({
             {/* Rapid Quick-Add Bar */}
             <form
               onSubmit={handleQuickAddSubmit}
-              className="rounded-xl border border-border bg-surface-card p-3 sm:p-3.5"
+              className="rounded-xl border border-border/70 bg-surface-card p-3 sm:p-3.5 shadow-xs"
             >
               <div className="flex items-center gap-2">
                 <label htmlFor="flow-quick-add-input" className="sr-only">

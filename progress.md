@@ -518,3 +518,71 @@
     - Secondary buttons (`14-Unit Drawer`, `14-Unit Selector`, `Preview`, `Papers`) and primary button (`Topic Tracker (XX)`) now display crisp, confident typography with zero icon clutter.
   - **Verification:** `impeccable detect --json apps/study/src/components/curriculum` (`[]`), `pnpm --filter @ants/study test` (`36/36` passing across 7 test suites), `pnpm --filter @ants/study typecheck`, `pnpm --filter @ants/study lint`, and full monorepo check `pnpm typecheck` (`14/14` tasks passing).
 - **Next Session Target:** Switch to **Thaw Ye Zaw (`[THAW]`)** on branch `feat/*` to begin **`[THAW-1.1]`** (Monorepo Toolchain, ESLint, Vitest & Runnable Empty App Bootstrapping) and **`[THAW-1.2]`** (`@ants/shared-types` Foundation).
+
+
+### Session Z3 Polish (Pomodoro 1-Screen Responsive Layout & Timetable Vertical Zoom / Category Colors) — 2026-11-21 (`[ZYY]` `apps/flow` `/pomodoro` & `/timetable`)
+- **Polished (`[~]`):** Items **`[ZYY-3.1]`** (`PomodoroView.tsx`, `TaskListView.tsx`) & **`[ZYY-3.3]`** (`SmartTimetableView.tsx`, `TimetableWeekGridView.tsx`, `TimetableDayView.tsx`, `timetableStyles.ts`) on branch `zaylynn`.
+- **Summary:**
+  - Clarified UX requirements via `/askmefirst` (`ask_question` pop-up modals) and applied `/impeccable` craft guidelines in `Operate` mode.
+  - **Pomodoro 1-Screen Responsive View (`/pomodoro`):**
+    - Built a single-screen desktop/landscape 2-column layout (`grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]` within `max-w-6xl` shell) constrained to viewport height (`lg:h-[calc(100dvh-11.5rem)]`) with zero window-level page scrolling.
+    - Left column houses the interval selector, mechanical chronograph dial, and primary timer controls with balanced vertical flex.
+    - Right column houses the Task List within a dedicated card container featuring an internal scrollable list (`min-h-0 flex-1 overflow-y-auto`) so tall task queues scroll cleanly without moving the timer.
+    - Mobile / portrait viewports seamlessly stack into top-and-bottom cards with natural vertical scrolling.
+  - **Timetable Vertical Zoom & Category Distinction (`/timetable`):**
+    - Added vertical hour-height zoom controls in the week toolbar supporting discrete levels (`54px`, `72px`, `96px`, `120px` per hour) with `ZoomIn` / `ZoomOut` buttons, persisted via `localStorage` (`ants-flow-timetable-zoom-v1`).
+    - Made hour height dynamically scale all grid geometry, 15m drag-and-drop delta math, click-to-add slot offsets, and initial scroll centering in `TimetableWeekGridView`.
+    - Overhauled category color styling across all 10 event categories (`deep-work`, `work`, `study`, `health`, `reading`, `family`, `meal`, `commute`, `buffer`, `sleep`) with tinted background fills, high-contrast `border-l-[3.5px]` color accents, and dedicated `CATEGORY_PILL_CLASSES` category badges in both Week and Day views for Light and Amber Dark themes.
+  - **Verification:** `pnpm typecheck` (`14/14` tasks passing), `pnpm lint` (`14/14` tasks passing), `pnpm test` (`14/14` tasks passing, `@ants/flow` `28/28` tests passing), `pnpm --filter @ants/flow build` (`11/11` Next.js routes compiled cleanly), and Impeccable detector checks with zero hard errors.
+- **Next Session Target:** Developer manual sign-off for `/pomodoro` and `/timetable` changes on `http://localhost:3002`.
+
+### Session Z3 Visual Hierarchy & Anti-Cognitive Overload Polish — 2026-11-21 (`[ZYY]` `apps/flow`: Pomodoro, Tasks, Timetable)
+- **Polished (`[~]`):** Items **`[ZYY-3.1]`** (`PomodoroView.tsx`, `TaskListView.tsx`), **`[ZYY-3.2]`** (`TaskPlannerView.tsx`, `TaskCardView.tsx`, `taskStyles.ts`), and **`[ZYY-3.3]`** (`SmartTimetableView.tsx`, `TodayFocusRailView.tsx`) on branch `zaylynn`.
+- **Summary:**
+  - Clarified scope and direction via `/askmefirst` (`ask_question` pop-up modals) and applied `/impeccable` visual hierarchy principles in `Operate` mode.
+  - **Pomodoro Spotlight Anchor (`/pomodoro`):**
+    - Refactored [TaskListView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/flow/src/components/pomodoro/views/TaskListView.tsx) to establish an unmistakable **Spotlight Anchor** on the currently active tracking task (`border-primary-tint-border/90 bg-primary-tint/40 shadow-xs` with a glowing `Focusing` badge and primary highlight), immediately connecting the ticking mechanical chronograph dial to the active goal in flight.
+    - Softened secondary open task rows into clean, calm, hairline-divided rows with subtle hover actions (`sm:opacity-50 group-hover:opacity-100 group-focus-within:opacity-100`) to eliminate cognitive distraction while running focus intervals.
+    - Calmed outer card borders in [PomodoroView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/flow/src/components/pomodoro/views/PomodoroView.tsx) to `border-border/60 bg-surface-card/85`.
+  - **Task Planner Calm & Restrained Contrast Hierarchy (`/tasks`):**
+    - In [taskStyles.ts](file:///e:/NewANTS-main/NewANTS-main/apps/flow/src/components/tasks/views/taskStyles.ts), replaced loud multi-colored card borders with calm, restrained outlines (`border-destructive-border/70` for P1, `border-border/60` for P2–P4) that preserve semantic clarity through checkboxes and flags without turning the task list into a rainbow border wall.
+    - In [TaskCardView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/flow/src/components/tasks/views/TaskCardView.tsx), streamlined the metadata row (calm hairline date chips, subtle duration mono text, and soft tag pills) and subordinated secondary desktop card actions (`Subtasks`, `Schedule`, `Focus`, `Trash2`) to `sm:opacity-60 group-hover:opacity-100 group-focus-within:opacity-100` so task titles scan effortlessly at rest.
+    - In [TaskPlannerView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/flow/src/components/tasks/views/TaskPlannerView.tsx), subordinated the auxiliary demo preset selector to a quiet utility group (`text-xs text-foreground-muted`) alongside the prominent Smart List navigation tabs, and softened the Quick-Add card into a sleek input anchor.
+  - **Timetable Two-Tier Visual Hierarchy (`/timetable`):**
+    - Refactored [SmartTimetableView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/flow/src/components/timetable/views/SmartTimetableView.tsx) toolbar from a crowded, single-line 8-control wrap into a structured **Two-Tier Visual Hierarchy**:
+      - **Tier 1 (Main Navigation & Action Anchor):** Date stepper `< Today >` paired with the period heading (`periodLabel`) on the left, and the sliding segmented `Week | Day | Month` view switcher + primary solid `+ Block time` CTA on the right.
+      - **Tier 2 (Quiet Secondary Utility Shelf):** Grouped secondary view tools (`00–06 Grouped` / `00–24h Expanded` toggle, `Show Exams` toggle, vertical zoom `[- 72px +]`) and subordinated the demo preset selector with a quiet label.
+    - In [TodayFocusRailView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/flow/src/components/timetable/views/TodayFocusRailView.tsx), applied `sm:opacity-60 group-hover:opacity-100` to rail task actions for rapid, quiet glanceability.
+  - **Verification:** `pnpm typecheck` (`14/14` tasks passing), `pnpm lint` (`14/14` tasks passing), `pnpm test` (`14/14` tasks passing, including `@ants/flow` `28/28` tests passing), and `impeccable detect` with zero hard code errors.
+- **Next Session Target:** Manual review of visual hierarchy and scanability across `/pomodoro`, `/tasks`, and `/timetable` on `http://localhost:3002`.
+
+### Session Z4 Visual Hierarchy, Two-Tier Command Headers & Editorial Anchor Overhaul — 2026-11-21 (`[ZYY]` `apps/study` & `apps/org`)
+- **Polished (`[~]`):** Items in **`apps/study`** ([StudyDashboardView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/dashboard/views/StudyDashboardView.tsx), [PastPaperMatrixView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/papers/views/PastPaperMatrixView.tsx), [StudyPastPapersView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/papers/views/StudyPastPapersView.tsx), [StudyTopicTrackerView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/curriculum/views/StudyTopicTrackerView.tsx), [StudyCountdownView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/countdown/views/StudyCountdownView.tsx)) and **`apps/org`** ([OrgHomeLandingView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/home/views/OrgHomeLandingView.tsx), [OrgTeamShowcaseView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/team/views/OrgTeamShowcaseView.tsx), [OrgActivitiesView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/activities/views/OrgActivitiesView.tsx), [OrgArticlesView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/articles/views/OrgArticlesView.tsx)) on branch `zaylynn`.
+- **Summary:**
+  - Aligned requirements and execution pattern via `/askmefirst` (`ask_question` pop-up modals) and applied `/impeccable` visual hierarchy craft guidelines across all key pages of Study and Org.
+  - **`apps/study` Visual Hierarchy & Command Headers:**
+    - **Study Dashboard Hero Spotlight ([StudyDashboardView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/dashboard/views/StudyDashboardView.tsx)):** Added an unmistakable "Next Exam & Revision Sprint" Spotlight Hero Banner above the 2-column workbench with countdown timer, urgent days-left badge, Flow sync toggle, 1-click Focus launch in Flow, and check-in count. Softened subject cards to `border-border/60 bg-surface-card hover:border-border transition-colors`.
+    - **Past Paper Matrix Hairlines ([PastPaperMatrixView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/papers/views/PastPaperMatrixView.tsx)):** Softened heavy grid borders to subtle hairlines (`border-border-subtle`) and calmed `GRADE_STYLE` token borders for high data scanability.
+    - **Two-Tier Past Papers Command Header ([StudyPastPapersView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/papers/views/StudyPastPapersView.tsx)):**
+      - *Tier 1 (Main Action & Identity Anchor):* Breadcrumb, Subject code/title, Spec dropdown, and Matrix/Cards layout segmented toggle.
+      - *Metrics & Series Trend Strip:* Softened to `border-y border-border/60 py-3.5` with clean trend container (`border-border/60 bg-surface-card/75`).
+      - *Tier 2 (Quiet Utility Shelf):* Re-located cell score aggregation mode (`Best Score` / `Latest Sit`) to the filter shelf alongside variant and attempt filters, with softened unit pills and search input (`border-border/60 bg-surface-card`).
+    - **Two-Tier Topic Tracker Command Header ([StudyTopicTrackerView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/curriculum/views/StudyTopicTrackerView.tsx)):**
+      - *Tier 1:* Breadcrumb, subject title, subject select dropdown, and subtab switcher (`Syllabus Topics` / `Past Paper Matrix`) + Calculator link.
+      - *Mastery & Progress Strip:* Clean hairline borders (`border-y border-border/60 py-3.5`) with softened layout switcher.
+      - *Tier 2:* Calmed unit pills, status pills, difficulty selector, and search input (`border-border/60 bg-surface-card`). Softened accordion dividers to `divide-y divide-border/60 border-y border-border/60 bg-surface-card` and kanji tiles to `border-border/60`.
+    - **Countdown Spotlight & Secondary Cards ([StudyCountdownView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/study/src/components/countdown/views/StudyCountdownView.tsx)):** Softened nearest countdown hero to `border-border/60 bg-surface-card/90`, softened 3-column right telemetry rail (`divide-border/60 border-border/60`), calmed secondary cards to `border-border/60 bg-surface-card hover:border-border`, and subordinated desktop actions (`sm:opacity-80 sm:hover:opacity-100`).
+  - **`apps/org` Editorial Asymmetry & Restrained Anchors:**
+    - **Showcase Home ([OrgHomeLandingView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/home/views/OrgHomeLandingView.tsx)):** Strong editorial headline anchor with high-contrast primary CTA (`Register for Free`) paired with secondary (`Launch Grade Calculator`). Softened Ecosystem Map Dock to `border-border/60 bg-surface-card/90 divide-y divide-border/60`, calmed Products and Tutors sections (`border-t border-border/60 pt-14`), and calmed activity timeline cards (`border-border/60 bg-surface-card hover:border-border`).
+    - **Team Directory ([OrgTeamShowcaseView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/team/views/OrgTeamShowcaseView.tsx)):** Softened filter bar (`border-y border-border/60 py-5`) and calmed role and board pills (`border-border/60 bg-surface-card` / `bg-background`). Softened member cards to `border-border/60 bg-surface-card hover:border-border transition-colors` with quiet monogram icons and clean typography.
+    - **Activities Gallery ([OrgActivitiesView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/activities/views/OrgActivitiesView.tsx)):** Softened filter strip (`border-y border-border/60 py-4`) and category pills (`border-border/60 bg-surface-card`), letting full documentary photographs serve as the sole dominant visual anchor per card.
+    - **Articles Reader ([OrgArticlesView.tsx](file:///e:/NewANTS-main/NewANTS-main/apps/org/src/components/articles/views/OrgArticlesView.tsx)):** Calmed publication ledger (`border-border/60 bg-surface-card`), sticky toolbar (`border-border/60 shadow-xs`), sort switcher (`border-border/60`), and article cards (`border-border/60 bg-surface-card hover:border-border transition-colors`).
+  - **Verification:** Full monorepo verification passed 100% cleanly:
+    - `pnpm typecheck` (`14/14` tasks passing)
+    - `pnpm lint` (`14/14` tasks passing)
+    - `pnpm test` (`14/14` tasks passing):
+      - `@ants/study`: 36/36 tests passing
+      - `@ants/org`: 23/23 tests passing
+      - `@ants/flow`: 28/28 tests passing
+      - `@ants/calculator`: 3/3 tests passing
+- **Next Session Target:** Developer manual sign-off on `apps/flow`, `apps/study`, and `apps/org` visual hierarchy.

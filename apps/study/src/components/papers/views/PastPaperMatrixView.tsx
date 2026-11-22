@@ -26,10 +26,10 @@ export interface PastPaperMatrixViewProps {
 }
 
 const GRADE_STYLE: Record<ReturnType<typeof getGradeTone>, string> = {
-  top: 'border-success-border bg-success-tint text-on-success-tint',
-  strong: 'border-primary-tint-border bg-primary-tint text-on-primary-tint',
-  pass: 'border-border-hover bg-surface-inset text-foreground',
-  needs_work: 'border-danger-border bg-danger-tint text-on-danger-tint',
+  top: 'border-success-border/80 bg-success-tint text-on-success-tint',
+  strong: 'border-primary-tint-border/80 bg-primary-tint text-on-primary-tint',
+  pass: 'border-border/70 bg-surface-inset text-foreground',
+  needs_work: 'border-danger-border/80 bg-danger-tint text-on-danger-tint',
 };
 
 export function PastPaperMatrixView({
@@ -47,15 +47,15 @@ export function PastPaperMatrixView({
   return (
     <div
       data-testid="past-paper-excel-matrix"
-      className="overflow-hidden rounded-lg border border-border bg-surface-card shadow-[var(--shadow-tier-1)]"
+      className="overflow-hidden rounded-lg border border-border/70 bg-surface-card shadow-[var(--shadow-tier-1)]"
     >
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse text-left text-xs">
           <thead>
-            <tr className="border-b border-border bg-surface-inset/70">
+            <tr className="border-b border-border-subtle bg-surface-inset/70">
               <th
                 scope="col"
-                className="sticky left-0 z-10 min-w-[215px] border-r border-border bg-surface-inset px-4 py-3 font-bold uppercase tracking-wider text-foreground"
+                className="sticky left-0 z-10 min-w-[215px] border-r border-border-subtle bg-surface-inset px-4 py-3 font-bold uppercase tracking-wider text-foreground"
               >
                 <span>Paper / Variant</span>
                 <span className="mt-0.5 block font-mono text-[10px] font-medium normal-case tracking-normal text-foreground-muted">
@@ -67,7 +67,7 @@ export function PastPaperMatrixView({
                 <th
                   key={series.id}
                   scope="col"
-                  className="min-w-[106px] border-r border-border px-2.5 py-3 text-center font-mono font-bold text-foreground"
+                  className="min-w-[106px] border-r border-border-subtle px-2.5 py-3 text-center font-mono font-bold text-foreground"
                 >
                   <span>{getSeriesLabelForBoard(series, boardId, true)}</span>
                   <span className="mt-0.5 block text-[10px] font-normal text-foreground-muted">
@@ -92,7 +92,7 @@ export function PastPaperMatrixView({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border-subtle">
             {rows.map((row) => {
               let rowPctSum = 0;
               let rowLoggedCount = 0;
@@ -106,7 +106,7 @@ export function PastPaperMatrixView({
                   {/* Sticky Paper / Variant Identity Cell */}
                   <th
                     scope="row"
-                    className="sticky left-0 z-10 border-r border-border bg-surface-card px-4 py-2.5 text-left align-middle font-normal transition-colors group-hover:bg-surface-inset/50"
+                    className="sticky left-0 z-10 border-r border-border-subtle bg-surface-card px-4 py-2.5 text-left align-middle font-normal transition-colors group-hover:bg-surface-inset/50"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="rounded border border-primary-tint-border bg-primary-tint px-1.5 py-0.5 font-mono text-[11px] font-bold text-on-primary-tint">
@@ -132,7 +132,7 @@ export function PastPaperMatrixView({
                       return (
                         <td
                           key={series.id}
-                          className="border-r border-border bg-surface-inset/30 px-2 py-2.5 text-center align-middle"
+                          className="border-r border-border-subtle bg-surface-inset/30 px-2 py-2.5 text-center align-middle"
                           title="Not sat in this regional zone session (Feb/Mar is Variant 2 only)"
                         >
                           <span className="font-mono text-[10px] text-foreground-subtle">
@@ -157,7 +157,7 @@ export function PastPaperMatrixView({
                       return (
                         <td
                           key={series.id}
-                          className="border-r border-border p-1.5 text-center align-middle"
+                          className="border-r border-border-subtle p-1.5 text-center align-middle"
                         >
                           <button
                             type="button"

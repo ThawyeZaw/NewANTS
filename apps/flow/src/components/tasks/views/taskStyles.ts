@@ -19,12 +19,12 @@ export const PRIORITY_CHECKED_CLASSES: Record<TaskPriority, string> = {
   P4: 'border-foreground-muted bg-foreground-muted text-background',
 };
 
-/** Crisp 1px card outline distinction (zero heavy border-left stripes or stacked drop shadows). */
+/** Crisp 1px card outline distinction (calm hairline borders with subtle priority distinction). */
 export const PRIORITY_CARD_CLASSES: Record<TaskPriority, string> = {
-  P1: 'border-destructive-border bg-surface-card hover:border-destructive',
-  P2: 'border-primary-tint-border bg-surface-card hover:border-primary',
-  P3: 'border-border bg-surface-card hover:border-success-border',
-  P4: 'border-border bg-surface-card hover:border-border-hover',
+  P1: 'border-destructive-border/70 bg-surface-card hover:border-destructive/60 transition-colors',
+  P2: 'border-primary-tint-border/60 bg-surface-card hover:border-primary/50 transition-colors',
+  P3: 'border-border/60 bg-surface-card hover:border-border transition-colors',
+  P4: 'border-border/50 bg-surface-card hover:border-border transition-colors',
 };
 
 export const PRIORITY_DOT_CLASSES: Record<TaskPriority, string> = {

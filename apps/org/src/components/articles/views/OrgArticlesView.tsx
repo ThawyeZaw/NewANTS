@@ -813,7 +813,7 @@ export function OrgArticlesView({
 
           <div
             style={{ '--stagger-index': 2 } as React.CSSProperties}
-            className="ants-stagger-item flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-surface-card p-4 lg:col-span-4"
+            className="ants-stagger-item flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/60 bg-surface-card p-4 lg:col-span-4"
           >
             <div className="flex items-center gap-4 font-mono text-xs tabular-nums">
               <div>
@@ -824,7 +824,7 @@ export function OrgArticlesView({
                   Published Guides
                 </span>
               </div>
-              <div className="h-7 w-px bg-border" aria-hidden="true" />
+              <div className="h-7 w-px bg-border/60" aria-hidden="true" />
               <div>
                 <span className="block text-base font-bold text-foreground">
                   {totalReadMinutes}m
@@ -850,7 +850,7 @@ export function OrgArticlesView({
          * =================================================================== */}
         <section
           aria-label="Filter and sort articles"
-          className="ants-article-toolbar-glass sticky top-16 z-20 rounded-xl border border-border p-3.5 sm:p-4 space-y-3.5 shadow-xs"
+          className="ants-article-toolbar-glass sticky top-16 z-20 rounded-xl border border-border/60 p-3.5 sm:p-4 space-y-3.5 shadow-xs"
         >
           {/* Row 1: Fluid Category Tabs + Instant Search Input */}
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -886,7 +886,7 @@ export function OrgArticlesView({
                       'ants-glide-item relative z-10 inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
                       active
                         ? 'border-transparent bg-primary-solid text-on-primary'
-                        : 'border-border bg-surface-card text-foreground-muted hover:border-border-hover hover:text-foreground'
+                        : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                     )}
                   >
                     <CategoryTabIcon
@@ -972,7 +972,7 @@ export function OrgArticlesView({
                   role="group"
                   aria-label="Sort articles"
                   data-gliding-ready={sortIndicatorReady ? 'true' : 'false'}
-                  className="ants-glide-host relative inline-flex items-center gap-1 rounded-lg border border-border bg-background p-0.5"
+                  className="ants-glide-host relative inline-flex items-center gap-1 rounded-lg border border-border/60 bg-background p-0.5"
                 >
                   <span
                     aria-hidden="true"
@@ -1019,7 +1019,7 @@ export function OrgArticlesView({
          * 3. EMPTY STATE OR FEATURED LEAD + 2-COLUMN MAGAZINE CARD GRID
          * =================================================================== */}
         {filteredArticles.length === 0 ? (
-          <div className="rounded-xl border border-border bg-surface-card py-14 px-6 text-center space-y-3">
+          <div className="rounded-xl border border-border/60 bg-surface-card py-14 px-6 text-center space-y-3">
             <BookOpen
               className="mx-auto h-7 w-7 text-foreground-subtle"
               aria-hidden="true"
@@ -1051,7 +1051,7 @@ export function OrgArticlesView({
             {leadArticle && (
               <article
                 style={{ '--stagger-index': 0 } as React.CSSProperties}
-                className="ants-stagger-item ants-article-card overflow-hidden rounded-2xl border border-border bg-surface-card lg:grid lg:grid-cols-12"
+                className="ants-stagger-item ants-article-card overflow-hidden rounded-2xl border border-border/60 bg-surface-card hover:border-border transition-colors lg:grid lg:grid-cols-12"
               >
                 {/* Left 5 Columns: Stylized Typographic & SVG Cover */}
                 <div className="lg:col-span-5">
@@ -1145,7 +1145,7 @@ export function OrgArticlesView({
                         '--stagger-index': Math.min(idx + 1, 8),
                       } as React.CSSProperties
                     }
-                    className="ants-stagger-item ants-article-card group flex flex-col justify-between overflow-hidden rounded-xl border border-border bg-surface-card"
+                    className="ants-stagger-item ants-article-card group flex flex-col justify-between overflow-hidden rounded-xl border border-border/60 bg-surface-card hover:border-border transition-colors"
                   >
                     <div>
                       {/* Stylized Typographic & SVG Cover */}

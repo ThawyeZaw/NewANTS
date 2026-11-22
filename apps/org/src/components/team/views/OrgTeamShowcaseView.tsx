@@ -186,7 +186,7 @@ export function OrgTeamShowcaseView({
         {/* Unboxed Hairline Filter Bar */}
         <section
           aria-label="Filter team members"
-          className="space-y-4 border-y border-border py-5"
+          className="space-y-4 border-y border-border/60 py-5"
         >
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div
@@ -220,7 +220,7 @@ export function OrgTeamShowcaseView({
                       'ants-glide-item relative z-10 inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
                       active
                         ? 'border-transparent bg-primary-solid text-on-primary'
-                        : 'border-border bg-surface-card text-foreground-muted hover:border-border-hover hover:text-foreground'
+                        : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                     )}
                   >
                     <span>{tab.label}</span>
@@ -294,7 +294,7 @@ export function OrgTeamShowcaseView({
                         'ants-glide-item relative z-10 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
                         active
                           ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-semibold'
-                          : 'border-border bg-background text-foreground-muted hover:border-border-hover hover:text-foreground'
+                          : 'border-border/60 bg-background text-foreground-muted hover:border-border hover:text-foreground'
                       )}
                     >
                       {board === 'all' ? 'All Boards' : board}
@@ -312,7 +312,7 @@ export function OrgTeamShowcaseView({
 
         {/* Two-Column Directory Grid */}
         {filteredMembers.length === 0 ? (
-          <div className="border-b border-border py-12 text-center space-y-3">
+          <div className="border-b border-border/60 py-12 text-center space-y-3">
             <Users className="mx-auto h-7 w-7 text-foreground-subtle" aria-hidden="true" />
             <div className="space-y-1">
               <h2 className="text-base font-bold text-foreground">
@@ -352,7 +352,7 @@ export function OrgTeamShowcaseView({
                   key={member.id}
                   id={member.username}
                   style={{ '--stagger-index': Math.min(idx, 8) } as React.CSSProperties}
-                  className="ants-stagger-item ants-card-interactive flex flex-col justify-between rounded-xl border border-border bg-surface-card p-6"
+                  className="ants-stagger-item ants-card-interactive flex flex-col justify-between rounded-xl border border-border/60 bg-surface-card hover:border-border transition-colors p-6"
                 >
                   <div className="space-y-4">
                     {/* Header: Initials Monogram, Name, and Single Concise Role Label */}
@@ -363,7 +363,7 @@ export function OrgTeamShowcaseView({
                             'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border text-xs font-bold',
                             member.isFounder
                               ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                              : 'border-border bg-surface-inset text-foreground'
+                              : 'border-border/60 bg-surface-inset text-foreground'
                           )}
                         >
                           {member.initials}

@@ -43,6 +43,10 @@ export function TaskListView({
 
   const openTasks = tasks.filter((t) => !t.done);
   const doneTasks = tasks.filter((t) => t.done);
+  const activeTask = openTasks.find((t) => t.id === activeTaskId) ?? null;
+  const remainingOpenTasks = activeTask
+    ? openTasks.filter((t) => t.id !== activeTask.id)
+    : openTasks;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -59,8 +63,10 @@ export function TaskListView({
       <li
         key={task.id}
         className={cn(
-          'group flex items-center gap-3 rounded-lg px-2 py-2 transition-colors',
-          isActive ? 'bg-primary-tint' : 'hover:bg-surface-inset'
+          'group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors',
+          isActive
+            ? 'rounded-xl border border-primary-tint-border/90 bg-primary-tint/40 shadow-xs'
+            : 'hover:bg-surface-inset/60'
         )}
       >
         <button
@@ -86,25 +92,36 @@ export function TaskListView({
           title={task.done ? undefined : isActive ? 'Stop tracking this task' : 'Track sessions for this task'}
           className="min-w-0 flex-1 text-left focus-visible:outline-none disabled:cursor-default"
         >
-          <span
-            className={cn(
-              'block truncate text-sm',
-              task.done ? 'text-foreground-muted line-through' : 'text-foreground',
-              isActive && 'font-semibold'
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                'block truncate text-sm',
+                task.done ? 'text-foreground-muted line-through' : 'text-foreground',
+                isActive && 'font-semibold text-foreground'
+              )}
+            >
+              {task.title}
+            </span>
+            {isActive && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-solid px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary">
+                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                Focusing
+              </span>
             )}
-          >
-            {task.title}
-          </span>
+          </div>
         </button>
 
         <span
-          className="shrink-0 font-mono text-xs tabular-nums text-foreground-muted"
+          className={cn(
+            'shrink-0 font-mono text-xs tabular-nums',
+            isActive ? 'font-semibold text-primary' : 'text-foreground-muted'
+          )}
           aria-label={`${task.completedPomodoros} of ${task.estimatedPomodoros} sessions`}
         >
           {task.completedPomodoros}/{task.estimatedPomodoros}
         </span>
 
-        <div className="flex shrink-0 items-center opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+        <div className="flex shrink-0 items-center opacity-100 transition-opacity sm:opacity-50 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
           {!task.done && (
             <>
               <button
@@ -202,10 +219,13 @@ export function TaskListView({
           No tasks yet. Add one and pick it before you start, so each session counts toward it.
         </p>
       ) : (
-        <ul className="-mx-2 flex flex-col">
-          {openTasks.map(renderTask)}
-          {doneTasks.map(renderTask)}
-        </ul>
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          <ul className="-mx-1 flex flex-col gap-1.5">
+            {activeTask && renderTask(activeTask)}
+            {remainingOpenTasks.map(renderTask)}
+            {doneTasks.map(renderTask)}
+          </ul>
+        </div>
       )}
 
       {doneTasks.length > 0 && (
