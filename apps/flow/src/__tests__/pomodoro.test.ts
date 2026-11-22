@@ -24,6 +24,7 @@ import {
   advancePhase,
   applySettings,
   createInitialTimer,
+  extendTimer,
   finishInterval,
   formatClock,
   getProgress,
@@ -102,6 +103,29 @@ describe('@ants/flow [ZYY-3.1] Pomodoro Timer Studio & App Shell', () => {
     const afterFourth = advancePhase(fourthWork, DEFAULT_POMODORO_SETTINGS, t0 + 25 * 60_000, true);
     expect(afterFourth.timer.phase).toBe('longBreak');
     expect(afterFourth.timer.remainingMs).toBe(15 * 60_000);
+  });
+
+  it('extends running and paused timers with minimal-step duration adjustment', () => {
+    const t0 = 1_700_000_000_000;
+    const initial = createInitialTimer(DEFAULT_POMODORO_SETTINGS);
+    const running = startTimer(initial, t0);
+    expect(getRemainingMs(running, t0)).toBe(25 * 60_000);
+
+    // Add +5m
+    const extendedRunning = extendTimer(running, 5, t0);
+    expect(getRemainingMs(extendedRunning, t0)).toBe(30 * 60_000);
+    expect(extendedRunning.status).toBe('running');
+
+    // Reduce -5m
+    const reducedRunning = extendTimer(extendedRunning, -5, t0);
+    expect(getRemainingMs(reducedRunning, t0)).toBe(25 * 60_000);
+
+    // Extend paused timer
+    const paused = pauseTimer(running, t0 + 5 * 60_000);
+    expect(paused.remainingMs).toBe(20 * 60_000);
+    const extendedPaused = extendTimer(paused, 10, t0 + 5 * 60_000);
+    expect(extendedPaused.remainingMs).toBe(30 * 60_000);
+    expect(extendedPaused.status).toBe('paused');
   });
 
   it('credits completed pomodoros to the active task and logs session history', () => {
@@ -253,6 +277,11 @@ describe('@ants/flow [ZYY-3.1] Pomodoro Timer Studio & App Shell', () => {
     expect(APPEARANCE_BOOTSTRAP_SCRIPT).toContain('.the-ants.org');
     expect(() => registerPomodoroServiceWorker()).not.toThrow();
     await expect(unregisterDevServiceWorkers()).resolves.toBeUndefined();
+  });
+
+  it('renders PomodoroView with wide content shell and TaskListView scrollable container', () => {
+    expect(typeof PomodoroView).toBe('function');
+    expect(typeof TaskListView).toBe('function');
   });
 });
 

@@ -8,6 +8,8 @@ import {
   Moon,
   Plus,
   RotateCcw,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 import { Badge, Button, ThemeToggle, cn, useSlidingIndicator, type MockUserProfile } from '@ants/ui';
 import {
@@ -79,6 +81,12 @@ const PRESET_OPTIONS: { id: TimetablePresetId; label: string }[] = [
   { id: 'scholar-ial', label: 'IAL Scholar' },
 ];
 
+export const TIMETABLE_ZOOM_LEVELS = [54, 72, 96, 120] as const;
+export type TimetableHourHeight = (typeof TIMETABLE_ZOOM_LEVELS)[number];
+export const MIN_ZOOM_HOUR_HEIGHT: TimetableHourHeight = 54;
+export const MAX_ZOOM_HOUR_HEIGHT: TimetableHourHeight = 120;
+const TIMETABLE_ZOOM_STORAGE_KEY = 'ants-flow-timetable-zoom-v1';
+
 export function SmartTimetableView({
   initialState,
   exams = MOCK_SYNCED_EXAMS,
@@ -97,6 +105,7 @@ export function SmartTimetableView({
   const [hydrated, setHydrated] = useState(false);
   const [todayIso, setTodayIso] = useState(DEFAULT_TIMETABLE_REFERENCE_DATE);
   const [nowMinutes, setNowMinutes] = useState(14 * 60 + 23);
+  const [hourHeight, setHourHeight] = useState<TimetableHourHeight>(72);
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorDraft, setEditorDraft] = useState<BlockEditorDraft | null>(null);
@@ -143,9 +152,35 @@ export function SmartTimetableView({
         stateRef.current = saved;
         setState(saved);
       }
+      try {
+        const savedZoom = localStorage.getItem(TIMETABLE_ZOOM_STORAGE_KEY);
+        if (savedZoom) {
+          const parsed = Number(savedZoom);
+          if (TIMETABLE_ZOOM_LEVELS.includes(parsed as TimetableHourHeight)) {
+            setHourHeight(parsed as TimetableHourHeight);
+          }
+        }
+      } catch {
+        // ignore storage errors
+      }
     }
     setHydrated(true);
   }, [persistToLocalStorage, storageKey]);
+
+  const handleZoomStep = (delta: -1 | 1) => {
+    const currentIndex = TIMETABLE_ZOOM_LEVELS.indexOf(hourHeight);
+    const safeCurrent = currentIndex === -1 ? 1 : currentIndex;
+    const nextIndex = Math.max(0, Math.min(TIMETABLE_ZOOM_LEVELS.length - 1, safeCurrent + delta));
+    const nextZoom = TIMETABLE_ZOOM_LEVELS[nextIndex] ?? 72;
+    setHourHeight(nextZoom);
+    if (persistToLocalStorage) {
+      try {
+        localStorage.setItem(TIMETABLE_ZOOM_STORAGE_KEY, String(nextZoom));
+      } catch {
+        // ignore storage errors
+      }
+    }
+  };
 
   useEffect(() => {
     if (!hydrated || !persistToLocalStorage) return;
@@ -387,188 +422,232 @@ export function SmartTimetableView({
       user={user}
       headerActions={<ThemeToggle />}
     >
-      {/* Top Timetable Toolbar */}
-      <div className="ants-workspace-enter flex flex-col gap-3 border-b border-border pb-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-            Smart Timetable
-          </h1>
+      {/* Top Timetable Toolbar — Two-Tier Visual Hierarchy */}
+      <div className="ants-workspace-enter flex flex-col gap-3.5 border-b border-border pb-4">
+        {/* Tier 1: Main Navigation & Core View Controls */}
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+              Smart Timetable
+            </h1>
 
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-surface-card p-0.5">
-            <button
-              type="button"
-              onClick={() => stepPeriod(-1)}
-              aria-label="Previous period"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground"
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={() => commit({ ...stateRef.current, selectedDate: todayIso })}
-              className="rounded-md px-2.5 py-1 text-xs font-semibold text-foreground transition-colors hover:bg-surface-inset"
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              onClick={() => stepPeriod(1)}
-              aria-label="Next period"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground"
-            >
-              <ChevronRight className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
-
-          <span className="font-mono text-xs font-semibold tabular-nums text-foreground-muted">
-            {periodLabel}
-          </span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Week / Day / Month Mode Switcher */}
-          <div
-            ref={viewTabsRef}
-            role="tablist"
-            aria-label="Timetable view mode"
-            data-gliding-ready={viewTabsIndicatorReady ? 'true' : 'false'}
-            className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
-          >
-            <span
-              aria-hidden="true"
-              data-animate={viewTabsAnimate ? 'true' : 'false'}
-              className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
-              style={{
-                transform: `translate3d(${viewTabsRect.x}px, ${viewTabsRect.y}px, 0)`,
-                width: `${viewTabsRect.width}px`,
-                height: `${viewTabsRect.height}px`,
-                opacity: viewTabsIndicatorReady ? 1 : 0,
-              }}
-            />
-            {VIEW_TABS.map((t) => {
-              const active = state.viewMode === t.id;
-              return (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5 rounded-lg border border-border bg-surface-card p-0.5">
                 <button
-                  key={t.id}
                   type="button"
-                  role="tab"
-                  aria-selected={active}
-                  data-active={active ? 'true' : 'false'}
-                  onClick={() => commit({ ...stateRef.current, viewMode: t.id })}
-                  className={cn(
-                    'ants-glide-item relative z-10 rounded-md px-3 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
-                    active
-                      ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]'
-                      : 'text-foreground-muted hover:text-foreground'
-                  )}
+                  onClick={() => stepPeriod(-1)}
+                  aria-label="Previous period"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground"
                 >
-                  {t.label}
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 </button>
-              );
-            })}
+                <button
+                  type="button"
+                  onClick={() => commit({ ...stateRef.current, selectedDate: todayIso })}
+                  className="rounded-md px-2.5 py-1 text-xs font-semibold text-foreground transition-colors hover:bg-surface-inset"
+                >
+                  Today
+                </button>
+                <button
+                  type="button"
+                  onClick={() => stepPeriod(1)}
+                  aria-label="Next period"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground"
+                >
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+
+              <span className="font-mono text-xs font-semibold tabular-nums text-foreground-muted">
+                {periodLabel}
+              </span>
+            </div>
           </div>
 
-          {state.viewMode === 'week' && (
-            <button
-              type="button"
-              aria-pressed={state.showOvernightHours}
-              onClick={() =>
-                commit({
-                  ...stateRef.current,
-                  showOvernightHours: !stateRef.current.showOvernightHours,
-                })
-              }
-              title={
-                state.showOvernightHours
-                  ? 'Collapse 00:00–06:00 overnight sleep into summary strip'
-                  : 'Expand full 00:00–24:00 grid'
-              }
-              className={cn(
-                'inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold transition-colors',
-                state.showOvernightHours
-                  ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                  : 'border-border bg-surface-card text-foreground hover:border-border-hover'
-              )}
-            >
-              <Moon className="h-3.5 w-3.5" aria-hidden="true" />
-              {state.showOvernightHours ? '00–24h Expanded' : '00–06 Grouped'}
-            </button>
-          )}
-
-          <button
-            type="button"
-            aria-pressed={state.showExams}
-            onClick={() =>
-              commit({ ...stateRef.current, showExams: !stateRef.current.showExams })
-            }
-            className={cn(
-              'inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-semibold transition-colors',
-              state.showExams
-                ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint'
-                : 'border-border bg-surface-card text-foreground-muted hover:text-foreground'
-            )}
-          >
-            <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
-            Show Exams
-          </button>
-
-          {/* Demo Preset Switcher */}
-          <div className="inline-flex items-center rounded-lg border border-border bg-surface-card p-0.5">
+          <div className="flex items-center gap-2.5">
+            {/* Week / Day / Month Mode Switcher */}
             <div
-              ref={presetTabsRef}
-              data-gliding-ready={presetTabsIndicatorReady ? 'true' : 'false'}
-              className="ants-glide-host relative inline-flex items-center"
+              ref={viewTabsRef}
+              role="tablist"
+              aria-label="Timetable view mode"
+              data-gliding-ready={viewTabsIndicatorReady ? 'true' : 'false'}
+              className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
             >
               <span
                 aria-hidden="true"
-                data-animate={presetTabsAnimate ? 'true' : 'false'}
-                className="ants-glide-indicator z-0 rounded-md bg-surface-inset"
+                data-animate={viewTabsAnimate ? 'true' : 'false'}
+                className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
                 style={{
-                  transform: `translate3d(${presetTabsRect.x}px, ${presetTabsRect.y}px, 0)`,
-                  width: `${presetTabsRect.width}px`,
-                  height: `${presetTabsRect.height}px`,
-                  opacity: presetTabsIndicatorReady ? 1 : 0,
+                  transform: `translate3d(${viewTabsRect.x}px, ${viewTabsRect.y}px, 0)`,
+                  width: `${viewTabsRect.width}px`,
+                  height: `${viewTabsRect.height}px`,
+                  opacity: viewTabsIndicatorReady ? 1 : 0,
                 }}
               />
-              {PRESET_OPTIONS.map((p) => {
-                const active = state.presetId === p.id;
+              {VIEW_TABS.map((t) => {
+                const active = state.viewMode === t.id;
                 return (
                   <button
-                    key={p.id}
+                    key={t.id}
                     type="button"
-                    aria-pressed={active}
+                    role="tab"
+                    aria-selected={active}
                     data-active={active ? 'true' : 'false'}
-                    onClick={() => switchPreset(p.id)}
+                    onClick={() => commit({ ...stateRef.current, viewMode: t.id })}
                     className={cn(
-                      'ants-glide-item relative z-10 rounded-md px-2.5 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
+                      'ants-glide-item relative z-10 rounded-md px-3 py-1 text-xs font-semibold transition-colors active:scale-[0.98]',
                       active
-                        ? 'bg-surface-inset text-foreground'
+                        ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]'
                         : 'text-foreground-muted hover:text-foreground'
                     )}
                   >
-                    {p.label}
+                    {t.label}
                   </button>
                 );
               })}
             </div>
+
+            <Button
+              size="sm"
+              leftIcon={<Plus className="h-3.5 w-3.5" aria-hidden="true" />}
+              onClick={() => openQuickAdd(state.selectedDate, 6 * 60 + 15)}
+            >
+              Block time
+            </Button>
+          </div>
+        </div>
+
+        {/* Tier 2: Quiet Secondary Utility Shelf */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-foreground-muted">
+          <div className="flex flex-wrap items-center gap-2">
+            {state.viewMode === 'week' && (
+              <div
+                className="flex items-center gap-0.5 rounded-lg border border-border/70 bg-surface-card p-0.5"
+                title="Vertical Zoom (Hour Height)"
+              >
+                <button
+                  type="button"
+                  onClick={() => handleZoomStep(-1)}
+                  disabled={hourHeight <= MIN_ZOOM_HOUR_HEIGHT}
+                  aria-label="Zoom out timetable vertically"
+                  title="Zoom out (shorter hours)"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground disabled:opacity-30"
+                >
+                  <ZoomOut className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+                <span className="min-w-11 px-1 text-center font-mono text-[11px] font-semibold tabular-nums text-foreground">
+                  {hourHeight}px
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleZoomStep(1)}
+                  disabled={hourHeight >= MAX_ZOOM_HOUR_HEIGHT}
+                  aria-label="Zoom in timetable vertically"
+                  title="Zoom in (taller hours)"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground disabled:opacity-30"
+                >
+                  <ZoomIn className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </div>
+            )}
+
+            {state.viewMode === 'week' && (
+              <button
+                type="button"
+                aria-pressed={state.showOvernightHours}
+                onClick={() =>
+                  commit({
+                    ...stateRef.current,
+                    showOvernightHours: !stateRef.current.showOvernightHours,
+                  })
+                }
+                title={
+                  state.showOvernightHours
+                    ? 'Collapse 00:00–06:00 overnight sleep into summary strip'
+                    : 'Expand full 00:00–24:00 grid'
+                }
+                className={cn(
+                  'inline-flex h-7 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors',
+                  state.showOvernightHours
+                    ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-semibold'
+                    : 'border-border/70 bg-surface-card text-foreground hover:border-border-hover'
+                )}
+              >
+                <Moon className="h-3 w-3" aria-hidden="true" />
+                {state.showOvernightHours ? '00–24h Expanded' : '00–06 Grouped'}
+              </button>
+            )}
+
             <button
               type="button"
-              title="Reset active preset"
-              aria-label="Reset active preset"
-              onClick={() => switchPreset(state.presetId)}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted hover:bg-surface-inset hover:text-foreground"
+              aria-pressed={state.showExams}
+              onClick={() =>
+                commit({ ...stateRef.current, showExams: !stateRef.current.showExams })
+              }
+              className={cn(
+                'inline-flex h-7 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors',
+                state.showExams
+                  ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-semibold'
+                  : 'border-border/70 bg-surface-card text-foreground-muted hover:text-foreground'
+              )}
             >
-              <RotateCcw className="h-3 w-3" aria-hidden="true" />
+              <GraduationCap className="h-3 w-3" aria-hidden="true" />
+              Show Exams
             </button>
           </div>
 
-          <Button
-            size="sm"
-            leftIcon={<Plus className="h-3.5 w-3.5" aria-hidden="true" />}
-            onClick={() => openQuickAdd(state.selectedDate, 6 * 60 + 15)}
-          >
-            Block time
-          </Button>
+          {/* Subordinated Demo Preset Switcher */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-foreground-subtle">Preset:</span>
+            <div className="inline-flex items-center rounded-lg border border-border/60 bg-surface-card p-0.5">
+              <div
+                ref={presetTabsRef}
+                data-gliding-ready={presetTabsIndicatorReady ? 'true' : 'false'}
+                className="ants-glide-host relative inline-flex items-center"
+              >
+                <span
+                  aria-hidden="true"
+                  data-animate={presetTabsAnimate ? 'true' : 'false'}
+                  className="ants-glide-indicator z-0 rounded-md bg-surface-inset"
+                  style={{
+                    transform: `translate3d(${presetTabsRect.x}px, ${presetTabsRect.y}px, 0)`,
+                    width: `${presetTabsRect.width}px`,
+                    height: `${presetTabsRect.height}px`,
+                    opacity: presetTabsIndicatorReady ? 1 : 0,
+                  }}
+                />
+                {PRESET_OPTIONS.map((p) => {
+                  const active = state.presetId === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      aria-pressed={active}
+                      data-active={active ? 'true' : 'false'}
+                      onClick={() => switchPreset(p.id)}
+                      className={cn(
+                        'ants-glide-item relative z-10 rounded-md px-2 py-0.5 text-xs font-medium transition-colors active:scale-[0.98]',
+                        active
+                          ? 'bg-surface-inset text-foreground font-semibold'
+                          : 'text-foreground-muted hover:text-foreground'
+                      )}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                title="Reset active preset"
+                aria-label="Reset active preset"
+                onClick={() => switchPreset(state.presetId)}
+                className="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground-muted hover:bg-surface-inset hover:text-foreground"
+              >
+                <RotateCcw className="h-3 w-3" aria-hidden="true" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -625,6 +704,7 @@ export function SmartTimetableView({
               blocks={state.blocks}
               showOvernightHours={state.showOvernightHours}
               nowMinutes={nowMinutes}
+              hourHeight={hourHeight}
               onSelectDate={(iso) =>
                 commit({ ...stateRef.current, selectedDate: iso })
               }

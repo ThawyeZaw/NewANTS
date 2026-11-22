@@ -246,12 +246,12 @@ export function TodayFocusRailView({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 opacity-100 transition-opacity sm:opacity-60 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
                       <button
                         type="button"
                         onClick={() => onScheduleTask(task)}
                         title="Schedule onto timetable"
-                        className="inline-flex h-6 items-center gap-1 rounded border border-border px-1.5 text-[10px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground"
+                        className="inline-flex h-6 items-center gap-1 rounded border border-border/70 px-1.5 text-[10px] font-semibold text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground"
                       >
                         <CalendarPlus className="h-3 w-3" aria-hidden="true" />
                         Block

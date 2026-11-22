@@ -1,7 +1,17 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image as ImageIcon, Maximize2, Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
+import {
+  Clock,
+  Maximize2,
+  Pause,
+  Play,
+  RotateCcw,
+  SkipForward,
+  Sliders,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import {
   THEME_CHANGE_EVENT,
   THEME_STORAGE_KEY,
@@ -19,11 +29,13 @@ import {
   clampNumber,
   createId,
   estimateFinishTime,
+  extendTimer,
   finishInterval,
   formatClock,
   getProgress,
   getRemainingMs,
   pauseTimer,
+  resetTimer,
   startTimer,
   type PomodoroPersistedState,
   type PomodoroPhase,
@@ -32,7 +44,12 @@ import {
   type PomodoroTask,
 } from '../../../lib/pomodoro/engine';
 import { POMODORO_STORAGE_KEY, loadPomodoroState, savePomodoroState } from '../../../lib/pomodoro/storage';
-import { ambientAudio, getAmbientSound, getFocusScene } from '../../../lib/pomodoro/ambient';
+import {
+  AMBIENT_SOUNDS,
+  ambientAudio,
+  getAmbientSound,
+  getFocusScene,
+} from '../../../lib/pomodoro/ambient';
 import { playClockTick, playClockTickSample, playFocusCue, playSound, unlockAudio } from '../../../lib/pomodoro/sound';
 import {
   applyAppearance,
@@ -74,6 +91,12 @@ export interface PomodoroViewProps {
 
 const PHASES: PomodoroPhase[] = ['work', 'shortBreak', 'longBreak'];
 const NEW_TASK_INPUT_ID = 'flow-pomodoro-new-task-input';
+
+const DURATION_PRESETS: Record<PomodoroPhase, readonly number[]> = {
+  work: [15, 25, 50, 90],
+  shortBreak: [3, 5, 10],
+  longBreak: [15, 20, 30],
+};
 
 const roundButton =
   'inline-flex h-12 w-12 items-center justify-center rounded-full text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
@@ -551,6 +574,123 @@ export function PomodoroView({
         ? state.settings.shortBreakMinutes
         : state.settings.longBreakMinutes;
 
+  const extendTimerByMinutes = useCallback(
+    (deltaMinutes: number) => {
+      unlockAudio();
+      const t = Date.now();
+      setNow(t);
+      const current = stateRef.current;
+      commit({
+        ...current,
+        timer: extendTimer(current.timer, deltaMinutes, t),
+      });
+    },
+    [commit]
+  );
+
+  const setPhaseDurationPreset = useCallback(
+    (minutes: number) => {
+      const current = stateRef.current;
+      const phase = current.timer.phase;
+      const updatedSettings: PomodoroSettings = {
+        ...current.settings,
+        ...(phase === 'work' ? { workMinutes: minutes } : {}),
+        ...(phase === 'shortBreak' ? { shortBreakMinutes: minutes } : {}),
+        ...(phase === 'longBreak' ? { longBreakMinutes: minutes } : {}),
+      };
+      commit({
+        ...current,
+        settings: updatedSettings,
+        timer: resetTimer(current.timer, updatedSettings),
+      });
+      onSettingsChange?.(updatedSettings);
+    },
+    [commit, onSettingsChange]
+  );
+
+  const toggleClockTick = useCallback(() => {
+    unlockAudio();
+    const current = stateRef.current;
+    const nextTicking = !current.settings.sound.ticking;
+    const updated: PomodoroSettings = {
+      ...current.settings,
+      sound: { ...current.settings.sound, ticking: nextTicking },
+    };
+    commit(applySettings(current, updated));
+    if (nextTicking && !(current.timer.status === 'running' && current.timer.phase === 'work')) {
+      playClockTickSample(current.settings.sound.tickingVolume);
+    }
+    onSettingsChange?.(updated);
+  }, [commit, onSettingsChange]);
+
+  const cycleAmbientSound = useCallback(() => {
+    unlockAudio();
+    const current = stateRef.current;
+    const currentIndex = AMBIENT_SOUNDS.findIndex((s) => s.id === current.settings.ambient.sound);
+    const nextSound = AMBIENT_SOUNDS[(currentIndex + 1) % AMBIENT_SOUNDS.length]!.id;
+    const updated: PomodoroSettings = {
+      ...current.settings,
+      ambient: { ...current.settings.ambient, sound: nextSound },
+    };
+    commit(applySettings(current, updated));
+    onSettingsChange?.(updated);
+  }, [commit, onSettingsChange]);
+
+  const startTaskAndTimer = useCallback(
+    (taskId: string) => {
+      unlockAudio();
+      const t = Date.now();
+      setNow(t);
+      const current = stateRef.current;
+      const isCurrentActive = current.activeTaskId === taskId;
+      const isCurrentlyRunning = current.timer.status === 'running';
+
+      if (isCurrentActive && isCurrentlyRunning) {
+        commit({ ...current, timer: pauseTimer(current.timer, t) });
+        if (current.settings.sound.enabled) playFocusCue('pause', current.settings.sound.volume);
+        return;
+      }
+
+      const nextTimer = startTimer(current.timer, t);
+      commit({
+        ...current,
+        activeTaskId: taskId,
+        timer: nextTimer,
+      });
+      if (current.settings.sound.enabled) playFocusCue('start', current.settings.sound.volume);
+      if (current.timer.phase === 'work' && current.settings.focus.autoEnterOnWork) openFocusMode();
+    },
+    [commit, openFocusMode]
+  );
+
+  const addAndStartTask = useCallback(
+    (title: string, estimatedPomodoros: number) => {
+      unlockAudio();
+      const t = Date.now();
+      setNow(t);
+      const task: PomodoroTask = {
+        id: createId('task'),
+        title,
+        estimatedPomodoros: clampNumber(estimatedPomodoros, 1, 20, 1),
+        completedPomodoros: 0,
+        done: false,
+        createdAt: new Date().toISOString(),
+      };
+      const current = stateRef.current;
+      const nextTimer = startTimer(current.timer, t);
+      commit({
+        ...current,
+        tasks: [task, ...current.tasks],
+        activeTaskId: task.id,
+        timer: nextTimer,
+      });
+      if (current.settings.sound.enabled) playFocusCue('start', current.settings.sound.volume);
+      onTasksChange?.([task, ...current.tasks]);
+      if (current.timer.phase === 'work' && current.settings.focus.autoEnterOnWork) openFocusMode();
+    },
+    [commit, onTasksChange, openFocusMode]
+  );
+
   const sectionTabsRef = useRef<HTMLDivElement | null>(null);
   const {
     rect: sectionRect,
@@ -572,18 +712,13 @@ export function PomodoroView({
   const intervalIndicatorReady = intervalReady && intervalRect.visible;
 
   const startLabel = isRunning ? 'Pause' : state.timer.status === 'paused' ? 'Resume' : 'Start';
-  const atmosphereLabel = [
-    activeScene.id !== 'none' ? activeScene.label : null,
-    activeAmbientSound.id !== 'off' ? activeAmbientSound.label : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
 
   return (
     <>
       <FlowShellView
         activeSection="pomodoro"
         tabs={[]}
+        contentWidth="wide"
         timerBadge={state.timer.status !== 'idle' ? timeLabel : null}
         backgroundImageSrc={
           tab === 'timer' && state.settings.ambient.showSceneOnTimer ? activeScene.imageSrc : null
@@ -658,115 +793,228 @@ export function PomodoroView({
       </div>
 
       {tab === 'timer' ? (
-        <div key="timer" className="ants-panel-enter mx-auto max-w-xl">
-          <section aria-label="Timer" className="flex flex-col items-center">
-            <div
-              ref={intervalTabsRef}
-              role="tablist"
-              aria-label="Interval"
-              data-gliding-ready={intervalIndicatorReady ? 'true' : 'false'}
-              className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
+        <div key="timer" className="ants-panel-enter mx-auto max-w-5xl lg:max-w-6xl">
+          <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:gap-8 lg:items-stretch lg:h-[calc(100dvh-11.5rem)] lg:min-h-[560px] lg:max-h-[760px] landscape:grid landscape:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] landscape:gap-6">
+            {/* Left Column: Timer & Controls (1-screen viewport) */}
+            <section
+              aria-label="Timer"
+              className="flex flex-col items-center justify-between rounded-2xl border border-border/60 bg-surface-card/85 p-5 sm:p-7 backdrop-blur-sm shadow-[var(--shadow-tier-1)] lg:h-full"
             >
-              <span
-                aria-hidden="true"
-                data-animate={intervalAnimate ? 'true' : 'false'}
-                className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
-                style={{
-                  transform: `translate3d(${intervalRect.x}px, ${intervalRect.y}px, 0)`,
-                  width: `${intervalRect.width}px`,
-                  height: `${intervalRect.height}px`,
-                  opacity: intervalIndicatorReady ? 1 : 0,
-                }}
-              />
-              {PHASES.map((phase) => {
-                const active = state.timer.phase === phase;
-                return (
+              <div
+                ref={intervalTabsRef}
+                role="tablist"
+                aria-label="Interval"
+                data-gliding-ready={intervalIndicatorReady ? 'true' : 'false'}
+                className="ants-glide-host relative inline-flex rounded-lg bg-surface-inset p-1"
+              >
+                <span
+                  aria-hidden="true"
+                  data-animate={intervalAnimate ? 'true' : 'false'}
+                  className="ants-glide-indicator z-0 rounded-md bg-surface-card shadow-[var(--shadow-tier-1)]"
+                  style={{
+                    transform: `translate3d(${intervalRect.x}px, ${intervalRect.y}px, 0)`,
+                    width: `${intervalRect.width}px`,
+                    height: `${intervalRect.height}px`,
+                    opacity: intervalIndicatorReady ? 1 : 0,
+                  }}
+                />
+                {PHASES.map((phase) => {
+                  const active = state.timer.phase === phase;
+                  return (
+                    <button
+                      key={phase}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      data-active={active ? 'true' : 'false'}
+                      onClick={() => selectPhase(phase)}
+                      className={cn(
+                        'ants-glide-item relative z-10 min-h-[38px] rounded-md px-3 py-1.5 text-sm font-medium transition-colors sm:px-4',
+                        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
+                        active ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]' : 'text-foreground-muted hover:text-foreground'
+                      )}
+                    >
+                      {PHASE_LABELS[phase]}
+                      <span className="sr-only">, {minutesFor(phase)} minutes</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Instant Duration Quick-Pills (Zero Modal Steps) */}
+              {state.timer.status === 'idle' ? (
+                <div className="mt-2.5 flex items-center justify-center gap-1.5">
+                  <span className="text-[11px] font-medium text-foreground-muted">Length:</span>
+                  {(DURATION_PRESETS[state.timer.phase] ?? [25]).map((mins) => {
+                    const isCurrent = minutesFor(state.timer.phase) === mins;
+                    return (
+                      <button
+                        key={mins}
+                        type="button"
+                        onClick={() => setPhaseDurationPreset(mins)}
+                        className={cn(
+                          'rounded-md px-2 py-0.5 font-mono text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                          isCurrent
+                            ? 'bg-primary-solid text-on-primary shadow-xs'
+                            : 'bg-surface-inset text-foreground-muted hover:bg-surface-elevated hover:text-foreground'
+                        )}
+                        title={`Set ${PHASE_LABELS[state.timer.phase]} duration to ${mins} minutes`}
+                      >
+                        {mins}m
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="mt-2 flex items-center justify-center gap-1.5">
                   <button
-                    key={phase}
                     type="button"
-                    role="tab"
-                    aria-selected={active}
-                    data-active={active ? 'true' : 'false'}
-                    onClick={() => selectPhase(phase)}
+                    onClick={() => extendTimerByMinutes(5)}
+                    title="Extend running session by 5 minutes without restarting (+5m)"
+                    className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-surface-inset px-2.5 py-0.5 text-xs font-mono font-medium text-foreground transition-all hover:border-primary hover:bg-surface-elevated hover:text-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    +5m
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => extendTimerByMinutes(10)}
+                    title="Extend running session by 10 minutes without restarting (+10m)"
+                    className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-surface-inset px-2.5 py-0.5 text-xs font-mono font-medium text-foreground transition-all hover:border-primary hover:bg-surface-elevated hover:text-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    +10m
+                  </button>
+                  {remainingMs > 5 * 60_000 && (
+                    <button
+                      type="button"
+                      onClick={() => extendTimerByMinutes(-5)}
+                      title="Reduce session by 5 minutes (-5m)"
+                      className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-surface-inset px-2 py-0.5 text-xs font-mono font-medium text-foreground-muted transition-all hover:border-destructive hover:text-destructive active:scale-[0.98] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    >
+                      -5m
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <TimerRingView
+                className="my-3 sm:my-5"
+                progress={progress}
+                timeLabel={timeLabel}
+                remainingMs={remainingMs}
+                phase={state.timer.phase}
+                status={state.timer.status}
+                caption={isWork ? activeTask?.title ?? 'No task selected' : 'Take a break'}
+                cycleCount={state.timer.cycleCount}
+                longBreakInterval={state.settings.longBreakInterval}
+                onToggle={toggleStartPause}
+              />
+
+              <div className="flex flex-col items-center gap-3.5 sm:gap-4">
+                <div className="flex items-center gap-5 sm:gap-6">
+                  <button type="button" onClick={reset} aria-label="Reset" title="Reset (R)" className={roundButton}>
+                    <RotateCcw className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={toggleStartPause}
+                    title={`${startLabel} (Space or click dial)`}
                     className={cn(
-                      'ants-glide-item relative z-10 min-h-[38px] rounded-md px-3 py-1.5 text-sm font-medium transition-colors sm:px-4',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
-                      active ? 'bg-surface-card text-foreground shadow-[var(--shadow-tier-1)]' : 'text-foreground-muted hover:text-foreground'
+                      'inline-flex h-13 min-w-36 items-center justify-center gap-2 rounded-full bg-primary px-7 text-base font-semibold text-on-primary transition-[background-color,transform] hover:bg-primary-hover active:scale-[0.98] sm:h-14 sm:min-w-40 sm:px-8',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
                     )}
                   >
-                    {PHASE_LABELS[phase]}
-                    <span className="sr-only">, {minutesFor(phase)} minutes</span>
+                    {isRunning ? <Pause className="h-5 w-5 fill-current" aria-hidden="true" /> : <Play className="h-5 w-5 fill-current" aria-hidden="true" />}
+                    <span>{startLabel}</span>
+                    <kbd className="hidden font-mono text-[11px] opacity-75 sm:inline">[Space]</kbd>
                   </button>
-                );
-              })}
+                  <button type="button" onClick={skip} aria-label="Skip to next interval" title="Skip (S)" className={roundButton}>
+                    <SkipForward className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </div>
+
+                <div className="flex w-full flex-wrap items-center justify-center gap-2 border-t border-border/40 pt-2.5 sm:gap-2.5">
+                  {/* 1-Click Clock Ticking Toggle */}
+                  <button
+                    type="button"
+                    onClick={toggleClockTick}
+                    title={`Toggle mechanical clock ticking (${state.settings.sound.ticking ? 'Currently On' : 'Currently Off'})`}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                      state.settings.sound.ticking
+                        ? 'bg-primary-tint/70 text-primary-solid font-semibold'
+                        : 'bg-surface-inset text-foreground-muted hover:text-foreground'
+                    )}
+                  >
+                    <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Tick {state.settings.sound.ticking ? 'On' : 'Off'}</span>
+                  </button>
+
+                  {/* 1-Click Ambient Sound Cycle */}
+                  <button
+                    type="button"
+                    onClick={cycleAmbientSound}
+                    title={`Cycle ambient soundscape (Current: ${activeAmbientSound.label}). Click to cycle.`}
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+                      state.settings.ambient.sound !== 'off'
+                        ? 'bg-primary-tint/70 text-primary-solid font-semibold'
+                        : 'bg-surface-inset text-foreground-muted hover:text-foreground'
+                    )}
+                  >
+                    {state.settings.ambient.sound !== 'off' ? (
+                      <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    ) : (
+                      <VolumeX className="h-3.5 w-3.5" aria-hidden="true" />
+                    )}
+                    <span className="max-w-[100px] truncate">{activeAmbientSound.label}</span>
+                  </button>
+
+                  {/* Focus Mode Launcher */}
+                  <button
+                    type="button"
+                    onClick={openFocusMode}
+                    title="Open distraction-free Focus Mode (F)"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-surface-inset px-2.5 py-1 text-xs font-medium text-foreground-muted transition-all hover:bg-surface-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  >
+                    <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Focus</span>
+                    <kbd className="hidden font-mono text-[10px] text-foreground-muted/70 sm:inline">[F]</kbd>
+                  </button>
+
+                  {/* Settings Drawer Button */}
+                  <button
+                    type="button"
+                    onClick={() => openSettings('timer')}
+                    title="Full Pomodoro & Atmosphere Settings (,)"
+                    className="inline-flex items-center gap-1 rounded-lg bg-surface-inset p-1.5 text-xs text-foreground-muted transition-all hover:bg-surface-elevated hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    aria-label="Pomodoro settings"
+                  >
+                    <Sliders className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* Right Column: Tasks Panel (1-screen viewport) */}
+            <div className="flex flex-col rounded-2xl border border-border/60 bg-surface-card/85 p-5 sm:p-6 backdrop-blur-sm shadow-[var(--shadow-tier-1)] lg:h-full lg:min-h-0 landscape:h-full landscape:min-h-0">
+              <TaskListView
+                className="flex flex-col h-full min-h-0"
+                tasks={state.tasks}
+                activeTaskId={state.activeTaskId}
+                finishEstimate={hydrated ? finishEstimate : null}
+                newTaskInputId={NEW_TASK_INPUT_ID}
+                onAddTask={addTask}
+                onAddAndStartTask={addAndStartTask}
+                onToggleTask={toggleTask}
+                onDeleteTask={deleteTask}
+                onSelectTask={(id) => commit({ ...stateRef.current, activeTaskId: id })}
+                onStartTask={startTaskAndTimer}
+                onChangeEstimate={changeEstimate}
+                onClearCompleted={() => updateTasks(stateRef.current.tasks.filter((t) => !t.done))}
+                timerRunning={isRunning}
+              />
             </div>
-
-            <TimerRingView
-              className="mt-7 sm:mt-9"
-              progress={progress}
-              timeLabel={timeLabel}
-              remainingMs={remainingMs}
-              phase={state.timer.phase}
-              status={state.timer.status}
-              caption={isWork ? activeTask?.title ?? 'No task selected' : 'Take a break'}
-              cycleCount={state.timer.cycleCount}
-              longBreakInterval={state.settings.longBreakInterval}
-            />
-
-            <div className="mt-8 flex items-center gap-6 sm:mt-10">
-              <button type="button" onClick={reset} aria-label="Reset" title="Reset (R)" className={roundButton}>
-                <RotateCcw className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={toggleStartPause}
-                title={`${startLabel} (Space)`}
-                className={cn(
-                  'inline-flex h-14 min-w-40 items-center justify-center gap-2 rounded-full bg-primary px-8 text-base font-semibold text-on-primary transition-[background-color,transform] hover:bg-primary-hover active:scale-[0.98]',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
-                )}
-              >
-                {isRunning ? <Pause className="h-5 w-5" aria-hidden="true" /> : <Play className="h-5 w-5" aria-hidden="true" />}
-                {startLabel}
-              </button>
-              <button type="button" onClick={skip} aria-label="Skip to next interval" title="Skip (S)" className={roundButton}>
-                <SkipForward className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-5">
-              <button
-                type="button"
-                onClick={openFocusMode}
-                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
-                Focus mode
-              </button>
-              <button
-                type="button"
-                onClick={() => openSettings('atmosphere')}
-                className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                {atmosphereLabel || 'Scene & sound'}
-              </button>
-            </div>
-          </section>
-
-          <TaskListView
-            className="mt-14 border-t border-border pt-8"
-            tasks={state.tasks}
-            activeTaskId={state.activeTaskId}
-            finishEstimate={hydrated ? finishEstimate : null}
-            newTaskInputId={NEW_TASK_INPUT_ID}
-            onAddTask={addTask}
-            onToggleTask={toggleTask}
-            onDeleteTask={deleteTask}
-            onSelectTask={(id) => commit({ ...stateRef.current, activeTaskId: id })}
-            onChangeEstimate={changeEstimate}
-            onClearCompleted={() => updateTasks(stateRef.current.tasks.filter((t) => !t.done))}
-          />
+          </div>
         </div>
       ) : (
         <div key="stats" className="ants-panel-enter">

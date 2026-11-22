@@ -12,10 +12,15 @@ import {
   formatMinutes24h,
   formatShortWeekday,
   getBlocksForDate,
+  getCategoryLabel,
   snapMinutes,
   type TimetableBlock,
 } from '../../../lib/timetable/engine';
-import { CATEGORY_BLOCK_CLASSES, PRIORITY_BADGE_CLASSES } from './timetableStyles';
+import {
+  CATEGORY_BLOCK_CLASSES,
+  CATEGORY_PILL_CLASSES,
+  PRIORITY_BADGE_CLASSES,
+} from './timetableStyles';
 
 export interface TimetableWeekGridViewProps {
   weekDates: string[];
@@ -24,6 +29,7 @@ export interface TimetableWeekGridViewProps {
   blocks: TimetableBlock[];
   showOvernightHours?: boolean;
   nowMinutes?: number;
+  hourHeight?: number;
   onSelectDate: (iso: string) => void;
   onQuickAddSlot: (date: string, startMinutes: number) => void;
   onEditBlock: (block: TimetableBlock) => void;
@@ -33,8 +39,6 @@ export interface TimetableWeekGridViewProps {
   onToggleOvernight?: () => void;
   onSwitchToDay?: () => void;
 }
-
-const HOUR_HEIGHT = 72;
 
 interface DragSession {
   mode: 'move' | 'resize';
@@ -55,6 +59,7 @@ export function TimetableWeekGridView({
   blocks,
   showOvernightHours = false,
   nowMinutes = 14 * 60 + 23,
+  hourHeight = 72,
   onSelectDate,
   onQuickAddSlot,
   onEditBlock,
@@ -64,6 +69,7 @@ export function TimetableWeekGridView({
   onToggleOvernight,
   onSwitchToDay,
 }: TimetableWeekGridViewProps) {
+  const HOUR_HEIGHT = hourHeight;
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const columnsRef = useRef<HTMLDivElement | null>(null);
   const [drag, setDrag] = useState<DragSession | null>(null);
@@ -435,9 +441,17 @@ export function TimetableWeekGridView({
                               </div>
 
                               {!compact && (
-                                <div className="mt-0.5 flex flex-nowrap items-center gap-1 overflow-hidden">
-                                  <span className="truncate font-mono text-[10px] tabular-nums opacity-80">
+                                <div className="mt-0.5 flex flex-wrap items-center gap-1 overflow-hidden">
+                                  <span className="truncate font-mono text-[10px] tabular-nums opacity-85">
                                     {formatMinutes24h(displayStart)}–{formatMinutes24h(displayEnd)}
+                                  </span>
+                                  <span
+                                    className={cn(
+                                      'shrink-0 rounded border px-1 font-mono text-[9px] font-semibold leading-3.5',
+                                      CATEGORY_PILL_CLASSES[block.category]
+                                    )}
+                                  >
+                                    {getCategoryLabel(block.category)}
                                   </span>
                                   {block.priority && (
                                     <span

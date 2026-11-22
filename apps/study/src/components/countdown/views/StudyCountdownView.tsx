@@ -335,7 +335,7 @@ export function StudyCountdownView({
         {/* Next Nearest Exam Spotlight & Hairline Telemetry Strip */}
         <section
           aria-label="Nearest exam countdown telemetry"
-          className="rounded-xl border border-border bg-surface-card p-5 shadow-[var(--shadow-tier-1)]"
+          className="rounded-xl border border-border/60 bg-surface-card/90 p-5 shadow-[var(--shadow-tier-1)]"
         >
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-center">
             <div className="space-y-2 lg:col-span-7">
@@ -380,7 +380,7 @@ export function StudyCountdownView({
               )}
             </div>
 
-            <div className="grid grid-cols-3 divide-x divide-border border-t border-border pt-4 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+            <div className="grid grid-cols-3 divide-x divide-border/60 border-t border-border/60 pt-4 lg:col-span-5 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
               <div className="pr-3">
                 <div className="text-[11px] font-medium text-foreground-muted">Total Exams</div>
                 <div className="mt-1 font-mono text-xl font-bold text-foreground tabular-nums">
@@ -425,7 +425,7 @@ export function StudyCountdownView({
         )}
 
         {/* Controls: Board Tabs, Kind Filter Pills & Search */}
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface-card p-3.5">
+        <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-surface-card/85 p-3.5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div
               ref={boardTabsRef}
@@ -489,7 +489,7 @@ export function StudyCountdownView({
             role="tablist"
             aria-label="Filter countdowns by category"
             data-gliding-ready={kindIndicatorReady ? 'true' : 'false'}
-            className="ants-glide-host relative flex items-center gap-1.5 overflow-x-auto border-t border-border pt-2.5"
+            className="ants-glide-host relative flex items-center gap-1.5 overflow-x-auto border-t border-border/60 pt-2.5"
           >
             <span
               aria-hidden="true"
@@ -552,7 +552,7 @@ export function StudyCountdownView({
                 <article
                   key={exam.id}
                   style={{ '--stagger-index': Math.min(index, 7) } as React.CSSProperties}
-                  className="ants-stagger-item ants-card-interactive flex flex-col justify-between rounded-xl border border-border bg-surface-card p-4 shadow-[var(--shadow-tier-1)]"
+                  className="ants-stagger-item ants-card-interactive flex flex-col justify-between rounded-xl border border-border/60 bg-surface-card hover:border-border transition-colors p-4 shadow-[var(--shadow-tier-1)]"
                 >
                   <div>
                     {/* Top Row: Code + Badges + Edit */}
@@ -580,7 +580,7 @@ export function StudyCountdownView({
                         )}
                       </div>
 
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 sm:opacity-80 sm:hover:opacity-100 transition-opacity">
                         {exam.isCustom && (
                           <button
                             type="button"
@@ -616,7 +616,7 @@ export function StudyCountdownView({
                       {exam.title}
                     </h3>
 
-                    <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-border pt-3">
+                    <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-border-subtle pt-3">
                       <div className="font-mono text-2xl font-bold tracking-tight text-foreground tabular-nums">
                         {parts.isPast ? 'Completed' : `${parts.days}d`}
                         {!parts.isPast && (
@@ -630,7 +630,7 @@ export function StudyCountdownView({
 
                       <Badge variant={urgencyBadgeVariant} mono dot={parts.urgency === 'urgent'}>
                         {parts.isPast
-                          ? 'Sat'
+                           ? 'Sat'
                           : parts.urgency === 'urgent'
                             ? 'Urgent'
                             : parts.urgency === 'upcoming'
@@ -661,7 +661,7 @@ export function StudyCountdownView({
                   </div>
 
                   {/* Card Footer: Flow Sync + Focus Handoff */}
-                  <div className="mt-4 flex items-center justify-between gap-2 border-t border-border pt-3">
+                  <div className="mt-4 flex items-center justify-between gap-2 border-t border-border-subtle pt-3">
                     <button
                       type="button"
                       onClick={() => handleToggleFlowSync(exam)}

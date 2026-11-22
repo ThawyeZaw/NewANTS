@@ -21,6 +21,8 @@ export interface TimerRingViewProps {
   size?: 'lg' | 'xl';
   /** Use `'photo'` when rendered over a darkened photographic backdrop */
   tone?: 'default' | 'photo';
+  /** Optional click-to-start / click-to-pause callback for 0-step dial interaction */
+  onToggle?: () => void;
   className?: string;
 }
 
@@ -101,6 +103,7 @@ export function TimerRingView({
   longBreakInterval = 4,
   size = 'lg',
   tone = 'default',
+  onToggle,
   className,
 }: TimerRingViewProps) {
   const uid = useId().replace(/:/g, '');
@@ -152,11 +155,26 @@ export function TimerRingView({
       className={cn(
         'relative mx-auto aspect-square w-full select-none',
         size === 'xl' ? 'max-w-[min(70vh,480px)]' : 'max-w-[308px] sm:max-w-[332px]',
+        onToggle &&
+          'cursor-pointer group rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         className
       )}
-      role="timer"
+      onClick={onToggle}
+      onKeyDown={(e) => {
+        if (onToggle && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          onToggle();
+        }
+      }}
+      tabIndex={onToggle ? 0 : undefined}
+      role={onToggle ? 'button' : 'timer'}
       aria-live="off"
-      aria-label={`${caption}: ${timeLabel} remaining`}
+      aria-label={
+        onToggle
+          ? `${status === 'running' ? 'Pause timer' : 'Start timer'} (Space): ${timeLabel} remaining`
+          : `${caption}: ${timeLabel} remaining`
+      }
+      title={onToggle ? `${status === 'running' ? 'Pause' : 'Start'} (Space or click dial)` : undefined}
     >
       <svg
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}

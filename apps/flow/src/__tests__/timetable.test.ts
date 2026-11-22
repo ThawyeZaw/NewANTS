@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { BlockEditorModalView } from '../components/timetable/views/BlockEditorModalView';
-import { SmartTimetableView } from '../components/timetable/views/SmartTimetableView';
+import {
+  MAX_ZOOM_HOUR_HEIGHT,
+  MIN_ZOOM_HOUR_HEIGHT,
+  SmartTimetableView,
+  TIMETABLE_ZOOM_LEVELS,
+} from '../components/timetable/views/SmartTimetableView';
+import {
+  CATEGORY_BLOCK_CLASSES,
+  CATEGORY_DOT_CLASSES,
+  CATEGORY_PILL_CLASSES,
+} from '../components/timetable/views/timetableStyles';
 import { TelegramReminderModalView } from '../components/timetable/views/TelegramReminderModalView';
 import { TimetableDayView } from '../components/timetable/views/TimetableDayView';
 import { TimetableMonthView } from '../components/timetable/views/TimetableMonthView';
@@ -168,6 +178,33 @@ describe('@ants/flow [ZYY-3.3] Smart Timetable Views & Helpers', () => {
     const wedBlocks = getBlocksForDate(coaching.blocks, '2026-11-11').filter((b) => b.endMinutes <= 19 * 60 + 45);
     const open = findNextOpenSlotMinutes(wedBlocks, 45, 6 * 60 + 15);
     expect(open).toBe(19 * 60 + 45);
+  });
+
+  it('supports vertical zoom presets (54px to 120px) and distinct category color classes', () => {
+    expect(TIMETABLE_ZOOM_LEVELS).toEqual([54, 72, 96, 120]);
+    expect(MIN_ZOOM_HOUR_HEIGHT).toBe(54);
+    expect(MAX_ZOOM_HOUR_HEIGHT).toBe(120);
+
+    const categories = [
+      'deep-work',
+      'work',
+      'study',
+      'health',
+      'reading',
+      'family',
+      'commute',
+      'meal',
+      'buffer',
+      'sleep',
+    ] as const;
+
+    categories.forEach((cat) => {
+      expect(CATEGORY_BLOCK_CLASSES[cat]).toBeDefined();
+      expect(CATEGORY_PILL_CLASSES[cat]).toBeDefined();
+      expect(CATEGORY_DOT_CLASSES[cat]).toBeDefined();
+      // Ensure each category has a prominent 3.5px left border
+      expect(CATEGORY_BLOCK_CLASSES[cat]).toContain('border-l-[3.5px]');
+    });
   });
 });
 

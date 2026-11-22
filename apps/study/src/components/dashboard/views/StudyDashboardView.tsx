@@ -200,6 +200,7 @@ export function StudyDashboardView({
 
   const pinnedCount = boardCountdowns.filter((item) => item.pinned).length;
   const syncedToFlowCount = boardCountdowns.filter((item) => item.syncedToFlow).length;
+  const nearestExam = boardCountdowns[0] ?? null;
 
   const boardActivity = useMemo(
     () => recentActivity.filter((item) => item.boardId === activeBoard),
@@ -383,6 +384,82 @@ export function StudyDashboardView({
         </div>
       </section>
 
+      {/* Spotlight Anchor: Next Exam & Revision Sprint */}
+      {nearestExam && (
+        <section
+          aria-label="Next exam and revision sprint spotlight"
+          className="mt-6 rounded-xl border border-primary-tint-border/90 bg-primary-tint/35 p-4 sm:p-5 shadow-xs"
+        >
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0 space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary-solid px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary">
+                  <CalendarClock className="h-3 w-3" aria-hidden="true" />
+                  Next Imminent Exam
+                </span>
+                <span className="font-mono text-xs font-bold text-foreground">
+                  {nearestExam.paperCode}
+                </span>
+                <span className="text-xs text-foreground-muted">·</span>
+                <span className="font-mono text-xs text-foreground-muted">
+                  {nearestExam.examDateLabel}
+                </span>
+              </div>
+              <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
+                {nearestExam.title}
+              </h2>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted font-mono tabular-nums">
+                <span>Target: {nearestExam.targetGrade}</span>
+                <span>·</span>
+                <span className="text-foreground">
+                  Revision Check-in: {boardSummary.reviewedTodayCount}/{boardSummary.subjectCount} reviewed today
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <Badge
+                variant={
+                  getCountdownUrgency(nearestExam.daysLeft) === 'urgent'
+                    ? 'deadline'
+                    : getCountdownUrgency(nearestExam.daysLeft) === 'upcoming'
+                      ? 'active-filter'
+                      : 'verified'
+                }
+                mono
+                dot={getCountdownUrgency(nearestExam.daysLeft) === 'urgent'}
+                className="text-xs px-2.5 py-1"
+              >
+                {nearestExam.daysLeft}d left
+              </Badge>
+
+              <button
+                type="button"
+                onClick={() => handleFlowSyncToggle(nearestExam.id)}
+                aria-pressed={nearestExam.syncedToFlow}
+                className={cn(
+                  'inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition-colors',
+                  nearestExam.syncedToFlow
+                    ? 'border-success-border bg-success-tint text-on-success-tint'
+                    : 'border-border/70 bg-surface-card text-foreground-muted hover:text-foreground'
+                )}
+              >
+                <RefreshCw className="h-3 w-3" aria-hidden="true" />
+                <span>{nearestExam.syncedToFlow ? 'Flow Synced' : 'Sync Flow'}</span>
+              </button>
+
+              <a
+                href={`${flowUrl}?task=${encodeURIComponent(nearestExam.title)}&pomodoros=2`}
+                className="inline-flex h-8 items-center gap-1.5 rounded-md bg-primary-solid px-3 text-xs font-semibold text-on-primary hover:bg-primary-hover shadow-2xs transition-colors"
+              >
+                <span>Focus in Flow</span>
+                <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Main 2-Column Workbench */}
       <div className="mt-7 grid grid-cols-1 gap-8 xl:grid-cols-12">
         {/* Left Primary Column: Enrolled Subjects */}
@@ -417,7 +494,7 @@ export function StudyDashboardView({
                   key={subject.id}
                   data-subject-card={subject.id}
                   style={{ '--stagger-index': Math.min(idx, 6) } as React.CSSProperties}
-                  className="ants-stagger-item ants-card-interactive rounded-lg border border-border bg-surface-card p-5 shadow-[var(--shadow-tier-1)] hover:border-border-hover"
+                  className="ants-stagger-item ants-card-interactive rounded-lg border border-border/60 bg-surface-card p-5 shadow-[var(--shadow-tier-1)] hover:border-border transition-colors"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -510,18 +587,18 @@ export function StudyDashboardView({
                         href="/calculator"
                         className="text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                       >
-                        Grade Calculator
+                        Calculator
                       </Link>
                       <Link
                         href={`/curriculum/${encodeURIComponent(subject.code)}?tab=papers`}
                         className="text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                       >
-                        Past Papers
+                        Papers
                       </Link>
                       <Link
                         href={`/curriculum/${encodeURIComponent(subject.code)}?tab=topics`}
                         onClick={() => onOpenTopicTracker?.(subject)}
-                        className="inline-flex items-center gap-1 text-on-primary-tint hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
+                        className="inline-flex items-center gap-1 text-primary-solid font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                       >
                         <span>Topic Tracker</span>
                         <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />

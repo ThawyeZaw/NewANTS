@@ -106,7 +106,7 @@ export function OrgActivitiesView({
         {/* Unboxed Hairline Filter Strip */}
         <section
           aria-label="Filter community activities"
-          className="flex flex-col gap-3 border-y border-border py-4 lg:flex-row lg:items-center lg:justify-between"
+          className="flex flex-col gap-3 border-y border-border/60 py-4 lg:flex-row lg:items-center lg:justify-between"
         >
           <div
             ref={categoryTabsRef}
@@ -139,7 +139,7 @@ export function OrgActivitiesView({
                     'ants-glide-item relative z-10 inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.98]',
                     active
                       ? 'border-transparent bg-primary-solid text-on-primary'
-                      : 'border-border bg-surface-card text-foreground-muted hover:border-border-hover hover:text-foreground'
+                      : 'border-border/60 bg-surface-card text-foreground-muted hover:border-border hover:text-foreground'
                   )}
                 >
                   <span>{tab.label}</span>
