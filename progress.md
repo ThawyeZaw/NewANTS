@@ -586,3 +586,25 @@
       - `@ants/flow`: 28/28 tests passing
       - `@ants/calculator`: 3/3 tests passing
 - **Next Session Target:** Developer manual sign-off on `apps/flow`, `apps/study`, and `apps/org` visual hierarchy.
+
+### Session Z3 Minimal-Steps & Friction-Free Flow Productivity — 2026-11-21 (`[ZYY]` `apps/flow` `/pomodoro` & `/tasks`)
+- **Polished (`[~]`):** Items **`[ZYY-3.1]`** (`PomodoroView.tsx`, `TaskListView.tsx`, `TimerRingView.tsx`, `engine.ts`) on branch `zaylynn`.
+- **Summary:**
+  - Clarified UX requirements via `/askmefirst` (`ask_question` pop-up modals) with explicit user direction: *"efficient, productive and user friendly with minimal steps"*.
+  - **Zero-Modal Duration Presets & Running Extensions:**
+    - Embedded 1-click duration preset chips directly under the interval tabs when idle (`15m`, `25m`, `50m`, `90m` for Work; `3m`, `5m`, `10m` for Short Break; `15m`, `20m`, `30m` for Long Break) that update settings and reset the clock with zero dialog clicks.
+    - Added live `+5m` and `+10m` extension pills (and `-5m` reduction) when running/paused, backed by `extendTimer(timer, deltaMinutes, now)` in `engine.ts`, so users can extend their focus flow state without restarting.
+  - **Tactile Clock Dial Click-to-Toggle:**
+    - Enhanced `<TimerRingView />` with `onToggle` click and keyboard (`Space`/`Enter`) handlers and subtle hover state, allowing users to start or pause the timer by clicking directly on the mechanical chronograph dial with zero aiming needed.
+  - **Minimal-Step Task Integration (`<TaskListView />`):**
+    - **1-Click "Focus Now" Row Action:** Added a dedicated Play/Focus action button directly on each task row that marks the task as active AND immediately starts the timer in a single click (or toggles pause if already running).
+    - **Add & Focus in 1 Step:** Added an `Add & Focus` button and `Ctrl+Enter` / `Cmd+Enter` / `Shift+Enter` shortcut in the quick-add bar to create the task and launch the timer immediately.
+    - **Shorthand Estimate Parsing:** Added automatic parsing for shorthand tokens like `Essay draft ~2` or `Physics review #3` to set the estimated pomodoros automatically from typing.
+  - **Zero-Dialog Audio & Atmosphere Controls:**
+    - Added 1-click canvas controls below the timer: `Tick [On/Off]` toggle for mechanical clock ticking, `Sound: [Rain/Off/...]` quick cycle for ambient soundscapes, `Focus [F]` launcher, and quiet settings drawer gear.
+  - **Verification:**
+    - `pnpm --filter @ants/ui --filter @ants/calculator --filter @ants/org --filter @ants/flow --filter @ants/study lint` passed with 0 errors.
+    - `pnpm typecheck` passed cleanly across all 14 Turbo tasks.
+    - `pnpm turbo run test --concurrency=1` passed with 29/29 tests in `@ants/flow` (including new `extendTimer` test) and all monorepo suites passing.
+    - `pnpm --filter @ants/flow build` compiled all 11 Next.js routes cleanly with zero static generation or bundling errors.
+- **Next Session Target:** Developer manual sign-off on the minimal-step Pomodoro & Flow workflow on `http://localhost:3002/pomodoro`.

@@ -258,6 +258,33 @@ export function resetTimer(timer: TimerState, settings: PomodoroSettings): Timer
   };
 }
 
+/**
+ * Add or subtract minutes from an active, paused, or idle timer.
+ * Clamps remaining time between 1 minute and 180 minutes.
+ */
+export function extendTimer(
+  timer: TimerState,
+  deltaMinutes: number,
+  now: number
+): TimerState {
+  const deltaMs = deltaMinutes * 60_000;
+  const currentRemaining = getRemainingMs(timer, now);
+  const nextRemaining = Math.max(60_000, Math.min(180 * 60_000, currentRemaining + deltaMs));
+
+  if (timer.status === 'running') {
+    return {
+      ...timer,
+      remainingMs: nextRemaining,
+      endAt: now + nextRemaining,
+    };
+  }
+
+  return {
+    ...timer,
+    remainingMs: nextRemaining,
+  };
+}
+
 export function switchPhase(
   timer: TimerState,
   phase: PomodoroPhase,
