@@ -15,9 +15,11 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import {
+  AntMascot,
   Button,
   MOCK_AUTHENTICATED_USER,
   cn,
+  emitMiloCheer,
   useSlidingIndicator,
   type MockUserProfile,
 } from '@ants/ui';
@@ -378,6 +380,12 @@ export function StudyPastPapersView({
         `Saved ${row.paperCode} attempt (${outcome.createdAttempt.rawScore}/${row.maxRaw} · ${outcome.createdAttempt.derivedGrade}).`
       );
     }
+    emitMiloCheer({
+      mood: 'celebrating',
+      propVariant: 'pencil',
+      badge: outcome.xpEarned > 0 ? `+${outcome.xpEarned} XP` : outcome.createdAttempt.derivedGrade,
+      message: `${row.paperCode} logged (${outcome.createdAttempt.derivedGrade})! Every paper sharpens exam instinct.`,
+    });
     onAttemptSaved?.(outcome.createdAttempt);
   };
 
@@ -1093,6 +1101,15 @@ export function StudyPastPapersView({
       {/* 4. Matrix or Card View Output */}
       {filteredRows.length === 0 ? (
         <div className="ants-panel-enter rounded-lg border border-border bg-surface-card p-8 text-center space-y-2">
+          <AntMascot
+            mood="curious"
+            app="study"
+            propVariant="magnifier"
+            size={76}
+            interactive
+            ariaLabel=""
+            className="mx-auto mb-2"
+          />
           <p className="text-sm font-semibold text-foreground">
             No past papers match your active filters.
           </p>

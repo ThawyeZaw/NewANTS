@@ -12,7 +12,15 @@ import {
   QrCode,
   Users,
 } from 'lucide-react';
-import { ScrollReveal, cn, useSlidingIndicator } from '@ants/ui';
+import {
+  AntMascot,
+  ScrollReveal,
+  cn,
+  useSlidingIndicator,
+  type AntMascotApp,
+  type AntMascotMood,
+  type AntMascotPropVariant,
+} from '@ants/ui';
 import {
   loadOrgCmsState,
   subscribeOrgCmsChanges,
@@ -102,6 +110,16 @@ function OrbitNodePillIcon({
       return <Compass className={className} aria-hidden="true" />;
   }
 }
+
+const ORBIT_MILO_PRESETS: Record<
+  OrbitToolNode['id'],
+  { mood: AntMascotMood; app: AntMascotApp; propVariant: AntMascotPropVariant }
+> = {
+  calculator: { mood: 'happy', app: 'org', propVariant: 'pencil' },
+  study: { mood: 'studying', app: 'study', propVariant: 'scholar' },
+  tutors: { mood: 'nudge', app: 'telegram', propVariant: 'bell' },
+  flow: { mood: 'focus', app: 'flow', propVariant: 'headphones' },
+};
 
 const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
@@ -537,10 +555,16 @@ export function OrgHomeLandingView({
                 key={activeOrbit.id}
                 className="ants-panel-enter pt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex min-w-0 items-start gap-2.5">
-                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary-tint-border bg-primary-tint text-on-primary-tint">
-                    <OrbitNodePillIcon id={activeOrbit.id} className="h-4 w-4" />
-                  </span>
+                <div className="flex min-w-0 items-center gap-3">
+                  <AntMascot
+                    size={54}
+                    mood={ORBIT_MILO_PRESETS[activeOrbit.id].mood}
+                    app={ORBIT_MILO_PRESETS[activeOrbit.id].app}
+                    propVariant={ORBIT_MILO_PRESETS[activeOrbit.id].propVariant}
+                    interactive
+                    ariaLabel=""
+                    className="shrink-0"
+                  />
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span className="shrink-0 whitespace-nowrap rounded border border-primary-tint-border bg-primary-tint px-1.5 py-0.5 font-mono text-[10px] font-bold text-on-primary-tint">

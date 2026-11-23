@@ -265,6 +265,7 @@ export {
 } from './views/UserProfileView';
 
 export {
+  ANT_MASCOT_NAME,
   ANT_MASCOT_PRESETS,
   AntMascot,
   AntMascotView,
@@ -273,7 +274,41 @@ export {
   type AntMascotApp,
   type AntMascotMood,
   type AntMascotPreset,
+  type AntMascotPresetKey,
   type AntMascotProps,
   type AntMascotPropVariant,
   type AntMascotSize,
+  type AntMascotVariant,
 } from './views/AntMascotView';
+
+export {
+  NotFoundView,
+  type NotFoundQuickLink,
+  type NotFoundViewProps,
+} from './views/NotFoundView';
+
+export {
+  ANTS_MILO_CHEER_EVENT,
+  DEFAULT_MILO_COMPANION_PREFS,
+  MILO_COMPANION_STORAGE_KEY,
+  MILO_DRAG_QUIPS,
+  clampMiloDragPosition,
+  emitMiloCheer,
+  getRouteMiloQuips,
+  loadMiloCompanionPrefs,
+  saveMiloCompanionPrefs,
+  type ClampMiloDragPositionInput,
+  type ClampedMiloDragResult,
+  type MiloCheerPayload,
+  type MiloCompanionPrefs,
+  type MiloDockEdge,
+  type MiloDockPosition,
+  type MiloStorageLike,
+  type RouteMiloQuipSet,
+} from './lib/milo';
+
+export {
+  MiloCompanionDock,
+  MiloCompanionDockView,
+  type MiloCompanionDockViewProps,
+} from './views/MiloCompanionDockView';

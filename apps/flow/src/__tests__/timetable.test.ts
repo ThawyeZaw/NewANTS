@@ -18,7 +18,10 @@ import { TimetableWeekGridView } from '../components/timetable/views/TimetableWe
 import { TodayFocusRailView } from '../components/timetable/views/TodayFocusRailView';
 import {
   buildPomodoroHandoffUrl,
+  clampHourHeight,
   computeDayAllocations,
+  computeFitHourHeight,
+  filterVisibleTimelineBlocks,
   findNextOpenSlotMinutes,
   formatMinutes12h,
   formatMinutes24h,
@@ -26,9 +29,12 @@ import {
   getMonthGridDates,
   getTelegramTriggerMinutes,
   getWeekDates,
+  layoutOverlappingBlocks,
   moveBlockToSlot,
   resizeBlockDuration,
   snapMinutes,
+  summarizeOvernightSleep,
+  type TimetableBlock,
 } from '../lib/timetable/engine';
 import {
   loadTimetableState,
@@ -40,6 +46,7 @@ import {
   MOCK_SYNCED_EXAMS,
   createCoachingBlocks,
   createPresetTimetableState,
+  createScholarBlocks,
 } from '../mocks/timetable.mock';
 
 describe('@ants/flow [ZYY-3.3] Smart Timetable Views & Helpers', () => {
@@ -180,10 +187,15 @@ describe('@ants/flow [ZYY-3.3] Smart Timetable Views & Helpers', () => {
     expect(open).toBe(19 * 60 + 45);
   });
 
-  it('supports vertical zoom presets (54px to 120px) and distinct category color classes', () => {
-    expect(TIMETABLE_ZOOM_LEVELS).toEqual([54, 72, 96, 120]);
-    expect(MIN_ZOOM_HOUR_HEIGHT).toBe(54);
-    expect(MAX_ZOOM_HOUR_HEIGHT).toBe(120);
+  it('supports flexible zoom bounds (28px to 140px), fit calculation, and distinct category color classes', () => {
+    expect(TIMETABLE_ZOOM_LEVELS).toEqual([28, 40, 56, 72, 96, 120, 140]);
+    expect(MIN_ZOOM_HOUR_HEIGHT).toBe(28);
+    expect(MAX_ZOOM_HOUR_HEIGHT).toBe(140);
+    expect(clampHourHeight(10)).toBe(28);
+    expect(clampHourHeight(200)).toBe(140);
+    expect(clampHourHeight(84.4)).toBe(84);
+    expect(computeFitHourHeight(900, 18)).toBe(37);
+    expect(computeFitHourHeight(600, 24)).toBe(28);
 
     const categories = [
       'deep-work',
@@ -202,9 +214,62 @@ describe('@ants/flow [ZYY-3.3] Smart Timetable Views & Helpers', () => {
       expect(CATEGORY_BLOCK_CLASSES[cat]).toBeDefined();
       expect(CATEGORY_PILL_CLASSES[cat]).toBeDefined();
       expect(CATEGORY_DOT_CLASSES[cat]).toBeDefined();
-      // Ensure each category has a prominent 3.5px left border
       expect(CATEGORY_BLOCK_CLASSES[cat]).toContain('border-l-[3.5px]');
     });
   });
-});
 
+  it('lays out overlapping blocks side-by-side in equal cluster columns without hiding back-to-back blocks', () => {
+    const makeBlock = (id: string, startMinutes: number, endMinutes: number): TimetableBlock => ({
+      id,
+      title: id,
+      date: '2026-11-11',
+      startMinutes,
+      endMinutes,
+      category: 'study',
+      recurrence: 'none',
+      telegramReminder: { enabled: false, leadMinutes: 0 },
+    });
+
+    // Cluster 1: 3-way overlap around 09:00–11:00
+    // Back-to-back block 11:00–12:00 stays full-width (colCount = 1)
+    const sample: TimetableBlock[] = [
+      makeBlock('a', 540, 660),
+      makeBlock('b', 570, 630),
+      makeBlock('c', 600, 660),
+      makeBlock('d', 660, 720),
+    ];
+
+    const positioned = layoutOverlappingBlocks(sample, 360, 1440);
+    expect(positioned).toHaveLength(4);
+
+    const a = positioned.find((p) => p.block.id === 'a')!;
+    const b = positioned.find((p) => p.block.id === 'b')!;
+    const c = positioned.find((p) => p.block.id === 'c')!;
+    const d = positioned.find((p) => p.block.id === 'd')!;
+
+    expect(a.colIndex).toBe(0);
+    expect(b.colIndex).toBe(1);
+    // b ends at 630, c starts at 600 so c needs a 3rd column
+    expect(c.colIndex).toBe(2);
+    expect(a.colCount).toBe(3);
+    expect(b.colCount).toBe(3);
+    expect(c.colCount).toBe(3);
+    expect(d.colIndex).toBe(0);
+    expect(d.colCount).toBe(1);
+  });
+
+  it('folds morning overnight sleep blocks cleanly into the 00–06 banner without peeking past 06:00', () => {
+    const scholarBlocks = createScholarBlocks(DEFAULT_TIMETABLE_REFERENCE_DATE);
+    const collapsed = filterVisibleTimelineBlocks(scholarBlocks, false);
+    const expanded = filterVisibleTimelineBlocks(scholarBlocks, true);
+
+    expect(collapsed.some((b) => b.id === 'sch_sleep_am')).toBe(false);
+    expect(collapsed.some((b) => b.id === 'sch_sleep_pm')).toBe(true);
+    expect(expanded.some((b) => b.id === 'sch_sleep_am')).toBe(true);
+
+    expect(summarizeOvernightSleep(scholarBlocks)).toBe('11:00 PM – 6:30 AM (7h 30m rest)');
+    expect(summarizeOvernightSleep(createCoachingBlocks(DEFAULT_TIMETABLE_REFERENCE_DATE))).toBe(
+      '10:30 PM – 6:00 AM (7h 30m rest)'
+    );
+  });
+});

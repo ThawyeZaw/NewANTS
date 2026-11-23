@@ -6,6 +6,13 @@
  */
 
 export type TimetableViewMode = 'week' | 'day' | 'month';
+export type MonthDensityMode = 'compact' | 'comfortable' | 'detailed';
+
+export const MIN_ZOOM_HOUR_HEIGHT = 28;
+export const MAX_ZOOM_HOUR_HEIGHT = 140;
+export const DEFAULT_ZOOM_HOUR_HEIGHT = 64;
+export const TIMETABLE_ZOOM_LEVELS = [28, 40, 56, 72, 96, 120, 140] as const;
+export type TimetableHourHeight = number;
 
 export type BlockCategory =
   | 'deep-work'
@@ -400,4 +407,131 @@ export function findNextOpenSlotMinutes(
     cursor = Math.max(cursor, snapMinutes(b.endMinutes, 15));
   }
   return Math.min(1440 - needed, cursor);
+}
+
+/** Clamps and rounds any vertical hour-height zoom value (px/hr) within supported bounds. */
+export function clampHourHeight(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_ZOOM_HOUR_HEIGHT;
+  return Math.max(MIN_ZOOM_HOUR_HEIGHT, Math.min(MAX_ZOOM_HOUR_HEIGHT, Math.round(value)));
+}
+
+/** Computes an hour-height (px/hr) that fits all `visibleHours` cleanly inside `viewportHeight`. */
+export function computeFitHourHeight(viewportHeight: number, visibleHours: number): number {
+  const safeHours = Math.max(1, visibleHours);
+  const raw = Math.floor((viewportHeight - 230) / safeHours);
+  return Math.max(MIN_ZOOM_HOUR_HEIGHT, Math.min(84, raw));
+}
+
+export interface PositionedTimetableBlock {
+  block: TimetableBlock;
+  displayStart: number;
+  displayEnd: number;
+  colIndex: number;
+  colCount: number;
+}
+
+/**
+ * Lays out concurrent/overlapping blocks side-by-side in equal-width sub-columns
+ * within connected overlap clusters so blocks never stack over and hide each other.
+ */
+export function layoutOverlappingBlocks(
+  blocks: TimetableBlock[],
+  visibleStartMinutes: number,
+  visibleEndMinutes = 1440
+): PositionedTimetableBlock[] {
+  const items = blocks
+    .map((block) => ({
+      block,
+      displayStart: Math.max(visibleStartMinutes, block.startMinutes),
+      displayEnd: Math.min(visibleEndMinutes, block.endMinutes),
+    }))
+    .filter((item) => item.displayEnd > item.displayStart)
+    .sort(
+      (a, b) =>
+        a.displayStart - b.displayStart ||
+        b.displayEnd - b.displayStart - (a.displayEnd - a.displayStart) ||
+        a.block.id.localeCompare(b.block.id)
+    );
+
+  if (items.length === 0) return [];
+
+  const clusters: Array<typeof items> = [];
+  let currentCluster: typeof items = [];
+  let clusterMaxEnd = -1;
+
+  for (const item of items) {
+    if (currentCluster.length === 0 || item.displayStart < clusterMaxEnd) {
+      currentCluster.push(item);
+      clusterMaxEnd = Math.max(clusterMaxEnd, item.displayEnd);
+    } else {
+      clusters.push(currentCluster);
+      currentCluster = [item];
+      clusterMaxEnd = item.displayEnd;
+    }
+  }
+  if (currentCluster.length > 0) {
+    clusters.push(currentCluster);
+  }
+
+  const positioned: PositionedTimetableBlock[] = [];
+  for (const cluster of clusters) {
+    const colEnds: number[] = [];
+    const placed: Array<{ item: (typeof cluster)[number]; colIndex: number }> = [];
+
+    for (const item of cluster) {
+      let colIndex = colEnds.findIndex((end) => end <= item.displayStart);
+      if (colIndex === -1) {
+        colIndex = colEnds.length;
+        colEnds.push(item.displayEnd);
+      } else {
+        colEnds[colIndex] = item.displayEnd;
+      }
+      placed.push({ item, colIndex });
+    }
+
+    const colCount = Math.max(1, colEnds.length);
+    for (const { item, colIndex } of placed) {
+      positioned.push({
+        block: item.block,
+        displayStart: item.displayStart,
+        displayEnd: item.displayEnd,
+        colIndex,
+        colCount,
+      });
+    }
+  }
+
+  return positioned;
+}
+
+/**
+ * Overnight morning sleep blocks (e.g. 00:00–06:00 or 00:00–06:30) fold into the
+ * grouped `00–06` sleep banner when overnight hours are collapsed so they never peek into 06:00+.
+ */
+export function isGroupedOvernightSleepBlock(block: TimetableBlock): boolean {
+  return block.category === 'sleep' && block.startMinutes === 0 && block.endMinutes <= 450;
+}
+
+export function filterVisibleTimelineBlocks(
+  blocks: TimetableBlock[],
+  showOvernightHours: boolean
+): TimetableBlock[] {
+  if (showOvernightHours) return blocks;
+  return blocks.filter((b) => !isGroupedOvernightSleepBlock(b));
+}
+
+export function summarizeOvernightSleep(blocks: TimetableBlock[]): string {
+  const morningSleep = blocks.find((b) => isGroupedOvernightSleepBlock(b));
+  const eveningSleep = blocks.find(
+    (b) => b.category === 'sleep' && b.endMinutes === 1440 && b.startMinutes >= 1140
+  );
+
+  if (morningSleep && eveningSleep) {
+    const totalRest = 1440 - eveningSleep.startMinutes + morningSleep.endMinutes;
+    return `${formatMinutes12h(eveningSleep.startMinutes)} – ${formatMinutes12h(morningSleep.endMinutes)} (${formatDurationCompact(totalRest)} rest)`;
+  }
+  if (morningSleep) {
+    return `12:00 AM – ${formatMinutes12h(morningSleep.endMinutes)} (${formatDurationCompact(morningSleep.endMinutes)} rest)`;
+  }
+  return '00:00 – 06:00 collapsed';
 }

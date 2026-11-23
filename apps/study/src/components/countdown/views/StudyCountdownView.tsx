@@ -6,7 +6,6 @@ import {
   ArrowUpRight,
   CalendarClock,
   CheckCircle2,
-  Clock,
   Pencil,
   Pin,
   Plus,
@@ -16,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   MOCK_AUTHENTICATED_USER,
@@ -701,7 +701,15 @@ export function StudyCountdownView({
           </div>
         ) : (
           <div className="rounded-xl border border-border bg-surface-card p-8 text-center">
-            <Clock className="mx-auto h-6 w-6 text-foreground-muted" aria-hidden="true" />
+            <AntMascot
+              mood="curious"
+              app="study"
+              propVariant="magnifier"
+              size={76}
+              interactive
+              ariaLabel=""
+              className="mx-auto"
+            />
             <h3 className="mt-3 text-sm font-bold text-foreground">No matching exam countdowns</h3>
             <p className="mt-1 text-xs text-foreground-muted">
               Clear your search filter or add a custom/mock sitting for this syllabus track.

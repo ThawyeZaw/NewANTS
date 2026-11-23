@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
-  BookOpen,
   CheckSquare,
   Clock,
   Code2,
@@ -23,6 +22,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   Input,
@@ -389,6 +389,14 @@ export function StudyNotesView({
 
             {filteredNotes.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border p-4 text-center text-xs text-foreground-muted">
+                <AntMascot
+                  mood="curious"
+                  app="study"
+                  propVariant="magnifier"
+                  size={52}
+                  ariaLabel=""
+                  className="mx-auto mb-2"
+                />
                 No notes match the active search. Create a new note or clear filters.
               </div>
             ) : (
@@ -727,7 +735,15 @@ export function StudyNotesView({
             </section>
           ) : (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface-card p-10 text-center">
-              <BookOpen className="h-8 w-8 text-foreground-subtle" aria-hidden="true" />
+              <AntMascot
+                mood="studying"
+                app="study"
+                propVariant="scholar"
+                size={84}
+                interactive
+                ariaLabel=""
+                className="mx-auto"
+              />
               <p className="mt-3 text-sm font-semibold text-foreground">No note selected</p>
               <p className="mt-1 text-xs text-foreground-muted">
                 Create a Markdown note to organise equations, checklists, and examiner tips.

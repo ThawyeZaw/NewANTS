@@ -17,12 +17,14 @@ import {
   Trash2,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   Input,
   MOCK_AUTHENTICATED_USER,
   Modal,
   cn,
+  emitMiloCheer,
   useSlidingIndicator,
   type MockUserProfile,
 } from '@ants/ui';
@@ -205,9 +207,17 @@ export function StudyFlashcardsView({
           `Scheduled next review in ${schedule.intervalLabel} (+${xpAwarded} XP).`
         );
       }
+      if (!cramMode && activeDeck && getQueueForDeck(nextState.cards, activeDeck.id, false).length === 0) {
+        emitMiloCheer({
+          mood: 'celebrating',
+          propVariant: 'pencil',
+          badge: 'Deck Cleared',
+          message: 'All due flashcards cleared! Milo’s buzzing about that recall.',
+        });
+      }
       onRateCard?.(activeCard.id, rating);
     },
-    [activeCard, cramMode, learningState, onRateCard]
+    [activeCard, activeDeck, cramMode, learningState, onRateCard]
   );
 
   // Keyboard shortcuts: Space flips card, 1-4 rates card when flipped
@@ -732,7 +742,16 @@ export function StudyFlashcardsView({
               </div>
             ) : (
               <div className="mx-auto max-w-lg rounded-2xl border border-dashed border-border bg-surface-inset/35 p-8 text-center space-y-3">
-                <CheckCircle2 className="mx-auto h-8 w-8 text-success" aria-hidden="true" />
+                <AntMascot
+                  mood={activeStats.total === 0 ? 'curious' : 'celebrating'}
+                  app="study"
+                  propVariant={activeStats.total === 0 ? 'scholar' : 'pencil'}
+                  size="md"
+                  interactive
+                  badge={activeStats.total > 0 ? 'Deck Cleared' : undefined}
+                  ariaLabel=""
+                  className="mx-auto"
+                />
                 <h3 className="text-base font-bold text-foreground">
                   {activeStats.total === 0
                     ? 'This deck has no cards yet'

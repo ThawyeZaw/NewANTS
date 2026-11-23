@@ -28,6 +28,7 @@ import { Badge } from '../primitives/Badge';
 import { Button } from '../primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../primitives/Card';
 import { cn } from '../utils/cn';
+import { AntMascot } from './AntMascotView';
 
 export interface TelegramConnectCardViewProps {
   /** Current Telegram link state & per-channel notification preferences */
@@ -154,24 +155,35 @@ export function TelegramConnectCardView({
         {/* State 1: Unlinked -> Generate One-Time /start Verification Code Immediately */}
         {telegram.status === 'unlinked' && (
           <div className="flex flex-col gap-3 rounded-lg bg-surface-inset/75 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-sm font-semibold text-foreground">
-                Link your Telegram account via{' '}
-                <span className="font-mono">@TheANTsFlowBot</span>
-              </p>
-              <p className="text-xs leading-relaxed text-foreground-muted">
-                Telegram is unlinked by default until you verify during onboarding or below. Generates a one-time{' '}
-                <span className="font-mono text-foreground">ANT-XXXX</span>{' '}
-                handshake code—your Telegram <span className="font-mono text-foreground">@username</span>{' '}
-                is captured when you tap Start and stays separate from your ANTs account
-                {accountUsername ? (
-                  <>
-                    {' '}
-                    (<span className="font-mono text-foreground">@{accountUsername}</span>)
-                  </>
-                ) : null}
-                .
-              </p>
+            <div className="flex min-w-0 flex-1 items-center gap-3.5">
+              <AntMascot
+                mood="nudge"
+                app="telegram"
+                propVariant="bell"
+                size={68}
+                interactive
+                ariaLabel=""
+                className="shrink-0"
+              />
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="text-sm font-semibold text-foreground">
+                  Link your Telegram account via{' '}
+                  <span className="font-mono">@TheANTsFlowBot</span>
+                </p>
+                <p className="text-xs leading-relaxed text-foreground-muted">
+                  Telegram is unlinked by default until you verify during onboarding or below. Generates a one-time{' '}
+                  <span className="font-mono text-foreground">ANT-XXXX</span>{' '}
+                  handshake code—your Telegram <span className="font-mono text-foreground">@username</span>{' '}
+                  is captured when you tap Start and stays separate from your ANTs account
+                  {accountUsername ? (
+                    <>
+                      {' '}
+                      (<span className="font-mono text-foreground">@{accountUsername}</span>)
+                    </>
+                  ) : null}
+                  .
+                </p>
+              </div>
             </div>
             <Button
               type="button"
@@ -346,7 +358,18 @@ export function TelegramConnectCardView({
             {testPingSentAt && (
               <div className="rounded-lg bg-surface-card px-3.5 py-2.5 text-xs">
                 <div className="flex items-center justify-between gap-2 text-foreground-muted">
-                  <span className="font-semibold text-on-primary-tint">@TheANTsFlowBot → {telegram.handle}</span>
+                  <span className="inline-flex items-center gap-2 font-semibold text-on-primary-tint">
+                    <AntMascot
+                      variant="avatar"
+                      size={26}
+                      mood="celebrating"
+                      app="telegram"
+                      animated={false}
+                      ariaLabel=""
+                      className="shrink-0"
+                    />
+                    <span>@TheANTsFlowBot → {telegram.handle}</span>
+                  </span>
                   <span className="font-mono tabular-nums">{testPingSentAt}</span>
                 </div>
                 <p className="mt-1 text-foreground">

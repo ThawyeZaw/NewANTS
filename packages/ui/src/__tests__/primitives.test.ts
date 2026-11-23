@@ -204,4 +204,35 @@ describe('@ants/ui [ZYY-1.1] & [ZYY-1.2] Primitives & Ecosystem Chrome', () => {
     ).not.toThrow();
     expect(storeMap.get(THEME_STORAGE_KEY)).toBe('dark');
   });
+
+  it('renders Modal safely during SSR with viewport-bounded flex layout, z-[100], and accessible title linking', () => {
+    const closedHtml = renderToStaticMarkup(
+      React.createElement(Modal, {
+        open: false,
+        onClose: () => {},
+        title: 'Hidden Dialog',
+        children: React.createElement('p', null, 'Hidden body'),
+      })
+    );
+    expect(closedHtml).toBe('');
+
+    const openHtml = renderToStaticMarkup(
+      React.createElement(Modal, {
+        open: true,
+        onClose: () => {},
+        title: 'Schedule Time Block',
+        description: 'Changes snap to 15-minute slots.',
+        children: React.createElement('p', null, 'Dialog body'),
+      })
+    );
+    expect(openHtml).toContain('role="dialog"');
+    expect(openHtml).toContain('aria-modal="true"');
+    expect(openHtml).toContain('z-[100]');
+    expect(openHtml).toContain('max-h-[calc(100dvh-1.5rem)]');
+    expect(openHtml).toContain('overflow-y-auto');
+
+    const labelledByMatch = openHtml.match(/aria-labelledby="([^"]+)"/);
+    expect(labelledByMatch?.[1]).toBeTruthy();
+    expect(openHtml).toContain(`id="${labelledByMatch?.[1]}"`);
+  });
 });

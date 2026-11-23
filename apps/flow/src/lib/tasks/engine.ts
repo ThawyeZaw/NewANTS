@@ -10,14 +10,18 @@ import {
   addDaysIso,
   blockAppliesToDate,
   createTimetableId,
+  formatMinutes24h,
+  getCategoryLabel,
   toIsoDate,
+  type BlockCategory,
   type TaskPriority,
+  type TimetableBlock,
   type TimetablePersistedState,
   type TimetablePresetId,
   type TodayFocusTask,
 } from '../timetable/engine';
 
-export type TaskSmartView = 'all' | 'today' | 'upcoming' | 'high-priority' | 'completed';
+export type TaskSmartView = 'today' | 'inbox' | 'upcoming' | 'completed' | 'all' | 'high-priority';
 export type TaskSortMode = 'priority' | 'due-date' | 'duration' | 'recent';
 export type TaskPresetId = TimetablePresetId;
 
@@ -163,6 +167,12 @@ export function filterTasks(tasks: PlannerTask[], criteria: TaskFilterCriteria):
         // Today view surfaces open tasks pinned to Today Focus OR due on/before today
         if (task.done) return false;
         if (!task.inTodayFocus && (!task.dueDate || task.dueDate > criteria.todayIso)) {
+          return false;
+        }
+        break;
+      case 'inbox':
+        // Inbox holds open unscheduled tasks with no due date or timetable block
+        if (task.done || task.dueDate || task.linkedBlockId || task.inTodayFocus) {
           return false;
         }
         break;
@@ -436,9 +446,41 @@ export function toTimetableFocusTasks(tasks: PlannerTask[], todayIso: string): T
   }));
 }
 
+/** Timetable categories that generate actionable checklist tasks (skipping sleep, meals, commute, buffers). */
+export const ACTIONABLE_TIMETABLE_CATEGORIES: ReadonlySet<BlockCategory> = new Set([
+  'study',
+  'deep-work',
+  'work',
+  'health',
+  'family',
+  'reading',
+]);
+
+export function isActionableTimetableBlock(block: TimetableBlock): boolean {
+  return ACTIONABLE_TIMETABLE_CATEGORIES.has(block.category);
+}
+
+/** Propagates task completion back onto its linked timetable block for 2-way sync. */
+export function syncTaskCompletionToTimetable(
+  blocks: TimetableBlock[],
+  linkedBlockId: string | undefined,
+  done: boolean
+): TimetableBlock[] {
+  if (!linkedBlockId) return blocks;
+  let changed = false;
+  const next = blocks.map((block) => {
+    if (block.id !== linkedBlockId || Boolean(block.completed) === done) return block;
+    changed = true;
+    return { ...block, completed: done };
+  });
+  return changed ? next : blocks;
+}
+
 /**
- * Reconciles changes made inside `/timetable`'s Today Focus Rail back into `/tasks`
- * (e.g., if a user checked off or quick-added a task on `/timetable` before switching to `/tasks`).
+ * Reconciles Timetable blocks and focus entries into `/tasks` (2-way sync):
+ * - Updates completion & schedule slot labels on already-linked tasks.
+ * - Automatically surfaces actionable Timetable blocks (Study, Deep Work, Work, Health, Family, Reading)
+ *   as tasks, skipping Sleep, Meals, Commute, and Transition Buffers.
  */
 export function mergeTimetableIntoTasks(
   tasks: PlannerTask[],
@@ -448,26 +490,70 @@ export function mergeTimetableIntoTasks(
   const blockById = new Map(timetable.blocks.map((b) => [b.id, b]));
   const focusById = new Map(timetable.focusTasks.map((ft) => [ft.id, ft]));
   const knownIds = new Set(tasks.map((t) => t.id));
+  const linkedBlockIds = new Set(
+    tasks.map((t) => t.linkedBlockId).filter((id): id is string => Boolean(id))
+  );
 
   const updated = tasks.map((task) => {
     const linkedBlock = task.linkedBlockId ? blockById.get(task.linkedBlockId) : undefined;
     const matchedFocus = focusById.get(task.id);
     if (!linkedBlock && !matchedFocus) return task;
 
+    const isTodayBlock = linkedBlock
+      ? blockAppliesToDate(linkedBlock, todayIso) || linkedBlock.date === todayIso
+      : false;
+    const nextDone =
+      typeof linkedBlock?.completed === 'boolean'
+        ? linkedBlock.completed
+        : matchedFocus
+          ? matchedFocus.done
+          : task.done;
+
     return {
       ...task,
-      done: matchedFocus ? matchedFocus.done : task.done,
-      priority: matchedFocus ? matchedFocus.priority : task.priority,
+      done: nextDone,
+      priority: matchedFocus ? matchedFocus.priority : linkedBlock?.priority ?? task.priority,
       scheduledSlotLabel: linkedBlock
-        ? `${blockAppliesToDate(linkedBlock, todayIso) || linkedBlock.date === todayIso ? 'Today' : linkedBlock.date.slice(5)} · ${String(Math.floor(linkedBlock.startMinutes / 60)).padStart(2, '0')}:${String(linkedBlock.startMinutes % 60).padStart(2, '0')}`
+        ? `${isTodayBlock ? 'Today' : linkedBlock.date.slice(5)} · ${formatMinutes24h(linkedBlock.startMinutes)}–${formatMinutes24h(linkedBlock.endMinutes)}`
         : task.scheduledSlotLabel,
     };
   });
 
-  // Pull any brand-new tasks added directly on the Timetable rail (ids not yet in `/tasks`)
   const additions: PlannerTask[] = [];
+
+  // Pull actionable Timetable blocks not yet represented in `/tasks`
+  for (const block of timetable.blocks) {
+    if (!isActionableTimetableBlock(block) || linkedBlockIds.has(block.id)) continue;
+    const taskId = `blk_task_${block.id}`;
+    if (knownIds.has(taskId)) continue;
+    knownIds.add(taskId);
+    linkedBlockIds.add(block.id);
+
+    const isToday = blockAppliesToDate(block, todayIso) || block.date === todayIso;
+    const dueDate = isToday ? todayIso : block.date;
+    additions.push({
+      id: taskId,
+      title: block.title,
+      notes: block.notes,
+      priority: block.priority ?? 'P2',
+      dueDate,
+      tags: [getCategoryLabel(block.category)],
+      estimatedMinutes: Math.max(15, block.endMinutes - block.startMinutes),
+      pomodorosPlanned: block.pomodorosPlanned,
+      pomodorosDone: block.pomodorosDone,
+      inTodayFocus: isToday,
+      done: Boolean(block.completed),
+      subtasks: [],
+      linkedBlockId: block.id,
+      scheduledSlotLabel: `${isToday ? 'Today' : block.date.slice(5)} · ${formatMinutes24h(block.startMinutes)}–${formatMinutes24h(block.endMinutes)}`,
+      createdAt: `${dueDate}T${formatMinutes24h(block.startMinutes)}:00.000Z`,
+    });
+  }
+
+  // Pull any brand-new tasks added directly via legacy focusTasks (ids not yet in `/tasks`)
   for (const ft of timetable.focusTasks) {
     if (knownIds.has(ft.id)) continue;
+    knownIds.add(ft.id);
     additions.push({
       id: ft.id,
       title: ft.title,
@@ -485,5 +571,5 @@ export function mergeTimetableIntoTasks(
     });
   }
 
-  return additions.length > 0 ? [...additions, ...updated] : updated;
+  return additions.length > 0 ? [...updated, ...additions] : updated;
 }

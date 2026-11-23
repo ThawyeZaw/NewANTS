@@ -16,6 +16,7 @@ import { Button } from '../primitives/Button';
 import { ThemeToggle } from '../primitives/ThemeToggle';
 import { cn } from '../utils/cn';
 import { AppSwitcher } from './AppSwitcher';
+import { AntMascot } from './AntMascotView';
 import {
   AuthFormView,
   DEFAULT_AUTH_DEMO_PERSONAS,
@@ -243,6 +244,23 @@ export function AuthStudioView({
               videoUrl={videoUrl}
               posterUrl={posterUrl}
             />
+
+            {/* Compact Milo SSO Welcome Strip */}
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-card/75 px-3.5 py-2.5">
+              <AntMascot
+                variant="avatar"
+                size={40}
+                mood="happy"
+                app={app}
+                interactive
+                ariaLabel=""
+                className="shrink-0"
+              />
+              <p className="text-xs leading-relaxed text-foreground-muted">
+                <span className="font-semibold text-foreground">Milo says welcome back</span> — one{' '}
+                <span className="font-mono text-foreground">.the-ants.org</span> sign-in syncs Study and Flow together.
+              </p>
+            </div>
 
             {/* Compact Guest Access Strip (Zero Login Required per Spec Matrix) */}
             <div className="flex flex-wrap items-center justify-between gap-2.5 border-t border-border pt-4">

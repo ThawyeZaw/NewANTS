@@ -13,13 +13,17 @@ import {
   VolumeX,
 } from 'lucide-react';
 import {
+  AntMascot,
   THEME_CHANGE_EVENT,
   THEME_STORAGE_KEY,
   ThemeToggle,
   cn,
+  emitMiloCheer,
   persistThemeMode,
   readStoredThemeMode,
   useSlidingIndicator,
+  type AntMascotMood,
+  type AntMascotPropVariant,
   type MockUserProfile,
 } from '@ants/ui';
 import {
@@ -260,6 +264,14 @@ export function PomodoroView({
         const result = finishInterval(current, current.timer.endAt, true, t);
         commit(result.state);
         if (result.record) onSessionLogged?.(result.record);
+        if (result.endedPhase === 'work') {
+          emitMiloCheer({
+            mood: 'celebrating',
+            propVariant: 'headphones',
+            badge: 'Sprint Done',
+            message: 'Focus sprint complete! Stretch and grab a breather with Milo.',
+          });
+        }
         alertTransition(result.endedPhase, result.state.timer.phase, current.settings);
       },
       running ? 100 : 30_000
@@ -713,6 +725,34 @@ export function PomodoroView({
 
   const startLabel = isRunning ? 'Pause' : state.timer.status === 'paused' ? 'Resume' : 'Start';
 
+  const miloState: {
+    mood: AntMascotMood;
+    propVariant: AntMascotPropVariant;
+    message: string;
+  } = !isWork
+    ? {
+        mood: 'sleeping',
+        propVariant: 'pillow',
+        message: 'Break time — stretch, hydrate, and recharge with Milo.',
+      }
+    : state.timer.status === 'running'
+      ? {
+          mood: 'focus',
+          propVariant: 'headphones',
+          message: 'Headphones on — Milo’s guarding this focus sprint.',
+        }
+      : state.timer.status === 'paused'
+        ? {
+            mood: 'curious',
+            propVariant: 'headphones',
+            message: 'Paused for a breather — tap Resume when ready.',
+          }
+        : {
+            mood: 'happy',
+            propVariant: 'headphones',
+            message: 'Pick a task and hit Start — Milo’s ready with you.',
+          };
+
   return (
     <>
       <FlowShellView
@@ -897,7 +937,7 @@ export function PomodoroView({
               )}
 
               <TimerRingView
-                className="my-3 sm:my-5"
+                className="my-2 sm:my-3"
                 progress={progress}
                 timeLabel={timeLabel}
                 remainingMs={remainingMs}
@@ -991,6 +1031,26 @@ export function PomodoroView({
                   >
                     <Sliders className="h-3.5 w-3.5" aria-hidden="true" />
                   </button>
+                </div>
+
+                {/* Reactive Milo Focus Companion Strip */}
+                <div
+                  data-testid="pomodoro-milo-companion"
+                  className="flex w-full max-w-sm items-center gap-2.5 rounded-xl border border-border/50 bg-surface-inset/55 px-3 py-1.5"
+                >
+                  <AntMascot
+                    size={40}
+                    mood={miloState.mood}
+                    app="flow"
+                    propVariant={miloState.propVariant}
+                    interactive
+                    animated={state.timer.status === 'running' || !isWork}
+                    ariaLabel=""
+                    className="shrink-0"
+                  />
+                  <p className="min-w-0 truncate text-xs font-medium text-foreground-muted">
+                    {miloState.message}
+                  </p>
                 </div>
               </div>
             </section>

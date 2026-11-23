@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   ANTS_AUTH_SESSION_EVENT,
+  AntMascot,
   Badge,
   Button,
   MOCK_AUTHENTICATED_USER,
@@ -604,6 +605,15 @@ export function StudyLeaderboardView({
             </div>
           ) : (
             <div className="p-8 text-center">
+              <AntMascot
+                mood="curious"
+                app="study"
+                propVariant="magnifier"
+                size={72}
+                interactive
+                ariaLabel=""
+                className="mx-auto mb-2"
+              />
               <p className="text-sm font-semibold text-foreground">No matching scholars found</p>
               <p className="mt-1 text-xs text-foreground-muted">
                 Clear the search box or switch cohorts to view all participating scholars.

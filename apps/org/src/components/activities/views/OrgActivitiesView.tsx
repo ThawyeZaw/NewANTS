@@ -4,14 +4,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
-  Images,
   MapPin,
   RotateCcw,
   Search,
   Users,
   X,
 } from 'lucide-react';
-import { Button, Input, cn, useSlidingIndicator } from '@ants/ui';
+import { AntMascot, Button, Input, cn, useSlidingIndicator } from '@ants/ui';
 import { loadOrgCmsState, subscribeOrgCmsChanges } from '../../../lib/cms';
 import {
   countActivitiesByCategory,
@@ -182,7 +181,15 @@ export function OrgActivitiesView({
         {/* Activities Documentary Photo Grid */}
         {filteredActivities.length === 0 ? (
           <div className="border-b border-border py-12 text-center space-y-3">
-            <Images className="mx-auto h-7 w-7 text-foreground-subtle" aria-hidden="true" />
+            <AntMascot
+              mood="curious"
+              app="org"
+              propVariant="magnifier"
+              size={76}
+              interactive
+              ariaLabel=""
+              className="mx-auto"
+            />
             <div className="space-y-1">
               <h2 className="text-base font-bold text-foreground">
                 No activities match those filters

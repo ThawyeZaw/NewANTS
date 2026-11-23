@@ -11,12 +11,14 @@ import {
   Sparkles,
 } from 'lucide-react';
 import {
+  AntMascot,
   AppSwitcher,
   BrandHeaderBadge,
   Button,
   Tabs,
   ThemeToggle,
   cn,
+  emitMiloCheer,
   type EcosystemAppId,
 } from '@ants/ui';
 import {
@@ -333,6 +335,12 @@ export function GradeCalculatorView({
     };
 
     onSaveSnapshot?.(snapshot);
+    emitMiloCheer({
+      mood: isTopGrade ? 'celebrating' : 'happy',
+      propVariant: 'pencil',
+      badge: `Grade ${calculation.finalGrade}`,
+      message: `Saved ${activeSubject.code} (${calculation.finalGrade}) to your Study Tracker!`,
+    });
     setSavedBanner(
       `Saved ${activeSubject.title} (${activeSeries.label}) — Grade ${calculation.finalGrade}`
     );
@@ -737,7 +745,7 @@ export function GradeCalculatorView({
               </div>
             </div>
 
-            {/* Progress Bar & Humanized Next-Step Guidance */}
+            {/* Progress Bar & Humanized Next-Step Guidance with Milo */}
             <div className="space-y-3">
               <div className="h-2 w-full overflow-hidden rounded-full bg-surface-inset">
                 <div
@@ -746,33 +754,50 @@ export function GradeCalculatorView({
                 />
               </div>
 
-              <p className="text-sm text-foreground-muted leading-relaxed">
-                {calculation.nextBoundary ? (
-                  <>
-                    You need{' '}
-                    <strong className="font-mono font-semibold text-foreground">
-                      {calculation.nextBoundary.needed} more {calculation.metricUnit}
-                    </strong>{' '}
-                    to reach{' '}
-                    <strong className="text-foreground">
-                      Grade {calculation.nextBoundary.grade}
-                    </strong>{' '}
-                    ({calculation.nextBoundary.minScore} {calculation.metricUnit}).
-                  </>
-                ) : (
-                  <>
-                    Solid{' '}
-                    <strong className="text-foreground">
-                      Grade {calculation.finalGrade}
-                    </strong>{' '}
-                    — you are{' '}
-                    <strong className="font-mono font-semibold text-foreground">
-                      {calculation.bufferAboveTop} {calculation.metricUnit}
-                    </strong>{' '}
-                    above the top boundary.
-                  </>
-                )}
-              </p>
+              <div className="flex items-center gap-3.5">
+                <AntMascot
+                  size={56}
+                  mood={
+                    isTopGrade
+                      ? 'celebrating'
+                      : calculation.finalGrade === 'U'
+                        ? 'curious'
+                        : 'studying'
+                  }
+                  app={hostApp === 'study' ? 'study' : 'org'}
+                  propVariant={isTopGrade ? 'pencil' : 'scholar'}
+                  interactive
+                  ariaLabel=""
+                  className="shrink-0"
+                />
+                <p className="text-sm text-foreground-muted leading-relaxed">
+                  {calculation.nextBoundary ? (
+                    <>
+                      You need{' '}
+                      <strong className="font-mono font-semibold text-foreground">
+                        {calculation.nextBoundary.needed} more {calculation.metricUnit}
+                      </strong>{' '}
+                      to reach{' '}
+                      <strong className="text-foreground">
+                        Grade {calculation.nextBoundary.grade}
+                      </strong>{' '}
+                      ({calculation.nextBoundary.minScore} {calculation.metricUnit}).
+                    </>
+                  ) : (
+                    <>
+                      Solid{' '}
+                      <strong className="text-foreground">
+                        Grade {calculation.finalGrade}
+                      </strong>{' '}
+                      — you are{' '}
+                      <strong className="font-mono font-semibold text-foreground">
+                        {calculation.bufferAboveTop} {calculation.metricUnit}
+                      </strong>{' '}
+                      above the top boundary.
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
 
             {/* Clean Session Boundary Strip */}
@@ -824,7 +849,22 @@ export function GradeCalculatorView({
       {/* Mobile Sticky Bottom Total Score & Grade Summary Bar (sticky bottom-0 z-50) */}
       <div className="sticky bottom-0 z-50 border-t border-border-hover bg-surface-elevated/95 px-4 py-3 backdrop-blur-md shadow-[var(--shadow-tier-3)] lg:hidden">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <AntMascot
+              variant="avatar"
+              size={28}
+              mood={
+                isTopGrade
+                  ? 'celebrating'
+                  : calculation.finalGrade === 'U'
+                    ? 'curious'
+                    : 'studying'
+              }
+              app={hostApp === 'study' ? 'study' : 'org'}
+              animated={false}
+              ariaLabel=""
+              className="shrink-0"
+            />
             <div
               className={cn(
                 'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-mono text-lg font-extrabold',

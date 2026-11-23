@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { cn } from '@ants/ui';
+import { AntMascot, cn } from '@ants/ui';
 import { PHASE_LABELS, formatDuration, type PomodoroSessionRecord } from '../../../lib/pomodoro/engine';
 import { getDailyBuckets, getSummary, getWeeklyBuckets } from '../../../lib/pomodoro/stats';
 import { createMockPomodoroHistory } from '../../../mocks/pomodoro.mock';
@@ -196,7 +196,23 @@ export function PomodoroStatsView({
           Recent sessions
         </h2>
         {recent.length === 0 ? (
-          <p className="text-sm text-foreground-muted">Your finished sessions will show up here.</p>
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/70 px-4 py-6 text-center sm:flex-row sm:text-left">
+            <AntMascot
+              mood="idle"
+              app="flow"
+              propVariant="headphones"
+              size={64}
+              interactive
+              ariaLabel=""
+              className="shrink-0"
+            />
+            <div className="space-y-0.5">
+              <p className="text-sm font-semibold text-foreground">No sessions logged yet</p>
+              <p className="text-xs text-foreground-muted">
+                Your finished sessions will show up here — Milo will track your streak automatically.
+              </p>
+            </div>
+          </div>
         ) : (
           <ul className="divide-y divide-border border-y border-border">
             {recent.map((r) => (

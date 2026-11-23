@@ -27,6 +27,7 @@ import { type UserRole } from '../mocks/ecosystem-chrome.mock';
 import { Badge } from '../primitives/Badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../primitives/Card';
 import { cn } from '../utils/cn';
+import { AntMascot } from './AntMascotView';
 import { TutorSlotPainterView } from './TutorSlotPainterView';
 
 export interface PublicProfileSwitchItem {
@@ -96,11 +97,24 @@ export function UserProfileView({
     return (
       <Card className={cn('mx-auto max-w-xl', className)}>
         <CardHeader>
-          <CardTitle>Member profile not found</CardTitle>
-          <CardDescription>
-            No public ANTs profile matches{' '}
-            <span className="font-mono text-foreground">@{cleanHandle}</span> in this local workspace.
-          </CardDescription>
+          <div className="flex items-center gap-3.5">
+            <AntMascot
+              mood="curious"
+              app="flow"
+              propVariant="magnifier"
+              size={68}
+              interactive
+              ariaLabel=""
+              className="shrink-0"
+            />
+            <div>
+              <CardTitle>Member profile not found</CardTitle>
+              <CardDescription>
+                No public ANTs profile matches{' '}
+                <span className="font-mono text-foreground">@{cleanHandle}</span> in this local workspace.
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {availableProfiles && availableProfiles.length > 0 && (

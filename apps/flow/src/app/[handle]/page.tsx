@@ -1,6 +1,15 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { normalizeProfileHandle } from '@ants/ui';
 import { FlowProfilePageView } from '../../components/account/views/FlowProfilePageView';
+
+function decodeRouteHandle(rawHandle: string): string {
+  try {
+    return decodeURIComponent(rawHandle);
+  } catch {
+    return rawHandle;
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -8,7 +17,13 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
-  const clean = normalizeProfileHandle(handle) || 'profile';
+  const decoded = decodeRouteHandle(handle);
+  if (!decoded.startsWith('@')) {
+    return {
+      title: 'Page Not Found · Flow — The ANTs Productivity Studio',
+    };
+  }
+  const clean = normalizeProfileHandle(decoded) || 'profile';
   return {
     title: `@${clean} · Public Profile & Schedule — The ANTs`,
     description: `Public academic portfolio, verified credentials, and tutoring availability for @${clean} across The ANTs ecosystem.`,
@@ -21,6 +36,10 @@ export default async function PublicProfilePage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  return <FlowProfilePageView handle={handle} />;
+  const decoded = decodeRouteHandle(handle);
+  if (!decoded.startsWith('@')) {
+    notFound();
+  }
+  return <FlowProfilePageView handle={decoded} />;
 }
 

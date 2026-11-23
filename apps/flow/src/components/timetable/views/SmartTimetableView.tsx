@@ -2,37 +2,51 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   GraduationCap,
+  Maximize2,
   Moon,
   Plus,
   RotateCcw,
+  SlidersHorizontal,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
-import { Badge, Button, ThemeToggle, cn, useSlidingIndicator, type MockUserProfile } from '@ants/ui';
 import {
+  Badge,
+  Button,
+  ThemeToggle,
+  cn,
+  emitMiloCheer,
+  useSlidingIndicator,
+  type MockUserProfile,
+} from '@ants/ui';
+import {
+  DEFAULT_ZOOM_HOUR_HEIGHT,
+  MAX_ZOOM_HOUR_HEIGHT,
+  MIN_ZOOM_HOUR_HEIGHT,
+  TIMETABLE_ZOOM_LEVELS,
   addDaysIso,
-  computeDayAllocations,
-  createTimetableId,
-  findNextOpenSlotMinutes,
+  clampHourHeight,
+  computeFitHourHeight,
   formatFullDateLabel,
   formatMonthHeading,
-  getBlocksForDate,
   getWeekDates,
   moveBlockToSlot,
   parseIsoDate,
   resizeBlockDuration,
   toIsoDate,
+  type MonthDensityMode,
   type ReminderLeadMinutes,
   type SyncedExamCountdown,
-  type TaskPriority,
   type TimetableBlock,
+  type TimetableHourHeight,
   type TimetablePersistedState,
   type TimetablePresetId,
   type TimetableViewMode,
-  type TodayFocusTask,
 } from '../../../lib/timetable/engine';
 import {
   TIMETABLE_STORAGE_KEY,
@@ -50,7 +64,14 @@ import { TelegramReminderModalView } from './TelegramReminderModalView';
 import { TimetableDayView } from './TimetableDayView';
 import { TimetableMonthView } from './TimetableMonthView';
 import { TimetableWeekGridView } from './TimetableWeekGridView';
-import { TodayFocusRailView } from './TodayFocusRailView';
+
+export {
+  DEFAULT_ZOOM_HOUR_HEIGHT,
+  MAX_ZOOM_HOUR_HEIGHT,
+  MIN_ZOOM_HOUR_HEIGHT,
+  TIMETABLE_ZOOM_LEVELS,
+  type TimetableHourHeight,
+};
 
 export interface SmartTimetableViewProps {
   /** Initial state (defaults to realistic 24h coaching schedule preset) */
@@ -76,16 +97,27 @@ const VIEW_TABS: { id: TimetableViewMode; label: string }[] = [
   { id: 'month', label: 'Month' },
 ];
 
-const PRESET_OPTIONS: { id: TimetablePresetId; label: string }[] = [
-  { id: 'workday-coaching', label: '24h Workday' },
-  { id: 'scholar-ial', label: 'IAL Scholar' },
+const MONTH_DENSITY_OPTIONS: { id: MonthDensityMode; label: string }[] = [
+  { id: 'compact', label: 'Compact' },
+  { id: 'comfortable', label: 'Comfortable' },
+  { id: 'detailed', label: 'Detailed' },
 ];
 
-export const TIMETABLE_ZOOM_LEVELS = [54, 72, 96, 120] as const;
-export type TimetableHourHeight = (typeof TIMETABLE_ZOOM_LEVELS)[number];
-export const MIN_ZOOM_HOUR_HEIGHT: TimetableHourHeight = 54;
-export const MAX_ZOOM_HOUR_HEIGHT: TimetableHourHeight = 120;
+const PRESET_OPTIONS: { id: TimetablePresetId; label: string; hint: string }[] = [
+  {
+    id: 'workday-coaching',
+    label: '24h Workday',
+    hint: 'Full 1,440m workday & coaching blocks',
+  },
+  {
+    id: 'scholar-ial',
+    label: 'IAL Scholar',
+    hint: 'WMA11, 9702 & 0580 revision timetable',
+  },
+];
+
 const TIMETABLE_ZOOM_STORAGE_KEY = 'ants-flow-timetable-zoom-v1';
+const TIMETABLE_MONTH_DENSITY_STORAGE_KEY = 'ants-flow-timetable-month-density-v1';
 
 export function SmartTimetableView({
   initialState,
@@ -99,13 +131,23 @@ export function SmartTimetableView({
   onReminderSaved,
 }: SmartTimetableViewProps) {
   const [state, setState] = useState<TimetablePersistedState>(
-    () => initialState ?? createPresetTimetableState('workday-coaching', DEFAULT_TIMETABLE_REFERENCE_DATE)
+    () =>
+      initialState ??
+      createPresetTimetableState('workday-coaching', DEFAULT_TIMETABLE_REFERENCE_DATE)
   );
   const stateRef = useRef(state);
   const [hydrated, setHydrated] = useState(false);
   const [todayIso, setTodayIso] = useState(DEFAULT_TIMETABLE_REFERENCE_DATE);
   const [nowMinutes, setNowMinutes] = useState(14 * 60 + 23);
-  const [hourHeight, setHourHeight] = useState<TimetableHourHeight>(72);
+
+  const [hourHeight, setHourHeight] = useState<TimetableHourHeight>(
+    DEFAULT_ZOOM_HOUR_HEIGHT
+  );
+  const [isFitZoom, setIsFitZoom] = useState(false);
+  const [monthDensity, setMonthDensity] = useState<MonthDensityMode>('comfortable');
+
+  const [presetMenuOpen, setPresetMenuOpen] = useState(false);
+  const presetMenuRef = useRef<HTMLDivElement | null>(null);
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorDraft, setEditorDraft] = useState<BlockEditorDraft | null>(null);
@@ -121,16 +163,6 @@ export function SmartTimetableView({
   });
   const viewTabsIndicatorReady = viewTabsReady && viewTabsRect.visible;
 
-  const presetTabsRef = useRef<HTMLDivElement | null>(null);
-  const {
-    rect: presetTabsRect,
-    ready: presetTabsReady,
-    animate: presetTabsAnimate,
-  } = useSlidingIndicator(presetTabsRef, state.presetId, {
-    activeSelector: '[aria-pressed="true"]',
-  });
-  const presetTabsIndicatorReady = presetTabsReady && presetTabsRect.visible;
-
   const commit = useCallback(
     (next: TimetablePersistedState) => {
       stateRef.current = next;
@@ -140,7 +172,7 @@ export function SmartTimetableView({
     [onStateChange]
   );
 
-  // Hydrate saved state + real local time on mount
+  // Hydrate saved state, zoom, density, and real local time on mount
   useEffect(() => {
     document.title = 'Smart Timetable · Flow — The ANTs Productivity Studio';
     const now = new Date();
@@ -156,9 +188,17 @@ export function SmartTimetableView({
         const savedZoom = localStorage.getItem(TIMETABLE_ZOOM_STORAGE_KEY);
         if (savedZoom) {
           const parsed = Number(savedZoom);
-          if (TIMETABLE_ZOOM_LEVELS.includes(parsed as TimetableHourHeight)) {
-            setHourHeight(parsed as TimetableHourHeight);
+          if (Number.isFinite(parsed)) {
+            setHourHeight(clampHourHeight(parsed));
           }
+        }
+        const savedDensity = localStorage.getItem(TIMETABLE_MONTH_DENSITY_STORAGE_KEY);
+        if (
+          savedDensity === 'compact' ||
+          savedDensity === 'comfortable' ||
+          savedDensity === 'detailed'
+        ) {
+          setMonthDensity(savedDensity);
         }
       } catch {
         // ignore storage errors
@@ -167,25 +207,25 @@ export function SmartTimetableView({
     setHydrated(true);
   }, [persistToLocalStorage, storageKey]);
 
-  const handleZoomStep = (delta: -1 | 1) => {
-    const currentIndex = TIMETABLE_ZOOM_LEVELS.indexOf(hourHeight);
-    const safeCurrent = currentIndex === -1 ? 1 : currentIndex;
-    const nextIndex = Math.max(0, Math.min(TIMETABLE_ZOOM_LEVELS.length - 1, safeCurrent + delta));
-    const nextZoom = TIMETABLE_ZOOM_LEVELS[nextIndex] ?? 72;
-    setHourHeight(nextZoom);
-    if (persistToLocalStorage) {
-      try {
-        localStorage.setItem(TIMETABLE_ZOOM_STORAGE_KEY, String(nextZoom));
-      } catch {
-        // ignore storage errors
-      }
-    }
-  };
-
   useEffect(() => {
     if (!hydrated || !persistToLocalStorage) return;
     saveTimetableState(state, storageKey);
   }, [state, hydrated, persistToLocalStorage, storageKey]);
+
+  // Keep `/timetable` synced with updates made on `/focus` or `/tasks`
+  useEffect(() => {
+    if (!persistToLocalStorage) return;
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== null && event.key !== storageKey) return;
+      const latest = loadTimetableState(storageKey);
+      if (latest) {
+        stateRef.current = latest;
+        setState(latest);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [persistToLocalStorage, storageKey]);
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -196,14 +236,156 @@ export function SmartTimetableView({
     return () => window.clearInterval(id);
   }, []);
 
-  const weekDates = useMemo(() => getWeekDates(state.selectedDate, 1), [state.selectedDate]);
-  const selectedDayBlocks = useMemo(
-    () => getBlocksForDate(state.blocks, state.selectedDate),
-    [state.blocks, state.selectedDate]
+  // Close Presets popover on outside click or Escape
+  useEffect(() => {
+    if (!presetMenuOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        presetMenuRef.current &&
+        !presetMenuRef.current.contains(event.target as Node)
+      ) {
+        setPresetMenuOpen(false);
+      }
+    };
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setPresetMenuOpen(false);
+      }
+    };
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [presetMenuOpen]);
+
+  const applyHourHeight = useCallback(
+    (nextRaw: number, fit = false) => {
+      const clamped = clampHourHeight(nextRaw);
+      setHourHeight(clamped);
+      setIsFitZoom(fit);
+      if (persistToLocalStorage) {
+        try {
+          localStorage.setItem(TIMETABLE_ZOOM_STORAGE_KEY, String(clamped));
+        } catch {
+          // ignore storage errors
+        }
+      }
+    },
+    [persistToLocalStorage]
   );
-  const dayAllocations = useMemo(
-    () => computeDayAllocations(selectedDayBlocks),
-    [selectedDayBlocks]
+
+  const handleZoomStep = useCallback(
+    (delta: -1 | 1) => {
+      const stepPx = 12;
+      applyHourHeight(hourHeight + delta * stepPx, false);
+    },
+    [hourHeight, applyHourHeight]
+  );
+
+  const handleWheelZoom = useCallback(
+    (deltaPx: number) => {
+      setHourHeight((prev) => {
+        const next = clampHourHeight(prev + deltaPx);
+        if (persistToLocalStorage) {
+          try {
+            localStorage.setItem(TIMETABLE_ZOOM_STORAGE_KEY, String(next));
+          } catch {
+            // ignore storage errors
+          }
+        }
+        return next;
+      });
+      setIsFitZoom(false);
+    },
+    [persistToLocalStorage]
+  );
+
+  const handleFitZoom = useCallback(() => {
+    const visibleHours = stateRef.current.showOvernightHours ? 24 : 18;
+    const vpHeight = typeof window !== 'undefined' ? window.innerHeight : 900;
+    const fitPx = computeFitHourHeight(vpHeight, visibleHours);
+    applyHourHeight(fitPx, true);
+  }, [applyHourHeight]);
+
+  const handleSelectMonthDensity = useCallback(
+    (next: MonthDensityMode) => {
+      setMonthDensity(next);
+      if (persistToLocalStorage) {
+        try {
+          localStorage.setItem(TIMETABLE_MONTH_DENSITY_STORAGE_KEY, next);
+        } catch {
+          // ignore storage errors
+        }
+      }
+    },
+    [persistToLocalStorage]
+  );
+
+  // Keyboard shortcuts (+ / - / 0) for zoom & density
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (editorOpen || Boolean(reminderBlockId)) return;
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        if (
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable ||
+          (target.tagName === 'INPUT' &&
+            (target as HTMLInputElement).type !== 'range')
+        ) {
+          return;
+        }
+      }
+
+      if (stateRef.current.viewMode === 'month') {
+        if (event.key === '+' || event.key === '=') {
+          event.preventDefault();
+          const idx = MONTH_DENSITY_OPTIONS.findIndex((o) => o.id === monthDensity);
+          const next = MONTH_DENSITY_OPTIONS[Math.min(2, Math.max(0, idx + 1))]?.id;
+          if (next) handleSelectMonthDensity(next);
+        } else if (event.key === '-') {
+          event.preventDefault();
+          const idx = MONTH_DENSITY_OPTIONS.findIndex((o) => o.id === monthDensity);
+          const next = MONTH_DENSITY_OPTIONS[Math.min(2, Math.max(0, idx - 1))]?.id;
+          if (next) handleSelectMonthDensity(next);
+        } else if (event.key === '0') {
+          event.preventDefault();
+          handleSelectMonthDensity('compact');
+        }
+        return;
+      }
+
+      if (event.key === '+' || event.key === '=') {
+        event.preventDefault();
+        applyHourHeight(hourHeight + 12, false);
+      } else if (event.key === '-') {
+        event.preventDefault();
+        applyHourHeight(hourHeight - 12, false);
+      } else if (event.key === '0') {
+        event.preventDefault();
+        handleFitZoom();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [
+    editorOpen,
+    reminderBlockId,
+    hourHeight,
+    monthDensity,
+    applyHourHeight,
+    handleFitZoom,
+    handleSelectMonthDensity,
+  ]);
+
+  const weekDates = useMemo(
+    () => getWeekDates(state.selectedDate, 1),
+    [state.selectedDate]
   );
 
   const reminderBlock = useMemo(
@@ -226,7 +408,10 @@ export function SmartTimetableView({
       return;
     }
     if (current.viewMode === 'week') {
-      commit({ ...current, selectedDate: addDaysIso(current.selectedDate, direction * 7) });
+      commit({
+        ...current,
+        selectedDate: addDaysIso(current.selectedDate, direction * 7),
+      });
       return;
     }
     const d = parseIsoDate(current.selectedDate);
@@ -234,15 +419,22 @@ export function SmartTimetableView({
     commit({ ...current, selectedDate: toIsoDate(d) });
   };
 
-  const openQuickAdd = useCallback((date: string, startMinutes: number) => {
-    setEditorDraft({
-      mode: 'create',
-      defaultDate: date,
-      defaultStartMinutes: startMinutes,
-      defaultEndMinutes: Math.min(1440, startMinutes + 45),
-    });
-    setEditorOpen(true);
-  }, []);
+  const openQuickAdd = useCallback(
+    (date: string, startMinutes: number, endMinutes?: number) => {
+      const resolvedEnd =
+        endMinutes !== undefined
+          ? Math.min(1440, Math.max(startMinutes + 15, endMinutes))
+          : Math.min(1440, startMinutes + 45);
+      setEditorDraft({
+        mode: 'create',
+        defaultDate: date,
+        defaultStartMinutes: startMinutes,
+        defaultEndMinutes: resolvedEnd,
+      });
+      setEditorOpen(true);
+    },
+    []
+  );
 
   const openEditBlock = useCallback((block: TimetableBlock) => {
     setEditorDraft({
@@ -308,12 +500,21 @@ export function SmartTimetableView({
   const handleToggleBlockComplete = useCallback(
     (blockId: string) => {
       const current = stateRef.current;
+      const target = current.blocks.find((b) => b.id === blockId);
       commit({
         ...current,
         blocks: current.blocks.map((b) =>
           b.id === blockId ? { ...b, completed: !b.completed } : b
         ),
       });
+      if (target && !target.completed) {
+        emitMiloCheer({
+          mood: 'celebrating',
+          propVariant: 'pencil',
+          badge: 'Block Done',
+          message: 'Time block completed! Keep that Flow momentum rolling.',
+        });
+      }
     },
     [commit]
   );
@@ -335,75 +536,6 @@ export function SmartTimetableView({
     [commit, onReminderSaved]
   );
 
-  const handleAddFocusTask = useCallback(
-    (title: string, priority: TaskPriority) => {
-      const current = stateRef.current;
-      const newTask: TodayFocusTask = {
-        id: createTimetableId('ft'),
-        title,
-        priority,
-        estimatedMinutes: 50,
-        pomodorosPlanned: 2,
-        pomodorosDone: 0,
-        done: false,
-      };
-      commit({ ...current, focusTasks: [newTask, ...current.focusTasks] });
-    },
-    [commit]
-  );
-
-  const handleToggleFocusTask = useCallback(
-    (taskId: string) => {
-      const current = stateRef.current;
-      commit({
-        ...current,
-        focusTasks: current.focusTasks.map((t) =>
-          t.id === taskId ? { ...t, done: !t.done } : t
-        ),
-      });
-    },
-    [commit]
-  );
-
-  const handleDeleteFocusTask = useCallback(
-    (taskId: string) => {
-      const current = stateRef.current;
-      commit({
-        ...current,
-        focusTasks: current.focusTasks.filter((t) => t.id !== taskId),
-      });
-    },
-    [commit]
-  );
-
-  const handleScheduleTask = useCallback((task: TodayFocusTask) => {
-    const current = stateRef.current;
-    const dayBlocks = getBlocksForDate(current.blocks, current.selectedDate);
-    const startMin = findNextOpenSlotMinutes(dayBlocks, task.estimatedMinutes, 6 * 60 + 15);
-    const durationMin = Math.max(15, Math.min(180, Math.round(task.estimatedMinutes / 15) * 15));
-    const inferredCategory = task.tag === 'Health'
-      ? 'health'
-      : task.tag === 'Family'
-        ? 'family'
-        : task.tag === 'Reading'
-          ? 'reading'
-          : task.pomodorosPlanned
-            ? 'deep-work'
-            : 'work';
-
-    setEditorDraft({
-      mode: 'create',
-      defaultDate: current.selectedDate,
-      defaultStartMinutes: startMin,
-      defaultEndMinutes: Math.min(1440, startMin + durationMin),
-      defaultTitle: task.title,
-      defaultCategory: inferredCategory,
-      defaultPriority: task.priority,
-      defaultPomodoros: task.pomodorosPlanned,
-    });
-    setEditorOpen(true);
-  }, []);
-
   const switchPreset = (presetId: TimetablePresetId) => {
     const preset = createPresetTimetableState(presetId, todayIso);
     commit({
@@ -412,7 +544,11 @@ export function SmartTimetableView({
       showExams: stateRef.current.showExams,
       showOvernightHours: stateRef.current.showOvernightHours,
     });
+    setPresetMenuOpen(false);
   };
+
+  const activePresetLabel =
+    PRESET_OPTIONS.find((p) => p.id === state.presetId)?.label ?? 'Preset';
 
   return (
     <FlowShellView
@@ -422,10 +558,10 @@ export function SmartTimetableView({
       user={user}
       headerActions={<ThemeToggle />}
     >
-      {/* Top Timetable Toolbar — Two-Tier Visual Hierarchy */}
-      <div className="ants-workspace-enter flex flex-col gap-3.5 border-b border-border pb-4">
-        {/* Tier 1: Main Navigation & Core View Controls */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      {/* Compact Two-Row Timetable Toolbar */}
+      <div className="ants-workspace-enter flex flex-col gap-2.5 border-b border-border pb-3">
+        {/* Row 1: Date Stepper + View Switcher + Primary CTA */}
+        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               Smart Timetable
@@ -517,41 +653,93 @@ export function SmartTimetableView({
           </div>
         </div>
 
-        {/* Tier 2: Quiet Secondary Utility Shelf */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs text-foreground-muted">
+        {/* Row 2: Unified Zoom / Density Strip + Overnight + Exams + Compact Presets Menu */}
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-foreground-muted">
           <div className="flex flex-wrap items-center gap-2">
-            {state.viewMode === 'week' && (
+            {state.viewMode === 'month' ? (
               <div
-                className="flex items-center gap-0.5 rounded-lg border border-border/70 bg-surface-card p-0.5"
-                title="Vertical Zoom (Hour Height)"
+                role="group"
+                aria-label="Month view density"
+                className="inline-flex items-center rounded-lg border border-border/70 bg-surface-card p-0.5"
               >
+                {MONTH_DENSITY_OPTIONS.map((opt) => {
+                  const active = monthDensity === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => handleSelectMonthDensity(opt.id)}
+                      className={cn(
+                        'rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors',
+                        active
+                          ? 'bg-primary-tint text-on-primary-tint'
+                          : 'text-foreground-muted hover:text-foreground'
+                      )}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div
+                className="flex items-center gap-1 rounded-lg border border-border/70 bg-surface-card px-1.5 py-0.5"
+                title="Vertical Zoom (Ctrl+Scroll or +/- keys, 0 to Fit)"
+              >
+                <button
+                  type="button"
+                  onClick={handleFitZoom}
+                  aria-pressed={isFitZoom}
+                  title="Fit full day to screen (0)"
+                  className={cn(
+                    'inline-flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-semibold transition-colors',
+                    isFitZoom
+                      ? 'bg-primary-tint text-on-primary-tint'
+                      : 'text-foreground-muted hover:bg-surface-inset hover:text-foreground'
+                  )}
+                >
+                  <Maximize2 className="h-3 w-3" aria-hidden="true" />
+                  Fit
+                </button>
+                <span className="h-3.5 w-px bg-border" aria-hidden="true" />
                 <button
                   type="button"
                   onClick={() => handleZoomStep(-1)}
                   disabled={hourHeight <= MIN_ZOOM_HOUR_HEIGHT}
                   aria-label="Zoom out timetable vertically"
-                  title="Zoom out (shorter hours)"
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground disabled:opacity-30"
+                  title="Zoom out (-)"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground disabled:opacity-30"
                 >
                   <ZoomOut className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
-                <span className="min-w-11 px-1 text-center font-mono text-[11px] font-semibold tabular-nums text-foreground">
-                  {hourHeight}px
-                </span>
+                <input
+                  type="range"
+                  min={MIN_ZOOM_HOUR_HEIGHT}
+                  max={MAX_ZOOM_HOUR_HEIGHT}
+                  step={4}
+                  value={hourHeight}
+                  aria-label="Timetable zoom (pixels per hour)"
+                  onChange={(e) => applyHourHeight(Number(e.target.value), false)}
+                  className="h-1.5 w-20 cursor-pointer accent-primary sm:w-28"
+                />
                 <button
                   type="button"
                   onClick={() => handleZoomStep(1)}
                   disabled={hourHeight >= MAX_ZOOM_HOUR_HEIGHT}
                   aria-label="Zoom in timetable vertically"
-                  title="Zoom in (taller hours)"
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground disabled:opacity-30"
+                  title="Zoom in (+)"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground disabled:opacity-30"
                 >
                   <ZoomIn className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
+                <span className="min-w-10 text-center font-mono text-[11px] font-semibold tabular-nums text-foreground">
+                  {hourHeight}px
+                </span>
               </div>
             )}
 
-            {state.viewMode === 'week' && (
+            {state.viewMode !== 'month' && (
               <button
                 type="button"
                 aria-pressed={state.showOvernightHours}
@@ -569,7 +757,7 @@ export function SmartTimetableView({
                 className={cn(
                   'inline-flex h-7 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors',
                   state.showOvernightHours
-                    ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-semibold'
+                    ? 'border-primary-tint-border bg-primary-tint font-semibold text-on-primary-tint'
                     : 'border-border/70 bg-surface-card text-foreground hover:border-border-hover'
                 )}
               >
@@ -587,66 +775,82 @@ export function SmartTimetableView({
               className={cn(
                 'inline-flex h-7 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors',
                 state.showExams
-                  ? 'border-primary-tint-border bg-primary-tint text-on-primary-tint font-semibold'
+                  ? 'border-primary-tint-border bg-primary-tint font-semibold text-on-primary-tint'
                   : 'border-border/70 bg-surface-card text-foreground-muted hover:text-foreground'
               )}
             >
               <GraduationCap className="h-3 w-3" aria-hidden="true" />
-              Show Exams
+              Exams
             </button>
           </div>
 
-          {/* Subordinated Demo Preset Switcher */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] text-foreground-subtle">Preset:</span>
-            <div className="inline-flex items-center rounded-lg border border-border/60 bg-surface-card p-0.5">
+          {/* Tucked Demo Presets Popover */}
+          <div ref={presetMenuRef} className="relative">
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={presetMenuOpen}
+              onClick={() => setPresetMenuOpen((v) => !v)}
+              className="inline-flex h-7 items-center gap-1.5 rounded-lg border border-border/70 bg-surface-card px-2.5 text-xs font-medium text-foreground-muted transition-colors hover:border-border-hover hover:text-foreground"
+            >
+              <SlidersHorizontal className="h-3 w-3" aria-hidden="true" />
+              <span>{activePresetLabel}</span>
+              <ChevronDown
+                className={cn(
+                  'h-3 w-3 transition-transform',
+                  presetMenuOpen && 'rotate-180'
+                )}
+                aria-hidden="true"
+              />
+            </button>
+
+            {presetMenuOpen && (
               <div
-                ref={presetTabsRef}
-                data-gliding-ready={presetTabsIndicatorReady ? 'true' : 'false'}
-                className="ants-glide-host relative inline-flex items-center"
+                role="menu"
+                aria-label="Timetable presets"
+                className="absolute right-0 z-40 mt-1.5 w-60 overflow-hidden rounded-xl border border-border bg-popover p-1.5 shadow-[var(--shadow-tier-3)]"
               >
-                <span
-                  aria-hidden="true"
-                  data-animate={presetTabsAnimate ? 'true' : 'false'}
-                  className="ants-glide-indicator z-0 rounded-md bg-surface-inset"
-                  style={{
-                    transform: `translate3d(${presetTabsRect.x}px, ${presetTabsRect.y}px, 0)`,
-                    width: `${presetTabsRect.width}px`,
-                    height: `${presetTabsRect.height}px`,
-                    opacity: presetTabsIndicatorReady ? 1 : 0,
-                  }}
-                />
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-foreground-subtle">
+                  Demo Schedules
+                </div>
                 {PRESET_OPTIONS.map((p) => {
                   const active = state.presetId === p.id;
                   return (
                     <button
                       key={p.id}
                       type="button"
-                      aria-pressed={active}
-                      data-active={active ? 'true' : 'false'}
+                      role="menuitemradio"
+                      aria-checked={active}
                       onClick={() => switchPreset(p.id)}
                       className={cn(
-                        'ants-glide-item relative z-10 rounded-md px-2 py-0.5 text-xs font-medium transition-colors active:scale-[0.98]',
+                        'flex w-full items-start justify-between gap-2 rounded-lg px-2.5 py-2 text-left transition-colors',
                         active
-                          ? 'bg-surface-inset text-foreground font-semibold'
-                          : 'text-foreground-muted hover:text-foreground'
+                          ? 'bg-primary-tint text-on-primary-tint'
+                          : 'text-foreground hover:bg-surface-inset'
                       )}
                     >
-                      {p.label}
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold">{p.label}</div>
+                        <div className="text-[10px] opacity-75">{p.hint}</div>
+                      </div>
+                      {active && (
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      )}
                     </button>
                   );
                 })}
+                <div className="my-1 border-t border-border-subtle" />
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => switchPreset(state.presetId)}
+                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs font-medium text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+                  Reset active preset
+                </button>
               </div>
-              <button
-                type="button"
-                title="Reset active preset"
-                aria-label="Reset active preset"
-                onClick={() => switchPreset(state.presetId)}
-                className="inline-flex h-6 w-6 items-center justify-center rounded-md text-foreground-muted hover:bg-surface-inset hover:text-foreground"
-              >
-                <RotateCcw className="h-3 w-3" aria-hidden="true" />
-              </button>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -655,7 +859,7 @@ export function SmartTimetableView({
       {state.showExams && exams.length > 0 && (
         <section
           aria-label="Synced exam countdowns from Study"
-          className="mt-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface-card px-3.5 py-2.5"
+          className="mt-3.5 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface-card px-3.5 py-2"
         >
           <span className="text-xs font-semibold text-foreground-muted">
             Study Exam Sync:
@@ -693,79 +897,83 @@ export function SmartTimetableView({
         </section>
       )}
 
-      {/* Main Split Workspace: 24h Calendar Grid + Today Focus Rail */}
-      <div className="mt-4 grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <section key={state.viewMode} aria-label="Timetable schedule" className="ants-fade-enter min-w-0">
-          {state.viewMode === 'week' && (
-            <TimetableWeekGridView
-              weekDates={weekDates}
-              todayIso={todayIso}
-              selectedDate={state.selectedDate}
-              blocks={state.blocks}
-              showOvernightHours={state.showOvernightHours}
-              nowMinutes={nowMinutes}
-              hourHeight={hourHeight}
-              onSelectDate={(iso) =>
-                commit({ ...stateRef.current, selectedDate: iso })
-              }
-              onQuickAddSlot={openQuickAdd}
-              onEditBlock={openEditBlock}
-              onOpenReminder={(block) => setReminderBlockId(block.id)}
-              onMoveBlock={handleMoveBlock}
-              onResizeBlock={handleResizeBlock}
-              onToggleOvernight={() =>
-                commit({
-                  ...stateRef.current,
-                  showOvernightHours: !stateRef.current.showOvernightHours,
-                })
-              }
-              onSwitchToDay={() => commit({ ...stateRef.current, viewMode: 'day' })}
-            />
-          )}
+      {/* 100% Full-Width Timetable Workspace */}
+      <section
+        key={state.viewMode}
+        aria-label="Timetable schedule"
+        className="ants-fade-enter mt-3.5 min-w-0"
+      >
+        {state.viewMode === 'week' && (
+          <TimetableWeekGridView
+            weekDates={weekDates}
+            todayIso={todayIso}
+            selectedDate={state.selectedDate}
+            blocks={state.blocks}
+            showOvernightHours={state.showOvernightHours}
+            nowMinutes={nowMinutes}
+            hourHeight={hourHeight}
+            onSelectDate={(iso) =>
+              commit({ ...stateRef.current, selectedDate: iso })
+            }
+            onQuickAddSlot={openQuickAdd}
+            onEditBlock={openEditBlock}
+            onOpenReminder={(block) => setReminderBlockId(block.id)}
+            onMoveBlock={handleMoveBlock}
+            onResizeBlock={handleResizeBlock}
+            onToggleOvernight={() =>
+              commit({
+                ...stateRef.current,
+                showOvernightHours: !stateRef.current.showOvernightHours,
+              })
+            }
+            onSwitchToDay={() => commit({ ...stateRef.current, viewMode: 'day' })}
+            onWheelZoom={handleWheelZoom}
+          />
+        )}
 
-          {state.viewMode === 'day' && (
-            <TimetableDayView
-              date={state.selectedDate}
-              todayIso={todayIso}
-              blocks={state.blocks}
-              onQuickAddSlot={openQuickAdd}
-              onEditBlock={openEditBlock}
-              onToggleBlockComplete={handleToggleBlockComplete}
-              onOpenReminder={(block) => setReminderBlockId(block.id)}
-            />
-          )}
+        {state.viewMode === 'day' && (
+          <TimetableDayView
+            date={state.selectedDate}
+            todayIso={todayIso}
+            blocks={state.blocks}
+            showOvernightHours={state.showOvernightHours}
+            nowMinutes={nowMinutes}
+            hourHeight={hourHeight}
+            onQuickAddSlot={openQuickAdd}
+            onEditBlock={openEditBlock}
+            onToggleBlockComplete={handleToggleBlockComplete}
+            onOpenReminder={(block) => setReminderBlockId(block.id)}
+            onToggleOvernight={() =>
+              commit({
+                ...stateRef.current,
+                showOvernightHours: !stateRef.current.showOvernightHours,
+              })
+            }
+            onMoveBlock={handleMoveBlock}
+            onResizeBlock={handleResizeBlock}
+            onWheelZoom={handleWheelZoom}
+          />
+        )}
 
-          {state.viewMode === 'month' && (
-            <TimetableMonthView
-              anchorDate={state.selectedDate}
-              todayIso={todayIso}
-              selectedDate={state.selectedDate}
-              blocks={state.blocks}
-              exams={exams}
-              showExams={state.showExams}
-              onSelectDay={(iso) =>
-                commit({
-                  ...stateRef.current,
-                  selectedDate: iso,
-                  viewMode: 'day',
-                })
-              }
-            />
-          )}
-        </section>
-
-        <TodayFocusRailView
-          selectedDate={state.selectedDate}
-          allocations={dayAllocations}
-          tasks={state.focusTasks}
-          telegramConnected={state.telegramConnected}
-          telegramHandle={state.telegramHandle}
-          onAddTask={handleAddFocusTask}
-          onToggleTask={handleToggleFocusTask}
-          onDeleteTask={handleDeleteFocusTask}
-          onScheduleTask={handleScheduleTask}
-        />
-      </div>
+        {state.viewMode === 'month' && (
+          <TimetableMonthView
+            anchorDate={state.selectedDate}
+            todayIso={todayIso}
+            selectedDate={state.selectedDate}
+            blocks={state.blocks}
+            exams={exams}
+            showExams={state.showExams}
+            density={monthDensity}
+            onSelectDay={(iso) =>
+              commit({
+                ...stateRef.current,
+                selectedDate: iso,
+                viewMode: 'day',
+              })
+            }
+          />
+        )}
+      </section>
 
       <BlockEditorModalView
         open={editorOpen}

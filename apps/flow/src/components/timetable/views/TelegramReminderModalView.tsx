@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Bell, BellOff, Clock, Send } from 'lucide-react';
-import { Badge, Button, Modal, cn } from '@ants/ui';
+import { AntMascot, Badge, Button, Modal, cn } from '@ants/ui';
 import {
   REMINDER_LEAD_OPTIONS,
   formatMinutes12h,
@@ -186,12 +186,23 @@ export function TelegramReminderModalView({
                 {formatMinutes12h(cronMinutes)} ({formatMinutes24h(cronMinutes)})
               </span>
             </div>
-            <p className="mt-2 rounded-lg border border-border bg-surface-card px-3 py-2 text-xs leading-relaxed text-foreground">
-              <span className="font-semibold text-primary">@TheANTsFlowBot:</span>{' '}
-              {block.title} starts at{' '}
-              <span className="font-mono tabular-nums">{formatMinutes12h(block.startMinutes)}</span>
-              {note.trim() ? ` — ${note.trim()}` : '.'}
-            </p>
+            <div className="mt-2 flex items-center gap-2.5 rounded-lg border border-border bg-surface-card px-3 py-2 text-xs leading-relaxed text-foreground">
+              <AntMascot
+                variant="avatar"
+                size={26}
+                mood="nudge"
+                app="telegram"
+                animated={false}
+                ariaLabel=""
+                className="shrink-0"
+              />
+              <p className="min-w-0">
+                <span className="font-semibold text-primary">@TheANTsFlowBot:</span>{' '}
+                {block.title} starts at{' '}
+                <span className="font-mono tabular-nums">{formatMinutes12h(block.startMinutes)}</span>
+                {note.trim() ? ` — ${note.trim()}` : '.'}
+              </p>
+            </div>
           </div>
         </div>
       </form>

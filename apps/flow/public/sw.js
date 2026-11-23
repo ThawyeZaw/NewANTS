@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ants-flow-pwa-v7';
+const CACHE_NAME = 'ants-flow-pwa-v9';
 const PRECACHE_URLS = [
   '/manifest.webmanifest',
   '/icons/icon.svg',

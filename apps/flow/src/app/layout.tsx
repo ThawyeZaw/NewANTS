@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { APPEARANCE_BOOTSTRAP_SCRIPT } from '../lib/pomodoro/browser';
+import { FlowMiloDockView } from '../components/layout/views/FlowMiloDockView';
 import { FlowRouteProgressView } from '../components/layout/views/FlowRouteProgressView';
 import './globals.css';
 
@@ -45,9 +46,13 @@ export default function RootLayout({
         />
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body
+        className="min-h-screen bg-background text-foreground antialiased"
+        suppressHydrationWarning
+      >
         <FlowRouteProgressView />
         {children}
+        <FlowMiloDockView />
       </body>
     </html>
   );

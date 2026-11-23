@@ -684,3 +684,56 @@
   - **React Provider, Hooks & `<AuthGuard />` (`packages/auth-client/src/provider.tsx`):** Built `'use client'` `<AuthProvider />` (initial hydration, focus/visibility/tab sync), standalone-safe `useSession()`, `useRole()`, and `<AuthGuard />`, exposed granular subpath exports (`.`, `./client`, `./guards`, `./redirects`, `./server`) in `packages/auth-client/package.json`, and added `'@ants/auth-client'` to `transpilePackages` in `apps/{org,study,flow}/next.config.ts`.
   - **Verification:** Created `packages/auth-client/src/__tests__/auth-client.test.ts` (`7/7` passing), passed `pnpm typecheck` (`14/14` Turbo tasks), `pnpm lint` (`14/14` Turbo tasks), `pnpm turbo run test --concurrency=1` (`14/14` Turbo tasks; 151 tests passing across workspace packages), and verified HTTP `200` on all 4 running dev servers (`:3000`, `:3001`, `:3002`, `:8787`).
 - **Next Session Target (`[THAW]`):** Run `/continue` for **`[THAW-2.1]`** (`@ants/calculator` Engine & Public API Wiring).
+
+### Session Tooling — 2026-11-22 (Workspace `/pull` Skill)
+- **Completed:** Added the `/pull` workspace skill in `.agents/skills/pull/SKILL.md` and documented it in `AGENTS.md` alongside `/push`.
+- **Summary:**
+  - Created `.agents/skills/pull/SKILL.md` with a PowerShell-compatible sync & auto-heal runbook: auto-stashing dirty working trees, pulling `origin` (plus merging `origin/main` on `feat/*`/`ui/*` branches), ownership-aware merge conflict resolution, `pnpm install` / `pnpm db:migrate:local` / `pnpm clean:next` environment sync, and proactive `pnpm typecheck`, `pnpm lint`, and `pnpm test` error cleanup before coding begins.
+  - Updated `AGENTS.md` Section 4 with `### Safe Sync & Pull (\`/pull\`)`.
+
+### Session Brand Mascot Rollout (Milo Across Ecosystem) — 2026-11-22
+- **Completed:** Upgraded Milo (`<AntMascot />`) in `@ants/ui` and integrated earned-moment mascot touchpoints across `apps/org`, `apps/study`, `apps/flow`, `@ants/calculator`, shared Auth/Telegram views, and all 3 branded `not-found.tsx` routes.
+- **Summary:**
+  - **Character & Artwork Upgrade (`@ants/ui`):** Named the official mascot **Milo** (`ANT_MASCOT_NAME = 'Milo'`), refined `AntMascotView.tsx` to match `mascot-hero-sheet.jpg` and `mascot-expressions-grid.jpg` (curled spiral antennae, 4-point star eye catchlights, honey-striped teardrop abdomen, `magnifier` & `pillow` props), added `variant="avatar"` rounded-squircle badge, added `interactive` `ants-mascot-hop` spring tap + `tapLines` speech cycling, and added `<NotFoundView />` + expanded unit tests in `packages/ui/src/__tests__/mascot.test.ts`.
+  - **Shared UI & 404s:** Wired Milo into `AuthStudioView`, `WorkspaceAuthGateView` (`banner` + `gate`), `TelegramConnectCardView`, `UserProfileView` not-found fallback, `/@[handle]` 404 guard in `apps/flow/src/app/[handle]/page.tsx`, and created `apps/{org,study,flow}/src/app/not-found.tsx`.
+  - **Flow (`apps/flow`):** Wired live phase/status-reactive Milo companion strip into `PomodoroView` (keeping 1-screen timer card compact), subtle header avatar into `FocusModeView`, empty states into `TaskListView`, `PomodoroStatsView`, `TaskPlannerView`, and `TodayFocusRailView`, and ping avatar into `TelegramReminderModalView`.
+  - **Study (`apps/study`):** Wired Milo streak spotlight into `StudyDashboardView`, deck-cleared celebration into `StudyFlashcardsView`, score-band companion into `StudyQuizzesView`, and empty/filter states into `StudyCurriculumCatalogView`, `StudyTopicTrackerView`, `StudyPastPapersView`, `StudyNotesView`, `StudyCountdownView`, and `StudyLeaderboardView`.
+  - **Org (`apps/org`) & `@ants/calculator`:** Wired node-reactive Milo into `OrgHomeLandingView`'s Hero Ecosystem Orbit readout, subtle footer avatar into `OrgFooterView`, empty-search states into `OrgTeamShowcaseView`, `OrgActivitiesView`, and `OrgArticlesView`, and grade-reactive feedback into `GradeCalculatorView` (desktop card + mobile bar).
+  - **Duolingo-Style Floating Corner Companion (`<MiloCompanionDock />`):** Built `packages/ui/src/lib/milo.ts` (`loadMiloCompanionPrefs`, `saveMiloCompanionPrefs`, `emitMiloCheer`, `getRouteMiloQuips`, `ants-milo-companion-v1`, `ants-milo-cheer`) and `<MiloCompanionDockView />`, mounted via `OrgMiloDockView`, `StudyMiloDockView`, and `FlowMiloDockView` in all 3 `layout.tsx` files (with Quiet/Minimize persistence, `44px` avatar above mobile docks, and live `emitMiloCheer` celebrations on Pomodoro sprints, task/block completions, daily study check-ins, topic mastery, past paper logs, flashcard deck clears, quiz grading, and calculator saves).
+  - **Living Docs:** Updated `docs/design/mascot.md`, `AGENTS.md`, `AGENTS.zyy.md`, `spec.md`, and `progress.md`.
+
+### Session Z3 Polish — 2026-11-22 (`[ZYY]` `apps/flow` Full-Width Smart Timetable, Flexible Zoom & TickTick-Style Tasks)
+- **Polished (`[~]`):** Items **`[ZYY-3.2]`** & **`[ZYY-3.3]`** (`SmartTimetableView`, `TimetableWeekGridView`, `TimetableDayView`, `TimetableMonthView`, `FlowShellView`, `TaskPlannerView`, `TaskCardView`, `engine.ts`) on branch `main`.
+- **Summary:**
+  - Clarified layout, zoom, overview, and TickTick-style Tasks requirements via `/askmefirst` (`ask_question` pop-up modals).
+  - **Full-Width Timetable (`SmartTimetableView.tsx`, `FlowShellView.tsx`):** Removed the right-hand `TodayFocusRailView` rail from `/timetable` so Week, Day, and Month views render at 100% full width without horizontal desktop clipping, keeping Flow focused on 3 top-level tabs (**Timetable | Tasks | Pomodoro**).
+  - **Flexible Unified Zoom & Overview (`engine.ts`, `SmartTimetableView.tsx`, `TimetableWeekGridView.tsx`, `TimetableDayView.tsx`, `TimetableMonthView.tsx`):**
+    - Expanded Week & Day vertical zoom range to `28px–140px/hr` with a **Fit** viewport overview button (`computeFitHourHeight`), smooth slider, `-`/`+` steps, `Ctrl/Cmd+Wheel` zoom inside grids, and `+`/`-`/`0` keyboard shortcuts.
+    - Upgraded Day View from a flat list into a zoomable full-width proportional timeline with drag-to-move, drag-to-resize, drag-to-create, `00–06` grouped overnight sleep bar, and day blocks/focus/open-time overview.
+    - Added 3 Month density modes (`Compact` dot-overview, `Comfortable`, `Detailed` with timestamps) + active days & monthly focus hours summary.
+  - **Minimal Usability Improvements:**
+    - Compacted the toolbar and tucked Demo Presets (`24h Workday`, `IAL Scholar`, `Reset active preset`) into a dropdown popover.
+    - Added **drag-to-create** blocks directly on empty Week & Day slots with live time/duration preview tooltips.
+    - Added **side-by-side overlap column layout** (`layoutOverlappingBlocks`) and **clean morning sleep grouping** (`isGroupedOvernightSleepBlock`, `filterVisibleTimelineBlocks`, `summarizeOvernightSleep`) so blocks like `00:00–06:30` fold cleanly into the `00–06` banner instead of peeking past `06:00`.
+    - Bumped PWA cache in `apps/flow/public/sw.js` to `ants-flow-pwa-v8`.
+  - **Viewport-Safe Portaled Modal Fix (`packages/ui/src/primitives/Modal.tsx`, `BlockEditorModalView.tsx`):**
+    - Portaled `@ants/ui` `<Modal>` to `document.body` via `createPortal`, added `z-[100]`, body scroll locking, `aria-labelledby`/`aria-describedby` linking, and a `max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] flex-col` frame with `shrink-0` pinned header/footer and single `flex-1 overflow-y-auto overscroll-contain` body so modals inside `<FlowShellView>` (`main z-10` under sticky `header z-20`) never paint behind the navbar or clip off-screen.
+    - Removed redundant inner `max-h-[62vh]` scrolling from `<BlockEditorModalView />`, paired Priority + Recurrence cleanly side-by-side on `sm:`, and connected the footer submit button via `form={formId}`.
+  - **Unified TickTick-Style Tasks & `/focus` Removal (`FlowShellView.tsx`, `TaskPlannerView.tsx`, `TaskCardView.tsx`, `lib/tasks/engine.ts`):**
+    - Removed `/focus` (`app/focus/page.tsx`, `FocusHubView.tsx`), deleted the redundant `TodayFocusPanelView.tsx` sidebar, and restored the clean 3-tab Flow navigation (**Timetable | Tasks | Pomodoro**).
+    - Consolidated `/tasks` into an ultra-minimal single-column TickTick-inspired list (`Today | Inbox | Upcoming | Done`), 1-line Quick Add, quiet `{N} left · {Xh} blocked` header summary, tucked Search / Filters / Presets popovers, and single-line expandable `<TaskCardView />` rows.
+    - Added 2-way Timetable sync in `lib/tasks/engine.ts`: `mergeTimetableIntoTasks` automatically pulls actionable Timetable blocks (`study`, `deep-work`, `work`, `health`, `family`, `reading`) while skipping `sleep`, `meal`, `commute`, and `buffer`; toggling or rescheduling linked tasks updates `ants-flow-timetable-v1` via `syncTaskCompletionToTimetable`.
+    - Bumped PWA cache in `apps/flow/public/sw.js` to `ants-flow-pwa-v9`.
+- **Verification:**
+  - `pnpm --filter @ants/ui test` (`4` files / `25` tests) and `pnpm --filter @ants/flow test` (`4` files / `32` tests, including `inbox`, `isActionableTimetableBlock`, `syncTaskCompletionToTimetable`, and actionable block sync assertions) passed.
+  - `pnpm typecheck` (`14/14` Turbo tasks), `pnpm lint` (`14/14` Turbo tasks), and `impeccable detect --json` (`[]`) passed cleanly.
+  - Live `localhost:3002` route check confirmed `/tasks`, `/timetable`, and `/pomodoro` return `HTTP 200` (`hasError=False`) and `/focus` returns `HTTP 404` after removal.
+- **Next Session Target:** Visual review of `/timetable` (full-width Week, Day, Month zoom, drag-to-create, and `Schedule Time Block` modal) and `/tasks` (TickTick single-column 2-way synced list) on `http://localhost:3002`.
+
+### Session Milo Companion Polish & Global Hidden Scrollbars — 2026-11-23
+- **Completed:** Polished Milo's corner companion presence and hid visible scrollbars globally across `@ants/org`, `@ants/study`, and `@ants/flow`.
+- **Summary:**
+  - **Global Hidden Scrollbars (`packages/ui/src/styles/tokens.css`, `apps/{org,study}/src/app/globals.css`):** Replaced styled thin scrollbars with global `scrollbar-width: none`, `-ms-overflow-style: none`, and `*::-webkit-scrollbar { display: none; width: 0; height: 0; }` so no scrollbar strip shows while wheel, touch, and keyboard scrolling remain intact.
+  - **Unified Borderless Milo & Lively Cute Motion (`AntMascotView.tsx`, `tokens.css`, `MiloCompanionDockView.tsx`):** Unified desktop and mobile dock triggers to borderless full-body Milo (`variant="full"` with warm ambient amber aura and drop shadow, removing the mobile rounded-square `avatar` badge difference), warmed cheek blush opacity, added natural periodic eye-blinks (`ants-mascot-blink`), buoyant idle sway (`ants-mascot-companion-idle`), playful drag dangle (`ants-mascot-drag-wiggle`), and golden star + rose heart tap bursts (`ants-mascot-burst`).
+  - **Draggable Edge-Snapping & Auto-Flipping Bubble (`packages/ui/src/lib/milo.ts`, `MiloCompanionDockView.tsx`):** Added pointer drag with viewport clamping (`clampMiloDragPosition`), soft left/right edge snap persisted in `ants-milo-companion-v1`, auto-flipping speech bubble alignment/direction (left/right & above/below), short relocation quips (`MILO_DRAG_QUIPS`), and double-click/minimize home reset.
+  - **Tests & Docs:** Expanded `packages/ui/src/__tests__/mascot.test.ts` and updated `docs/design/mascot.md`, `spec.md`, and `progress.md`.

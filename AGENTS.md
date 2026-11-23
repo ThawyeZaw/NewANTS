@@ -51,6 +51,9 @@ We follow a strict **UI-Prototype-First (`Zay` · `[ZYY]`) → Full-Stack Wiring
 ### Clarify Before Coding (`/askmefirst`)
 - Whenever requirements, UI states, or contracts have any ambiguity—or when `/askmefirst` is invoked—call the **`ask_question` tool (interactive pop-up modals)** with a `(Recommended)` option first before writing code.
 
+### Safe Sync & Pull (`/pull`)
+- Before starting work (or whenever syncing with teammates), invoking **`/pull`** pulls latest changes from `origin` (and merges `origin/main` into `feat/*` or `ui/*` branches), proactively resolves merge conflicts respecting dual-developer ownership rules, refreshes dependencies/local D1 migrations when changed, and cleans up any `pnpm typecheck`, `pnpm lint`, or `pnpm test` errors before coding begins.
+
 ### Safe Verified Push (`/push`)
 - When ready to push to GitHub, invoking **`/push`** automatically runs the verification gate (`pnpm typecheck`, `pnpm lint`, `pnpm test`), fixes any detected errors locally first, checks ownership boundaries (e.g. `ui/*` branches touching backend paths), and only pushes to the remote branch when 100% error-free.
 
@@ -62,10 +65,10 @@ Build **one atomic item per session** from your track (`[ZYY]` or `[THAW]`) in `
 4. **Local Dev Smoke Check:** Relevant dev server (`pnpm dev:org`, `pnpm dev:study`, `pnpm dev:flow`, or `pnpm dev:api`) renders/responds with zero runtime errors.
 5. **Developer Manual Sign-Off:** Present verification steps to the developer. Keep the item marked `[~]` until manually confirmed, then mark `[x]`.
 
-### Brand Mascot Standard (`<AntMascot />` & `docs/design/mascot.md`)
-- **Always reuse the official ANTs brand mascot** (`import { AntMascot, ANT_MASCOT_PRESETS } from '@ants/ui'`) for **streaks, empty states, Pomodoro focus/break states, onboarding/auth, 404/loading states, landing highlights, and Telegram reminder visuals**—never invent ad-hoc mascot illustrations or generic clip-art.
-- **Canonical Reference & Art Direction:** Follow [`docs/design/mascot.md`](./docs/design/mascot.md) and the visual reference sheets in [`docs/design/assets/mascot-hero-sheet.jpg`](./docs/design/assets/mascot-hero-sheet.jpg) and [`docs/design/assets/mascot-expressions-grid.jpg`](./docs/design/assets/mascot-expressions-grid.jpg) — lighter sunlit-gold (`#FBBF24` / `#FEF08A`), Playful Geometric Vector style, **warm, cheeky & positive/energetic** tone (never grumpy or harsh), keeping the iconic golden pencil + app-specific props (`headphones`/`timer` in Flow, `scholar` glasses in Study, `bell` in Telegram).
-- **Accessibility & Motion:** Pass `ariaLabel=""` when decorative; rely on the built-in `ants-mascot-*` CSS animations which automatically respect `prefers-reduced-motion`.
+### Brand Mascot Standard (Milo · `<AntMascot />`, `<MiloCompanionDock />` & `docs/design/mascot.md`)
+- **Always reuse Milo, the official ANTs brand mascot** (`import { ANT_MASCOT_NAME, AntMascot, ANT_MASCOT_PRESETS, MiloCompanionDock, emitMiloCheer, NotFoundView } from '@ants/ui'`) for **the collapsible corner companion dock + `emitMiloCheer(...)` achievement cheers across all 3 apps, streaks, empty states, Pomodoro focus/break states, quiz/flashcard completions, onboarding/auth, 404/loading states (`<NotFoundView />`), Org orbit/footer highlights, Grade Calculator feedback, and Telegram reminder visuals**—never invent ad-hoc mascot illustrations or generic clip-art. Supports `variant="full"` (curled spiral antennae, 4-point star catchlights, `pencil`/`scholar`/`headphones`/`timer`/`bell`/`magnifier`/`pillow` props) and `variant="avatar"` (compact squircle head icon badge) plus `interactive` tap-hop delight.
+- **Canonical Reference & Art Direction:** Follow [`docs/design/mascot.md`](./docs/design/mascot.md) and the visual reference sheets in [`docs/design/assets/mascot-hero-sheet.jpg`](./docs/design/assets/mascot-hero-sheet.jpg) and [`docs/design/assets/mascot-expressions-grid.jpg`](./docs/design/assets/mascot-expressions-grid.jpg) — lighter sunlit-gold (`#FBBF24` / `#FEF08A`), Playful Geometric Vector style, **warm, cheeky & positive/energetic** tone (never grumpy or harsh), keeping the iconic golden pencil + app-specific props (`headphones`/`timer`/`pillow` in Flow, `scholar` glasses in Study, `bell` in Telegram, `magnifier` in search/404s).
+- **Accessibility & Motion:** Pass `ariaLabel=""` when decorative; rely on the built-in `ants-mascot-*` CSS animations which automatically respect `prefers-reduced-motion`. Never nest `<AntMascot interactive />` inside another `<button>` or `<a>`.
 
 ### Mandatory End-of-Session File Updates (NEVER SKIP)
 At the end of **EVERY** session, AI agents **MUST** review and update:

@@ -14,9 +14,11 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   MOCK_AUTHENTICATED_USER,
   cn,
+  emitMiloCheer,
   useSlidingIndicator,
   type MockUserProfile,
 } from '@ants/ui';
@@ -213,7 +215,18 @@ export function StudyDashboardView({
   };
 
   const handleCheckInToggle = (subjectId: string) => {
+    const alreadyReviewed = (state.reviewedSubjectIdsByBoard[activeBoard] ?? []).includes(
+      subjectId
+    );
     setState((prev) => toggleSubjectReviewedToday(prev, activeBoard, subjectId));
+    if (!alreadyReviewed) {
+      emitMiloCheer({
+        mood: 'celebrating',
+        propVariant: 'scholar',
+        badge: `+${REVISION_CHECKIN_XP} XP`,
+        message: 'Daily revision check-in logged! Your streak is glowing.',
+      });
+    }
     onToggleSubjectCheckIn?.(activeBoard, subjectId);
   };
 
@@ -391,29 +404,46 @@ export function StudyDashboardView({
           className="mt-6 rounded-xl border border-primary-tint-border/90 bg-primary-tint/35 p-4 sm:p-5 shadow-xs"
         >
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="min-w-0 space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary-solid px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary">
-                  <CalendarClock className="h-3 w-3" aria-hidden="true" />
-                  Next Imminent Exam
-                </span>
-                <span className="font-mono text-xs font-bold text-foreground">
-                  {nearestExam.paperCode}
-                </span>
-                <span className="text-xs text-foreground-muted">·</span>
-                <span className="font-mono text-xs text-foreground-muted">
-                  {nearestExam.examDateLabel}
-                </span>
-              </div>
-              <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
-                {nearestExam.title}
-              </h2>
-              <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted font-mono tabular-nums">
-                <span>Target: {nearestExam.targetGrade}</span>
-                <span>·</span>
-                <span className="text-foreground">
-                  Revision Check-in: {boardSummary.reviewedTodayCount}/{boardSummary.subjectCount} reviewed today
-                </span>
+            <div className="flex min-w-0 items-center gap-4">
+              <AntMascot
+                mood={boardSummary.reviewedTodayCount > 0 ? 'celebrating' : 'studying'}
+                app="study"
+                propVariant="scholar"
+                size={68}
+                interactive
+                ariaLabel=""
+                className="shrink-0"
+              />
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-solid px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-primary">
+                    <CalendarClock className="h-3 w-3" aria-hidden="true" />
+                    Next Imminent Exam
+                  </span>
+                  <span className="font-mono text-xs font-bold text-foreground">
+                    {nearestExam.paperCode}
+                  </span>
+                  <span className="text-xs text-foreground-muted">·</span>
+                  <span className="font-mono text-xs text-foreground-muted">
+                    {nearestExam.examDateLabel}
+                  </span>
+                </div>
+                <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
+                  {nearestExam.title}
+                </h2>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-foreground-muted font-mono tabular-nums">
+                  <span>Target: {nearestExam.targetGrade}</span>
+                  <span>·</span>
+                  <span className="text-foreground">
+                    Revision Check-in: {boardSummary.reviewedTodayCount}/{boardSummary.subjectCount} reviewed today
+                  </span>
+                </div>
+                <p className="text-xs font-medium text-foreground-muted">
+                  {boardSummary.reviewedTodayCount >= boardSummary.subjectCount &&
+                  boardSummary.subjectCount > 0
+                    ? `All subjects checked in — Milo’s cheering your ${streakDays}-day streak!`
+                    : `${streakDays}-day streak active — log a quick revision check-in with Milo.`}
+                </p>
               </div>
             </div>
 
@@ -647,16 +677,26 @@ export function StudyDashboardView({
 
             <div className="rounded-lg border border-border bg-surface-card divide-y divide-border shadow-[var(--shadow-tier-1)]">
               {visibleCountdowns.length === 0 ? (
-                <div className="p-4 text-xs text-foreground-muted">
-                  No pinned exams on this board.{' '}
-                  <button
-                    type="button"
-                    onClick={() => setShowAllCountdowns(true)}
-                    className="font-semibold text-on-primary-tint underline"
-                  >
-                    Show all exams
-                  </button>{' '}
-                  to pin upcoming papers.
+                <div className="flex items-center gap-3 p-4 text-xs text-foreground-muted">
+                  <AntMascot
+                    mood="curious"
+                    app="study"
+                    propVariant="magnifier"
+                    size={52}
+                    ariaLabel=""
+                    className="shrink-0"
+                  />
+                  <div>
+                    No pinned exams on this board.{' '}
+                    <button
+                      type="button"
+                      onClick={() => setShowAllCountdowns(true)}
+                      className="font-semibold text-on-primary-tint underline"
+                    >
+                      Show all exams
+                    </button>{' '}
+                    to pin upcoming papers.
+                  </div>
                 </div>
               ) : (
                 visibleCountdowns.map((exam) => {

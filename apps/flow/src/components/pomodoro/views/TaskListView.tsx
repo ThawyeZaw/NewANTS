@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Check, Minus, Pause, Play, Plus, Trash2 } from 'lucide-react';
-import { cn } from '@ants/ui';
+import { AntMascot, cn } from '@ants/ui';
 import type { PomodoroTask } from '../../../lib/pomodoro/engine';
 import { MOCK_POMODORO_TASKS } from '../../../mocks/pomodoro.mock';
 
@@ -304,6 +304,15 @@ export function TaskListView({
 
       {tasks.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border/70 p-6 text-center">
+          <AntMascot
+            mood="curious"
+            app="flow"
+            propVariant="pencil"
+            size={72}
+            interactive
+            ariaLabel=""
+            className="mx-auto mb-2"
+          />
           <p className="text-sm font-medium text-foreground">No tasks in focus queue</p>
           <p className="mt-1 text-xs text-foreground-muted">
             Add a quick task above or press <kbd className="rounded bg-surface-inset px-1 font-mono">N</kbd> to start

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useId, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Bell, Play, Trash2 } from 'lucide-react';
 import { Button, Modal, cn } from '@ants/ui';
@@ -55,6 +55,7 @@ export function BlockEditorModalView({
   onSave,
   onDelete,
 }: BlockEditorModalViewProps) {
+  const formId = useId();
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('2026-11-11');
   const [startMinutes, setStartMinutes] = useState(540);
@@ -180,14 +181,14 @@ export function BlockEditorModalView({
             <Button variant="ghost" size="sm" onClick={onClose}>
               Cancel
             </Button>
-            <Button size="sm" disabled={!title.trim()} onClick={handleSubmit}>
+            <Button type="submit" form={formId} size="sm" disabled={!title.trim()}>
               {isEdit ? 'Save changes' : 'Add to timetable'}
             </Button>
           </div>
         </div>
       }
     >
-      <form onSubmit={handleSubmit} className="max-h-[62vh] space-y-4 overflow-y-auto pr-1">
+      <form id={formId} onSubmit={handleSubmit} className="space-y-3.5">
         <div>
           <label htmlFor="blk-title" className="mb-1.5 block text-xs font-semibold text-foreground-muted">
             Block title
@@ -285,7 +286,7 @@ export function BlockEditorModalView({
           </div>
         </fieldset>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <fieldset>
             <legend className="mb-1.5 text-xs font-semibold text-foreground-muted">Priority</legend>
             <div className="grid grid-cols-4 gap-1.5">
@@ -313,7 +314,7 @@ export function BlockEditorModalView({
 
           <fieldset>
             <legend className="mb-1.5 text-xs font-semibold text-foreground-muted">Recurrence</legend>
-            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-1.5">
               {RECURRENCE_OPTIONS.map((opt) => (
                 <button
                   key={opt.id}
@@ -321,7 +322,7 @@ export function BlockEditorModalView({
                   aria-pressed={recurrence === opt.id}
                   onClick={() => setRecurrence(opt.id)}
                   className={cn(
-                    'whitespace-nowrap rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors',
+                    'whitespace-nowrap rounded-lg border px-2 py-1.5 text-xs font-semibold transition-colors',
                     recurrence === opt.id
                       ? 'border-primary bg-primary-tint text-on-primary-tint'
                       : 'border-border bg-surface-card text-foreground-muted hover:border-border-hover'

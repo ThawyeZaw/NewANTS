@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Bell, CalendarPlus, Check, Play, Plus, Trash2 } from 'lucide-react';
-import { Badge, cn } from '@ants/ui';
+import { AntMascot, Badge, cn } from '@ants/ui';
 import {
   PRIORITY_ORDER,
   buildPomodoroHandoffUrl,
@@ -188,9 +188,20 @@ export function TodayFocusRailView({
 
         {/* Task List */}
         {sortedTasks.length === 0 ? (
-          <p className="py-8 text-center text-xs text-foreground-muted">
-            No {filter === 'ALL' ? '' : `${filter} `}tasks remaining.
-          </p>
+          <div className="py-6 text-center">
+            <AntMascot
+              mood="happy"
+              app="flow"
+              propVariant="pencil"
+              size={56}
+              interactive
+              ariaLabel=""
+              className="mx-auto mb-1.5"
+            />
+            <p className="text-xs text-foreground-muted">
+              No {filter === 'ALL' ? '' : `${filter} `}tasks remaining.
+            </p>
+          </div>
         ) : (
           <ul className="mt-3 divide-y divide-border-subtle">
             {sortedTasks.map((task) => (

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Image as ImageIcon, Minimize2, Pause, Play, RotateCcw, Settings, SkipForward, Volume2, VolumeX } from 'lucide-react';
-import { cn } from '@ants/ui';
+import { AntMascot, cn } from '@ants/ui';
 import {
   PHASE_LABELS,
   type AmbientSoundId,
@@ -167,9 +167,20 @@ export function FocusModeView({
       )}
 
       <header className="relative z-30 mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
-        <span className={cn('text-sm font-medium', hasPhoto ? 'text-white/85' : 'text-foreground-muted')}>
-          {isWork ? 'Focus mode' : `${PHASE_LABELS[phase]} · step away`}
-        </span>
+        <div className="flex items-center gap-2">
+          <AntMascot
+            variant="avatar"
+            size={26}
+            mood={isWork ? 'focus' : 'sleeping'}
+            app="flow"
+            animated={false}
+            ariaLabel=""
+            className="shrink-0"
+          />
+          <span className={cn('text-sm font-medium', hasPhoto ? 'text-white/85' : 'text-foreground-muted')}>
+            {isWork ? 'Focus mode' : `${PHASE_LABELS[phase]} · step away`}
+          </span>
+        </div>
 
         <div ref={menuRef} className="relative flex items-center gap-2">
           {onChangeScene && (

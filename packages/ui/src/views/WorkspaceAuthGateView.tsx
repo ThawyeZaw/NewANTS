@@ -7,12 +7,10 @@ import {
   Calculator,
   CalendarClock,
   CheckCircle2,
-  Eye,
   FileSpreadsheet,
   GraduationCap,
   HardDrive,
   ListChecks,
-  Lock,
   LogIn,
   Send,
   ShieldCheck,
@@ -32,6 +30,7 @@ import {
   CardTitle,
 } from '../primitives/Card';
 import { cn } from '../utils/cn';
+import { AntMascot } from './AntMascotView';
 import {
   DEFAULT_AUTH_DEMO_PERSONAS,
   type AuthDemoPersonaOption,
@@ -196,9 +195,15 @@ export function WorkspaceAuthGateView({
         )}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-tint text-on-primary-tint">
-            <Eye className="h-4 w-4" aria-hidden="true" />
-          </span>
+          <AntMascot
+            variant="avatar"
+            size={34}
+            mood="idle"
+            app={app}
+            animated={false}
+            ariaLabel=""
+            className="shrink-0"
+          />
           <div className="min-w-0 space-y-0.5">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-xs font-bold text-foreground">
@@ -268,9 +273,16 @@ export function WorkspaceAuthGateView({
           }
         >
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary-tint-border bg-primary-tint text-on-primary-tint">
-              <Lock className="h-5 w-5" aria-hidden="true" />
-            </span>
+            <AntMascot
+              variant="avatar"
+              size={44}
+              mood={isSettings ? 'nudge' : 'happy'}
+              app={app}
+              propVariant={isSettings ? 'bell' : undefined}
+              interactive
+              ariaLabel=""
+              className="shrink-0"
+            />
             <div className="min-w-0">
               <CardTitle className="text-xl font-extrabold tracking-tight">
                 {defaultTitle}

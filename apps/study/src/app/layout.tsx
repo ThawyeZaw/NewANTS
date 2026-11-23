@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { StudyMiloDockView } from '../components/layout/views/StudyMiloDockView';
 import { StudyRouteProgressView } from '../components/layout/views/StudyRouteProgressView';
 import './globals.css';
 
@@ -38,9 +39,13 @@ export default function RootLayout({
         />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body
+        className="min-h-screen bg-background text-foreground antialiased"
+        suppressHydrationWarning
+      >
         <StudyRouteProgressView />
         {children}
+        <StudyMiloDockView />
       </body>
     </html>
   );

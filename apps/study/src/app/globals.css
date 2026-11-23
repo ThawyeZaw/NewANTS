@@ -7,8 +7,6 @@
   html {
     scroll-behavior: smooth;
     caret-color: var(--primary-solid);
-    scrollbar-color: var(--border-hover) transparent;
-    scrollbar-width: thin;
   }
 
   ::selection {

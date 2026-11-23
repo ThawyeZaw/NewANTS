@@ -17,10 +17,12 @@ import {
   Sparkles,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   MOCK_AUTHENTICATED_USER,
   cn,
+  emitMiloCheer,
   useSlidingIndicator,
   type MockUserProfile,
 } from '@ants/ui';
@@ -320,7 +322,26 @@ export function StudyTopicTrackerView({
 
   const handleToggleSubtopic = (topic: SyllabusTopicItem, subtopicId: string) => {
     const willComplete = !state.completedSubtopicIds.includes(subtopicId);
-    setState((prev) => toggleSubtopicCompletion(prev, topic, subtopicId));
+    const prevStatus = deriveTopicStatus(
+      topic,
+      state.completedSubtopicIds,
+      state.statusOverrideByTopicId
+    );
+    const nextState = toggleSubtopicCompletion(state, topic, subtopicId);
+    const nextStatus = deriveTopicStatus(
+      topic,
+      nextState.completedSubtopicIds,
+      nextState.statusOverrideByTopicId
+    );
+    setState(nextState);
+    if (prevStatus !== 'mastered' && nextStatus === 'mastered') {
+      emitMiloCheer({
+        mood: 'celebrating',
+        propVariant: 'scholar',
+        badge: '+10 XP · Mastered',
+        message: `${topic.code} mastered! Milo just ticked that off your syllabus.`,
+      });
+    }
     onToggleSubtopic?.(topic.id, subtopicId, willComplete);
   };
 
@@ -328,7 +349,20 @@ export function StudyTopicTrackerView({
     topic: SyllabusTopicItem,
     nextStatus: TopicConfidenceStatus
   ) => {
+    const prevStatus = deriveTopicStatus(
+      topic,
+      state.completedSubtopicIds,
+      state.statusOverrideByTopicId
+    );
     setState((prev) => setTopicConfidenceStatus(prev, topic, nextStatus));
+    if (prevStatus !== 'mastered' && nextStatus === 'mastered') {
+      emitMiloCheer({
+        mood: 'celebrating',
+        propVariant: 'scholar',
+        badge: '+10 XP · Mastered',
+        message: `${topic.code} mastered! Milo just ticked that off your syllabus.`,
+      });
+    }
     onChangeTopicStatus?.(topic.id, nextStatus);
   };
 
@@ -915,6 +949,15 @@ export function StudyTopicTrackerView({
 
               {filteredTopics.length === 0 ? (
                 <div className="rounded-lg border border-border/60 bg-surface-card p-8 text-center space-y-2">
+                  <AntMascot
+                    mood="curious"
+                    app="study"
+                    propVariant="scholar"
+                    size={76}
+                    interactive
+                    ariaLabel=""
+                    className="mx-auto mb-2"
+                  />
                   <p className="text-sm font-semibold text-foreground">
                     No syllabus topics match your current filter.
                   </p>

@@ -312,23 +312,20 @@ a {
   text-underline-offset: 4px;
 }
 
-/* Custom subtle scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Hide visible scrollbars globally while preserving wheel, touch & keyboard scrolling */
+*,
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-hover);
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--foreground-subtle);
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Editorial & Quantitative Utility Helpers */
@@ -840,6 +837,95 @@ a {
   animation: ants-mascot-sparkle 1.8s ease-in-out infinite;
 }
 
+@keyframes ants-mascot-hop {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  32% {
+    transform: translateY(-10px) scale(1.06, 0.96);
+  }
+  65% {
+    transform: translateY(1px) scale(0.98, 1.03);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+}
+
+.ants-mascot-hop {
+  animation: ants-mascot-hop 380ms var(--ease-spring) both;
+}
+
+@keyframes ants-mascot-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+  98% {
+    transform: scaleY(1);
+  }
+}
+
+.ants-mascot-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ants-mascot-blink 4.6s ease-in-out infinite;
+}
+
+@keyframes ants-mascot-companion-idle {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  30% {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+  65% {
+    transform: translateY(-2px) rotate(1.5deg);
+  }
+}
+
+.ants-mascot-companion-idle {
+  animation: ants-mascot-companion-idle 3.4s ease-in-out infinite;
+}
+
+@keyframes ants-mascot-drag-wiggle {
+  0% {
+    transform: rotate(-8deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(8deg) scale(1.06);
+  }
+}
+
+.ants-mascot-drag-wiggle {
+  transform-origin: center;
+  animation: ants-mascot-drag-wiggle 420ms ease-in-out infinite alternate;
+}
+
+@keyframes ants-mascot-burst {
+  0% {
+    opacity: 0;
+    transform: translate(0px, 6px) scale(0.5);
+  }
+  28% {
+    opacity: 1;
+    transform: translate(calc(var(--burst-x, 0px) * 0.55), -11px) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--burst-x, 0px), -24px) scale(0.85);
+  }
+}
+
+.ants-mascot-burst {
+  animation: ants-mascot-burst 680ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -861,7 +947,12 @@ a {
   .ants-mascot-celebrate,
   .ants-mascot-antenna,
   .ants-mascot-zzz,
-  .ants-mascot-sparkle {
+  .ants-mascot-sparkle,
+  .ants-mascot-hop,
+  .ants-mascot-blink,
+  .ants-mascot-companion-idle,
+  .ants-mascot-drag-wiggle,
+  .ants-mascot-burst {
     animation: none;
   }
 

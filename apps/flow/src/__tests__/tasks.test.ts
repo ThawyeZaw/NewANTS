@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { TaskCardView } from '../components/tasks/views/TaskCardView';
 import { TaskPlannerView } from '../components/tasks/views/TaskPlannerView';
-import { TodayFocusPanelView } from '../components/tasks/views/TodayFocusPanelView';
 import {
   collectAvailableTags,
   computeTodayFocusSummary,
@@ -9,9 +8,11 @@ import {
   formatDueDateChip,
   getSubtaskProgress,
   getTodayFocusTasks,
+  isActionableTimetableBlock,
   mergeTimetableIntoTasks,
   parseQuickAddInput,
   sortTasks,
+  syncTaskCompletionToTimetable,
   toTimetableFocusTasks,
 } from '../lib/tasks/engine';
 import {
@@ -30,7 +31,6 @@ describe('@ants/flow [ZYY-3.2] Task Planner Views & Helpers', () => {
   it('exports all presentational Task Planner views and dual presets', () => {
     expect(TaskPlannerView).toBeDefined();
     expect(TaskCardView).toBeDefined();
-    expect(TodayFocusPanelView).toBeDefined();
 
     const coaching = createPresetTasksState('workday-coaching', DEFAULT_TASKS_REFERENCE_DATE);
     const scholar = createPresetTasksState('scholar-ial', DEFAULT_TASKS_REFERENCE_DATE);
@@ -188,6 +188,49 @@ describe('@ants/flow [ZYY-3.2] Task Planner Views & Helpers', () => {
     const merged = mergeTimetableIntoTasks(coachingTasks, toggledTimetable, DEFAULT_TASKS_REFERENCE_DATE);
     expect(merged.find((t) => t.id === 'ft_reading')?.done).toBe(true);
     expect(merged.some((t) => t.id === 'ft_rail_added')).toBe(true);
+    // Actionable timetable blocks (e.g. Core Work Block) are surfaced automatically, while sleep/meal/commute/buffer are skipped
+    expect(merged.some((t) => t.linkedBlockId === 'blk_work_am')).toBe(true);
+    expect(merged.some((t) => t.linkedBlockId === 'blk_sleep_am')).toBe(false);
+    expect(merged.some((t) => t.linkedBlockId === 'blk_lunch')).toBe(false);
+    expect(merged.some((t) => t.linkedBlockId === 'blk_commute_am')).toBe(false);
+    expect(merged.some((t) => t.linkedBlockId === 'blk_wake_buffer')).toBe(false);
+  });
+
+  it('filters Inbox tasks and syncs task completion 2-way with actionable Timetable blocks', () => {
+    const tasks = createCoachingPlannerTasks(DEFAULT_TASKS_REFERENCE_DATE);
+    const inboxItem = {
+      ...tasks[0]!,
+      id: 'tsk_unscheduled_inbox',
+      title: 'Unscheduled inbox item',
+      dueDate: undefined,
+      linkedBlockId: undefined,
+      inTodayFocus: false,
+      done: false,
+    };
+    const inboxFiltered = filterTasks([...tasks, inboxItem], {
+      smartView: 'inbox',
+      priorityFilter: 'ALL',
+      selectedTags: [],
+      searchQuery: '',
+      todayIso: DEFAULT_TASKS_REFERENCE_DATE,
+    });
+    expect(inboxFiltered.map((t) => t.id)).toEqual(['tsk_unscheduled_inbox']);
+
+    const timetable = createPresetTimetableState('workday-coaching', DEFAULT_TASKS_REFERENCE_DATE);
+    const sleepBlock = timetable.blocks.find((b) => b.category === 'sleep')!;
+    const workBlock = timetable.blocks.find((b) => b.id === 'blk_work_am')!;
+    expect(isActionableTimetableBlock(sleepBlock)).toBe(false);
+    expect(isActionableTimetableBlock(workBlock)).toBe(true);
+
+    const updatedBlocks = syncTaskCompletionToTimetable(timetable.blocks, 'blk_work_am', true);
+    expect(updatedBlocks.find((b) => b.id === 'blk_work_am')?.completed).toBe(true);
+
+    const syncedTasks = mergeTimetableIntoTasks(
+      [],
+      { ...timetable, blocks: updatedBlocks },
+      DEFAULT_TASKS_REFERENCE_DATE
+    );
+    expect(syncedTasks.find((t) => t.linkedBlockId === 'blk_work_am')?.done).toBe(true);
   });
 });
 

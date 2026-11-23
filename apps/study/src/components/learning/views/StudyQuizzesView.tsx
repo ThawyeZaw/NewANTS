@@ -20,11 +20,13 @@ import {
   XCircle,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   Input,
   MOCK_AUTHENTICATED_USER,
   cn,
+  emitMiloCheer,
   useSlidingIndicator,
   type MockUserProfile,
 } from '@ants/ui';
@@ -202,6 +204,15 @@ export function StudyQuizzesView({
     setLearningState((prev) => recordQuizAttemptInState(prev, attempt));
     setLastResult(evaluation);
     setPhase('results');
+    emitMiloCheer({
+      mood: evaluation.percent >= 80 ? 'celebrating' : 'happy',
+      propVariant: 'scholar',
+      badge: `+${evaluation.xpEarned} XP`,
+      message:
+        evaluation.percent >= 80
+          ? `${evaluation.percent}% scored! Sharp mark-scheme accuracy.`
+          : `Quiz graded (${evaluation.percent}%)—review missed steps below.`,
+    });
     onCompleteQuiz?.(attempt);
   }, [activeQuestions, activeQuiz, answers, onCompleteQuiz, preferredMode]);
 
@@ -702,14 +713,38 @@ export function StudyQuizzesView({
           <section aria-label="Quiz results and review" className="mx-auto max-w-3xl space-y-5">
             <div className="rounded-2xl border border-border bg-surface-card p-6 space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-primary" aria-hidden="true" />
-                    <span className="font-mono text-xs font-bold uppercase tracking-[0.06em] text-primary">
-                      Quiz Graded · {activeQuiz.subjectCode}
-                    </span>
+                <div className="flex items-center gap-3.5">
+                  <AntMascot
+                    mood={
+                      lastResult.percent >= 80
+                        ? 'celebrating'
+                        : lastResult.percent >= 50
+                          ? 'happy'
+                          : 'studying'
+                    }
+                    app="study"
+                    propVariant={lastResult.percent >= 80 ? 'pencil' : 'scholar'}
+                    size={76}
+                    interactive
+                    ariaLabel=""
+                    className="shrink-0"
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="h-5 w-5 text-primary" aria-hidden="true" />
+                      <span className="font-mono text-xs font-bold uppercase tracking-[0.06em] text-primary">
+                        Quiz Graded · {activeQuiz.subjectCode}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-extrabold text-foreground">{activeQuiz.title}</h2>
+                    <p className="text-xs text-foreground-muted">
+                      {lastResult.percent >= 80
+                        ? 'Milo’s buzzing — sharp mark-scheme accuracy!'
+                        : lastResult.percent >= 50
+                          ? 'Solid effort — review the missed steps with Milo below.'
+                          : 'Good warm-up — drill those missed questions right below with Milo.'}
+                    </p>
                   </div>
-                  <h2 className="text-xl font-extrabold text-foreground">{activeQuiz.title}</h2>
                 </div>
 
                 <div className="flex items-center gap-3">

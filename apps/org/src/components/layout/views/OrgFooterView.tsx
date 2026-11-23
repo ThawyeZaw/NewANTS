@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ANTS_AUTH_SESSION_EVENT,
+  AntMascot,
   BrandHeaderBadge,
   hasContributorRole,
   loadAuthSession,
@@ -80,7 +81,19 @@ export function OrgFooterView({ useLocalUrls = true }: OrgFooterViewProps) {
         </div>
 
         <div className="mt-8 border-t border-border-subtle pt-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-[11px] text-foreground-subtle">
-          <span>© {new Date().getFullYear()} The ANTs · ACE With Us · Yangon &amp; Online</span>
+          <div className="flex items-center gap-2.5">
+            <AntMascot
+              variant="avatar"
+              size={28}
+              mood="happy"
+              app="org"
+              interactive
+              animated={false}
+              ariaLabel="Milo, The ANTs mascot"
+              className="shrink-0"
+            />
+            <span>© {new Date().getFullYear()} The ANTs · ACE With Us · Yangon &amp; Online</span>
+          </div>
           <span>the-ants.org · study.the-ants.org · flow.the-ants.org</span>
         </div>
       </div>

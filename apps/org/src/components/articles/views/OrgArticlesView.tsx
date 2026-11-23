@@ -18,7 +18,7 @@ import {
   Timer,
   X,
 } from 'lucide-react';
-import { Button, Input, cn, useSlidingIndicator } from '@ants/ui';
+import { AntMascot, Button, Input, cn, useSlidingIndicator } from '@ants/ui';
 import { loadOrgCmsState, subscribeOrgCmsChanges } from '../../../lib/cms';
 import {
   countArticlesByCategory,
@@ -1020,9 +1020,14 @@ export function OrgArticlesView({
          * =================================================================== */}
         {filteredArticles.length === 0 ? (
           <div className="rounded-xl border border-border/60 bg-surface-card py-14 px-6 text-center space-y-3">
-            <BookOpen
-              className="mx-auto h-7 w-7 text-foreground-subtle"
-              aria-hidden="true"
+            <AntMascot
+              mood="curious"
+              app="org"
+              propVariant="magnifier"
+              size={76}
+              interactive
+              ariaLabel=""
+              className="mx-auto"
             />
             <div className="space-y-1">
               <h2 className="text-base font-bold text-foreground">
