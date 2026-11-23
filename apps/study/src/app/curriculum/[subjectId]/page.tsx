@@ -1,6 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
 import { StudyTopicTrackerView } from '../../../components/curriculum/views/StudyTopicTrackerView';
+import { MOCK_CURRICULUM_SUBJECTS } from '../../../mocks/study-curriculum.mock';
+
+export function generateStaticParams() {
+  return MOCK_CURRICULUM_SUBJECTS.map((subject) => ({ subjectId: subject.id }));
+}
 
 export const metadata: Metadata = {
   title: 'Syllabus Topic Tracker & Mastery Checklist | Study by The ANTs',

@@ -5,6 +5,7 @@ import type { AuthSessionBundle, UserRole } from '@ants/shared-types';
 import {
   AuthGuard,
   AuthProvider,
+  DEFAULT_BETA_API_URL,
   DEFAULT_LOCAL_API_URL,
   DEFAULT_PROD_API_URL,
   buildCrossSubdomainAppUrl,
@@ -77,6 +78,9 @@ describe('@ants/auth-client — Cross-Subdomain Origin & Redirect Helpers [THAW-
   it('resolves API and app origins accurately between local dev and *.the-ants.org production', () => {
     expect(resolveApiBaseUrl(undefined, 'localhost')).toBe(DEFAULT_LOCAL_API_URL);
     expect(resolveApiBaseUrl(undefined, 'study.the-ants.org')).toBe(DEFAULT_PROD_API_URL);
+    expect(resolveApiBaseUrl(undefined, 'ants-study.thawyezaw.workers.dev')).toBe(
+      DEFAULT_BETA_API_URL
+    );
     expect(resolveApiBaseUrl('https://staging-api.the-ants.org/')).toBe(
       'https://staging-api.the-ants.org'
     );
@@ -88,6 +92,9 @@ describe('@ants/auth-client — Cross-Subdomain Origin & Redirect Helpers [THAW-
     expect(resolveAppOrigin('flow', { currentHostname: 'the-ants.org' })).toBe(
       'https://flow.the-ants.org'
     );
+    expect(
+      resolveAppOrigin('study', { currentHostname: 'ants-org.thawyezaw.workers.dev' })
+    ).toBe('https://ants-study.thawyezaw.workers.dev');
     expect(buildCrossSubdomainAppUrl('study', '/past-papers', { currentHostname: 'localhost' })).toBe(
       'http://localhost:3001/past-papers'
     );

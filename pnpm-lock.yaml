@@ -23,6 +23,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@ants/calculator':
+        specifier: workspace:*
+        version: link:../../packages/calculator
       '@ants/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -256,6 +259,9 @@ importers:
 
   packages/calculator:
     dependencies:
+      '@ants/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
       '@ants/shared-types':
         specifier: workspace:*
         version: link:../shared-types

@@ -6,10 +6,15 @@ import {
   AuthSessionBundleSchema,
   AuthSignInEmailInputSchema,
   AuthSignUpInputSchema,
+  CalculatorCalculateInputSchema,
+  CalculatorCatalogResponseSchema,
+  CalculatorRouteOptionSchema,
+  CalculatorSavedSnapshotDtoSchema,
   ECOSYSTEM_APPS,
   ECOSYSTEM_APP_LIST,
   EDEXCEL_MATHS_UNITS,
   EDEXCEL_MATHS_YMA01_APPLIED_PAIRS,
+  EdexcelMathsSuiteCalculateInputSchema,
   ExamCountdownItemSchema,
   FlowTaskItemSchema,
   GradeCalculationSnapshotSchema,
@@ -35,6 +40,8 @@ import {
   normalizeUserRoles,
   parseRolesJson,
   serializeRolesJson,
+  toCalculatorBoardId,
+  toCurriculumBoardId,
   validateEdexcelMathsCashIn,
 } from '../index';
 
@@ -94,6 +101,10 @@ describe('@ants/shared-types — ecosystem & CORS allowlist', () => {
       expect(isAllowedCorsOrigin(origin)).toBe(true);
     }
     expect(isAllowedCorsOrigin('https://preview.the-ants.org')).toBe(true);
+    expect(isAllowedCorsOrigin('https://ants-study.thawyezaw.workers.dev')).toBe(true);
+    expect(isAllowedCorsOrigin('https://ants-org.thawyezaw.workers.dev')).toBe(true);
+    expect(isAllowedCorsOrigin('https://ants-flow.thawyezaw.workers.dev')).toBe(true);
+    expect(isAllowedCorsOrigin('https://evil.workers.dev')).toBe(false);
     expect(isAllowedCorsOrigin('https://evil.example.com')).toBe(false);
     expect(isAllowedCorsOrigin('http://the-ants.org.attacker.com')).toBe(false);
     expect(isAllowedCorsOrigin(undefined)).toBe(false);
@@ -433,5 +444,169 @@ describe('@ants/shared-types — cross-app Zod domain contracts', () => {
         },
       }).message?.text
     ).toBe('/start ANT-7K9P');
+  });
+
+  it('validates calculator board mappings, catalog DTOs, and saved snapshot contracts', () => {
+    expect(toCalculatorBoardId('cambridge-alevel')).toBe('caie-alevel');
+    expect(toCalculatorBoardId('cambridge-igcse')).toBe('caie-igcse');
+    expect(toCalculatorBoardId('edexcel-ial')).toBe('edexcel-ial');
+    expect(toCurriculumBoardId('caie-alevel')).toBe('cambridge-alevel');
+    expect(toCurriculumBoardId('caie-igcse')).toBe('cambridge-igcse');
+    expect(toCurriculumBoardId('edexcel-igcse')).toBe('edexcel-igcse');
+
+    const catalog = CalculatorCatalogResponseSchema.parse({
+      ok: true,
+      data: {
+        source: 'd1',
+        boards: [
+          {
+            id: 'edexcel-ial',
+            shortName: 'Edexcel IAL',
+            fullName: 'Pearson Edexcel International Advanced Level',
+            scaleBadge: 'UMS · A*–U',
+          },
+        ],
+        seriesOptions: [{ id: 'mj-2025', label: 'May / June 2025', tag: 'Summer' }],
+        subjects: [
+          {
+            id: 'edexcel-ial-maths',
+            boardId: 'edexcel-ial',
+            code: 'YMA01',
+            title: 'IAL Mathematics',
+            levelLabel: '6 Units · 600 UMS',
+            gradingScale: 'A*-U',
+            isModularUms: true,
+            maxTotalRaw: 450,
+            maxTotalUms: 600,
+            aStarRule: {
+              minTotalUms: 480,
+              minA2Ums: 180,
+              a2PaperCodes: ['WMA13', 'WMA14'],
+            },
+            papers: [
+              {
+                id: 'wma11',
+                code: 'WMA11',
+                unitCode: 'WMA11',
+                title: 'Pure Mathematics 1',
+                maxRaw: 75,
+                maxUms: 100,
+                weightLabel: '100 UMS',
+                defaultRaw: 64,
+                level: 'AS',
+                seriesPaperCutoffs: {
+                  'mj-2025': { passC: 41, gradeA: 55, topGrade: 63 },
+                },
+                seriesThresholds: {
+                  'mj-2025': { 'A*': 63, A: 55, B: 48, C: 41, D: 33, E: 27 },
+                },
+              },
+            ],
+            seriesBoundaries: {
+              'mj-2025': [
+                { grade: 'A*', minScore: 480 },
+                { grade: 'A', minScore: 480 },
+              ],
+            },
+          },
+        ],
+      },
+    });
+    expect(catalog.data.source).toBe('d1');
+
+    expect(
+      CalculatorCalculateInputSchema.parse({
+        subjectId: 'edexcel-ial-maths',
+        seriesId: 'mj-2025',
+        routeId: 'ial-v2',
+        perPaperSeriesById: { WMA11: 'jan-2025' },
+        rawMarksByPaper: { WMA11: 63 },
+      }).subjectId
+    ).toBe('edexcel-ial-maths');
+
+    expect(
+      CalculatorRouteOptionSchema.parse({
+        id: 'ext-v2',
+        label: 'Extended · Variant 2',
+        awardLevel: 'IGCSE',
+        tier: 'Extended',
+        variant: 'V2',
+        paperIds: ['p2', 'p4'],
+        paperWeights: { p2: 1.5, p4: 1.25 },
+        maxTotalScore: 200,
+        isModularUms: false,
+        gradingScale: 'A*-U',
+        allowedGrades: ['A*', 'A', 'B', 'C', 'D', 'E', 'F', 'G'],
+        seriesBoundaries: {
+          'mj-2025': [{ grade: 'A*', minScore: 160 }],
+        },
+      }).tier
+    ).toBe('Extended');
+
+    expect(
+      EdexcelMathsSuiteCalculateInputSchema.parse({
+        selectedUnitCodes: ['WMA11', 'WMA12', 'WMA13', 'WMA14', 'WME01', 'WST01'],
+        rawMarksByUnit: { WMA11: 66, WMA12: 64 },
+        seriesByUnit: { WMA11: 'jan-2025' },
+        defaultSeriesId: 'mj-2025',
+        awardMode: 'auto',
+      }).awardMode
+    ).toBe('auto');
+
+    expect(
+      EdexcelMathsSuiteCalculateInputSchema.parse({
+        selectedUnitCodes: ['WMA11', 'WMA12', 'WMA13', 'WMA14', 'WME01', 'WST01'],
+        inputMode: 'ums',
+        umsMarksByUnit: { WMA11: 92, WMA12: 88 },
+      }).inputMode
+    ).toBe('ums');
+
+    expect(
+      CalculatorCalculateInputSchema.parse({
+        subjectId: 'edexcel-ial-physics',
+        routeId: 'YPH11',
+        inputMode: 'ums',
+        umsMarksByPaper: { WPH11: 112, WPH12: 108 },
+      }).inputMode
+    ).toBe('ums');
+
+    expect(
+      GradeCalculationSnapshotSchema.parse({
+        boardId: 'edexcel-ial',
+        subjectId: 'edexcel-ial-physics',
+        subjectCode: 'YPH11',
+        subjectTitle: 'IAL Physics',
+        seriesId: 'direct-ums',
+        inputMode: 'ums',
+        rawMarksByPaper: {},
+        umsMarksByPaper: { WPH11: 110 },
+        totalRaw: 0,
+        maxTotalRaw: 440,
+        totalUms: 520,
+        maxTotalUms: 600,
+        percentage: 87,
+        finalGrade: 'A*',
+      }).inputMode
+    ).toBe('ums');
+
+    expect(
+      CalculatorSavedSnapshotDtoSchema.parse({
+        id: 'grd_123',
+        userId: 'usr_1',
+        subjectId: 'edexcel-ial-maths',
+        boardId: 'edexcel-ial',
+        subjectCode: 'YMA01',
+        subjectTitle: 'IAL Mathematics',
+        seriesId: 'mj-2025',
+        rawMarksByPaper: { WMA11: 63 },
+        totalRaw: 380,
+        maxTotalRaw: 450,
+        totalUms: 520,
+        maxTotalUms: 600,
+        percentage: 87,
+        finalGrade: 'A*',
+        createdAt: '2026-11-23T00:00:00.000Z',
+      }).finalGrade
+    ).toBe('A*');
   });
 });

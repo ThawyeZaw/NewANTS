@@ -14,7 +14,7 @@ export const SESSION_TTL_SHORT_SECONDS = 60 * 60 * 12;
 export interface CookiePolicy {
   domain: '.the-ants.org' | null;
   secure: boolean;
-  sameSite: 'Lax';
+  sameSite: 'Lax' | 'None';
   path: '/';
 }
 
@@ -29,6 +29,7 @@ function extractHostname(rawUrl?: string): string {
 
 /**
  * Resolves cross-subdomain cookie attributes:
+ * - Cloudflare `*.workers.dev` beta origins: host-only `Secure; SameSite=None` (`.workers.dev` is a Public Suffix)
  * - Production (`COOKIE_DOMAIN=.the-ants.org` or `*.the-ants.org` request): `Domain=.the-ants.org; Secure; SameSite=Lax`
  * - Local development (`localhost` / `127.0.0.1`): host-only `SameSite=Lax` (no `Domain`, no `Secure`)
  */
@@ -39,13 +40,31 @@ export function resolveCookiePolicy(cookieDomainEnv?: string, requestUrl?: strin
   const isLocalHost =
     normalizedEnv === 'localhost' ||
     normalizedEnv === '127.0.0.1' ||
-    (!normalizedEnv && (hostname === 'localhost' || hostname === '127.0.0.1'));
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1';
+
+  if (isLocalHost) {
+    return {
+      domain: null,
+      secure: false,
+      sameSite: 'Lax',
+      path: '/',
+    };
+  }
+
+  if (hostname.endsWith('.workers.dev')) {
+    return {
+      domain: null,
+      secure: true,
+      sameSite: 'None',
+      path: '/',
+    };
+  }
 
   const isProdDomain =
     normalizedEnv === '.the-ants.org' ||
     normalizedEnv === 'the-ants.org' ||
-    (!isLocalHost &&
-      !normalizedEnv &&
+    (!normalizedEnv &&
       (hostname === 'the-ants.org' || hostname.endsWith('.the-ants.org')));
 
   return {

@@ -4,6 +4,10 @@ import { OrgTeamMemberDetailView } from '../../../../components/team/views/OrgTe
 import { findTeamMemberByUsername } from '../../../../lib/showcase';
 import { MOCK_ORG_TEAM_MEMBERS } from '../../../../mocks/showcase-team.mock';
 
+export function generateStaticParams() {
+  return MOCK_ORG_TEAM_MEMBERS.map((member) => ({ username: member.username }));
+}
+
 export async function generateMetadata({
   params,
 }: {

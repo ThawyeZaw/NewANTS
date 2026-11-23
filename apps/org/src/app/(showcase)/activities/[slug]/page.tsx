@@ -4,6 +4,10 @@ import { OrgActivityDetailView } from '../../../../components/activities/views/O
 import { findActivityBySlug } from '../../../../lib/showcase';
 import { MOCK_ORG_ACTIVITIES } from '../../../../mocks/showcase-content.mock';
 
+export function generateStaticParams() {
+  return MOCK_ORG_ACTIVITIES.map((activity) => ({ slug: activity.slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {

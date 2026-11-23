@@ -1,3 +1,5 @@
+import type { EngineAStarRule } from '../engine/calculator-engine';
+
 export type ExamBoardId =
   | 'edexcel-ial'
   | 'caie-alevel'
@@ -15,17 +17,21 @@ export interface GradeThreshold {
 export interface PaperComponentMock {
   id: string;
   code: string;
+  unitCode?: string;
   title: string;
   maxRaw: number;
   /** Optional UMS cap for modular Edexcel units (e.g. 100 UMS or 120 UMS) */
   maxUms?: number;
   weightLabel: string;
   defaultRaw: number;
+  level?: 'AS' | 'A2' | 'IGCSE' | 'CORE' | 'EXTENDED';
   /** Per-series raw mark thresholds for [Pass C, Grade A, Top Grade] on this individual paper */
   seriesPaperCutoffs: Record<
     ExamSeriesId,
     { passC: number; gradeA: number; topGrade: number }
   >;
+  /** Optional complete per-series threshold dictionary (e.g. from D1 paper_grade_boundaries) */
+  seriesThresholds?: Record<string, Record<string, number>>;
 }
 
 export interface CalculatorSubjectMock {
@@ -38,6 +44,7 @@ export interface CalculatorSubjectMock {
   isModularUms: boolean;
   maxTotalRaw: number;
   maxTotalUms?: number;
+  aStarRule?: EngineAStarRule;
   papers: PaperComponentMock[];
   /** Per-series overall grade boundaries (measured against total UMS if modular, or total raw mark if linear) */
   seriesBoundaries: Record<ExamSeriesId, GradeThreshold[]>;
@@ -61,25 +68,25 @@ export const MOCK_EXAM_BOARDS: ExamBoardOption[] = [
     id: 'edexcel-ial',
     shortName: 'Edexcel IAL',
     fullName: 'Pearson Edexcel International Advanced Level',
-    scaleBadge: 'UMS · A*–U',
+    scaleBadge: 'Grades A*–U',
   },
   {
     id: 'caie-alevel',
     shortName: 'Cambridge AS & A-Level',
     fullName: 'Cambridge International AS & A Level',
-    scaleBadge: 'PUM · A*–U',
+    scaleBadge: 'Grades A*–U',
   },
   {
     id: 'caie-igcse',
     shortName: 'Cambridge IGCSE',
     fullName: 'Cambridge International General Certificate (IGCSE)',
-    scaleBadge: 'Extended · A*–G',
+    scaleBadge: 'Grades A*–G',
   },
   {
     id: 'edexcel-igcse',
     shortName: 'Edexcel IGCSE',
     fullName: 'Pearson Edexcel International GCSE (9–1)',
-    scaleBadge: 'Linear · 9–1',
+    scaleBadge: 'Grades 9–1',
   },
 ];
 

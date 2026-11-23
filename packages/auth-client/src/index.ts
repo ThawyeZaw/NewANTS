@@ -1,10 +1,14 @@
 // @ants/auth-client — Shared Cross-Subdomain SSO Client, useSession, useRole & Route Guards
 
 export {
+  BETA_APP_URLS,
+  BETA_WORKERS_DEV_HOST_SUFFIX,
+  DEFAULT_BETA_API_URL,
   DEFAULT_LOCAL_API_URL,
   DEFAULT_PROD_API_URL,
   buildCrossSubdomainAppUrl,
   buildCrossSubdomainLoginUrl,
+  isBetaWorkersDevHost,
   isLocalHostname,
   isProductionEcosystemHost,
   isTrustedEcosystemOrigin,

@@ -609,6 +609,49 @@ describe('@ants/api — Better Auth Drizzle D1 & Cross-Subdomain SSO [THAW-1.5]'
     expect(afterBody.session).toBeNull();
   });
 
+  it('emits host-only Secure SameSite=None cookies on *.thawyezaw.workers.dev beta origins', async () => {
+    const { d1 } = createInMemoryD1Database();
+    const api = createApiApp();
+    const env: ApiBindings = {
+      DB: d1,
+      ENVIRONMENT: 'beta',
+      COOKIE_DOMAIN: '.the-ants.org',
+      BETTER_AUTH_URL: 'https://ants-api.thawyezaw.workers.dev',
+      BETTER_AUTH_SECRET: 'beta-secret-key-min-32-characters-long',
+    };
+
+    const res = await api.request(
+      'https://ants-api.thawyezaw.workers.dev/api/auth/sign-up/email',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'https://ants-study.thawyezaw.workers.dev',
+        },
+        body: JSON.stringify({
+          name: 'Beta Tester',
+          email: 'beta@the-ants.org',
+          password: 'BetaPassword123!',
+          academicTrack: 'ial',
+        }),
+      },
+      env
+    );
+
+    expect(res.status).toBe(201);
+    expect(res.headers.get('access-control-allow-origin')).toBe(
+      'https://ants-study.thawyezaw.workers.dev'
+    );
+
+    const setCookies = getSetCookies(res.headers);
+    expect(setCookies).toHaveLength(2);
+    for (const header of setCookies) {
+      expect(header).toContain('Secure');
+      expect(header).toContain('SameSite=None');
+      expect(header).not.toContain('Domain=');
+    }
+  });
+
   it('returns 503 SERVICE_UNAVAILABLE cleanly if D1 DB binding is missing', async () => {
     const api = createApiApp();
     const res = await api.request('http://localhost:8787/api/auth/get-session', {}, {});

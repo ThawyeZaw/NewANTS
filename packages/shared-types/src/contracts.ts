@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { EdexcelMathsUnitCodeSchema } from './edexcel-maths';
 import { UserRoleSchema } from './roles';
 
 // ============================================================================
@@ -22,6 +23,28 @@ export const CALCULATOR_BOARD_IDS = [
 ] as const;
 export const CalculatorBoardIdSchema = z.enum(CALCULATOR_BOARD_IDS);
 export type CalculatorBoardId = z.infer<typeof CalculatorBoardIdSchema>;
+
+/**
+ * Maps canonical D1/Study curriculum board IDs (`cambridge-*`) to Calculator UI board IDs (`caie-*`).
+ */
+export function toCalculatorBoardId(
+  boardId: CurriculumBoardId | CalculatorBoardId
+): CalculatorBoardId {
+  if (boardId === 'cambridge-alevel') return 'caie-alevel';
+  if (boardId === 'cambridge-igcse') return 'caie-igcse';
+  return boardId;
+}
+
+/**
+ * Maps Calculator UI board IDs (`caie-*`) back to canonical D1 `curriculums.code` IDs (`cambridge-*`).
+ */
+export function toCurriculumBoardId(
+  boardId: CurriculumBoardId | CalculatorBoardId
+): CurriculumBoardId {
+  if (boardId === 'caie-alevel') return 'cambridge-alevel';
+  if (boardId === 'caie-igcse') return 'cambridge-igcse';
+  return boardId;
+}
 
 export const SUBJECT_TYPES = [
   'fixed_linear',
@@ -66,13 +89,34 @@ export const ExamSeriesIdSchema = z.union([
 ]);
 export type ExamSeriesId = z.infer<typeof ExamSeriesIdSchema>;
 
+export const CALCULATOR_MODES = ['standard', 'edexcel_maths_suite'] as const;
+export const CalculatorModeSchema = z.enum(CALCULATOR_MODES);
+export type CalculatorMode = z.infer<typeof CalculatorModeSchema>;
+
+export const CALCULATOR_BOUNDARY_SOURCES = ['official_d1', 'representative'] as const;
+export const CalculatorBoundarySourceSchema = z.enum(CALCULATOR_BOUNDARY_SOURCES);
+export type CalculatorBoundarySource = z.infer<typeof CalculatorBoundarySourceSchema>;
+
+export const CALCULATOR_AWARD_LEVELS = ['IGCSE', 'AS', 'AL', 'IAL'] as const;
+export const CalculatorAwardLevelSchema = z.enum(CALCULATOR_AWARD_LEVELS);
+export type CalculatorAwardLevel = z.infer<typeof CalculatorAwardLevelSchema>;
+
+export const CALCULATOR_INPUT_MODES = ['raw', 'ums'] as const;
+export const CalculatorInputModeSchema = z.enum(CALCULATOR_INPUT_MODES);
+export type CalculatorInputMode = z.infer<typeof CalculatorInputModeSchema>;
+
 export const GradeCalculationSnapshotSchema = z.object({
   boardId: z.union([CalculatorBoardIdSchema, CurriculumBoardIdSchema]),
   subjectId: z.string().min(1),
   subjectCode: z.string().min(1),
   subjectTitle: z.string().min(1),
   seriesId: ExamSeriesIdSchema,
-  rawMarksByPaper: z.record(z.string(), z.number().nonnegative()),
+  routeId: z.string().min(1).optional(),
+  routeLabel: z.string().min(1).optional(),
+  inputMode: CalculatorInputModeSchema.optional(),
+  perPaperSeriesById: z.record(z.string(), ExamSeriesIdSchema).optional(),
+  rawMarksByPaper: z.record(z.string(), z.number().nonnegative()).default({}),
+  umsMarksByPaper: z.record(z.string(), z.number().nonnegative()).optional(),
   totalRaw: z.number().nonnegative(),
   maxTotalRaw: z.number().positive(),
   totalUms: z.number().nonnegative().optional(),
@@ -81,6 +125,173 @@ export const GradeCalculationSnapshotSchema = z.object({
   finalGrade: z.string().min(1),
 });
 export type GradeCalculationSnapshot = z.infer<typeof GradeCalculationSnapshotSchema>;
+
+export const CalculatorGradeThresholdSchema = z.object({
+  grade: z.string().min(1),
+  minScore: z.number().nonnegative(),
+});
+export type CalculatorGradeThreshold = z.infer<typeof CalculatorGradeThresholdSchema>;
+
+export const CalculatorAStarRuleSchema = z.object({
+  minTotalUms: z.number().positive(),
+  minA2Ums: z.number().positive(),
+  a2PaperCodes: z.array(z.string().min(1)).min(1),
+  countBestA2Units: z.number().int().positive().optional(),
+});
+export type CalculatorAStarRule = z.infer<typeof CalculatorAStarRuleSchema>;
+
+export const CalculatorRouteOptionSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  awardLevel: CalculatorAwardLevelSchema,
+  cashInCode: z.string().min(1).optional(),
+  tier: z.enum(['Extended', 'Core', 'Higher', 'Foundation']).optional(),
+  variant: z.enum(['V1', 'V2', 'V3', 'Standard', 'R']).optional(),
+  pathwayLabel: z.string().min(1).optional(),
+  paperIds: z.array(z.string().min(1)).min(1),
+  paperWeights: z.record(z.string(), z.number().positive()).optional(),
+  maxTotalScore: z.number().positive(),
+  isModularUms: z.boolean(),
+  gradingScale: GradingScaleSchema,
+  allowedGrades: z.array(z.string().min(1)).optional(),
+  aStarRule: CalculatorAStarRuleSchema.optional(),
+  availableSeriesIds: z.array(z.string().min(1)).optional(),
+  seriesBoundaries: z.record(z.string(), z.array(CalculatorGradeThresholdSchema)),
+});
+export type CalculatorRouteOption = z.infer<typeof CalculatorRouteOptionSchema>;
+
+export const CalculatorPaperCutoffsSummarySchema = z.object({
+  passC: z.number().nonnegative(),
+  gradeA: z.number().nonnegative(),
+  topGrade: z.number().nonnegative(),
+});
+export type CalculatorPaperCutoffsSummary = z.infer<typeof CalculatorPaperCutoffsSummarySchema>;
+
+export const CALCULATOR_PAPER_LEVELS = ['AS', 'A2', 'IGCSE', 'CORE', 'EXTENDED'] as const;
+export const CalculatorPaperLevelSchema = z.enum(CALCULATOR_PAPER_LEVELS);
+export type CalculatorPaperLevel = z.infer<typeof CalculatorPaperLevelSchema>;
+
+export const CalculatorPaperDtoSchema = z.object({
+  id: z.string().min(1),
+  code: z.string().min(1),
+  unitCode: z.string().min(1),
+  title: z.string().min(1),
+  maxRaw: z.number().int().positive(),
+  seriesMaxRaw: z.record(z.string(), z.number().int().positive()).optional(),
+  maxUms: z.number().int().positive().optional(),
+  weightLabel: z.string().min(1),
+  defaultRaw: z.number().int().nonnegative(),
+  level: CalculatorPaperLevelSchema.optional(),
+  availableSeriesIds: z.array(z.string().min(1)).optional(),
+  seriesPaperCutoffs: z.record(z.string(), CalculatorPaperCutoffsSummarySchema),
+  seriesThresholds: z.record(z.string(), z.record(z.string(), z.number().nonnegative())).optional(),
+  seriesThresholdsByVariant: z
+    .record(z.string(), z.record(z.string(), z.record(z.string(), z.number().nonnegative())))
+    .optional(),
+});
+export type CalculatorPaperDto = z.infer<typeof CalculatorPaperDtoSchema>;
+
+export const CalculatorSubjectDtoSchema = z.object({
+  id: z.string().min(1),
+  boardId: CalculatorBoardIdSchema,
+  code: z.string().min(1),
+  title: z.string().min(1),
+  levelLabel: z.string().min(1),
+  gradingScale: GradingScaleSchema,
+  isModularUms: z.boolean(),
+  maxTotalRaw: z.number().int().positive(),
+  maxTotalUms: z.number().int().positive().optional(),
+  calculatorMode: CalculatorModeSchema.optional(),
+  asAwardCode: z.string().min(1).optional(),
+  aLevelAwardCode: z.string().min(1).optional(),
+  boundarySource: CalculatorBoundarySourceSchema.optional(),
+  defaultRouteId: z.string().min(1).optional(),
+  aStarRule: CalculatorAStarRuleSchema.optional(),
+  papers: z.array(CalculatorPaperDtoSchema).min(1),
+  routes: z.array(CalculatorRouteOptionSchema).optional(),
+  seriesBoundaries: z.record(z.string(), z.array(CalculatorGradeThresholdSchema)),
+});
+export type CalculatorSubjectDto = z.infer<typeof CalculatorSubjectDtoSchema>;
+
+export const CalculatorBoardDtoSchema = z.object({
+  id: CalculatorBoardIdSchema,
+  shortName: z.string().min(1),
+  fullName: z.string().min(1),
+  scaleBadge: z.string().min(1),
+});
+export type CalculatorBoardDto = z.infer<typeof CalculatorBoardDtoSchema>;
+
+export const CalculatorSeriesDtoSchema = z.object({
+  id: ExamSeriesIdSchema,
+  label: z.string().min(1),
+  tag: z.string().min(1),
+});
+export type CalculatorSeriesDto = z.infer<typeof CalculatorSeriesDtoSchema>;
+
+export const CalculatorCatalogResponseSchema = z.object({
+  ok: z.literal(true),
+  data: z.object({
+    boards: z.array(CalculatorBoardDtoSchema),
+    seriesOptions: z.array(CalculatorSeriesDtoSchema),
+    subjects: z.array(CalculatorSubjectDtoSchema),
+    source: z.literal('d1'),
+  }),
+});
+export type CalculatorCatalogResponse = z.infer<typeof CalculatorCatalogResponseSchema>;
+
+export const CalculatorCalculateInputSchema = z.object({
+  subjectId: z.string().min(1),
+  seriesId: ExamSeriesIdSchema.optional(),
+  routeId: z.string().min(1).optional(),
+  inputMode: CalculatorInputModeSchema.optional(),
+  perPaperSeriesById: z.record(z.string(), ExamSeriesIdSchema).optional(),
+  rawMarksByPaper: z.record(z.string(), z.number().nonnegative()).default({}),
+  umsMarksByPaper: z.record(z.string(), z.number().nonnegative()).optional(),
+});
+export type CalculatorCalculateInput = z.infer<typeof CalculatorCalculateInputSchema>;
+
+export const EDEXCEL_MATHS_SUITE_AWARD_MODES = [
+  'auto',
+  'YMA01+YFM01',
+  'YMA01+XFM01',
+  'XMA01+XFM01',
+  'YMA01',
+  'XMA01',
+  'YFM01',
+  'XFM01',
+] as const;
+export const EdexcelMathsSuiteAwardModeSchema = z.enum(EDEXCEL_MATHS_SUITE_AWARD_MODES);
+export type EdexcelMathsSuiteAwardMode = z.infer<typeof EdexcelMathsSuiteAwardModeSchema>;
+
+export const EdexcelMathsSuiteCalculateInputSchema = z.object({
+  selectedUnitCodes: z.array(EdexcelMathsUnitCodeSchema).min(1),
+  inputMode: CalculatorInputModeSchema.optional(),
+  rawMarksByUnit: z.record(z.string(), z.number().nonnegative()).default({}),
+  umsMarksByUnit: z.record(z.string(), z.number().nonnegative()).optional(),
+  seriesByUnit: z.record(z.string(), ExamSeriesIdSchema).optional(),
+  defaultSeriesId: ExamSeriesIdSchema.optional(),
+  awardMode: EdexcelMathsSuiteAwardModeSchema.optional(),
+});
+export type EdexcelMathsSuiteCalculateInput = z.infer<typeof EdexcelMathsSuiteCalculateInputSchema>;
+
+export const CalculatorSavedSnapshotDtoSchema = z.object({
+  id: z.string().min(1),
+  userId: z.string().nullable(),
+  subjectId: z.string().nullable(),
+  boardId: z.union([CalculatorBoardIdSchema, CurriculumBoardIdSchema]),
+  subjectCode: z.string().min(1),
+  subjectTitle: z.string().min(1),
+  seriesId: ExamSeriesIdSchema,
+  rawMarksByPaper: z.record(z.string(), z.number().nonnegative()),
+  totalRaw: z.number().nonnegative(),
+  maxTotalRaw: z.number().positive(),
+  totalUms: z.number().nonnegative().nullable(),
+  maxTotalUms: z.number().positive().nullable(),
+  percentage: z.number().min(0).max(100),
+  finalGrade: z.string().min(1),
+  createdAt: z.string().min(1),
+});
+export type CalculatorSavedSnapshotDto = z.infer<typeof CalculatorSavedSnapshotDtoSchema>;
 
 export const PastPaperAttemptInputSchema = z.object({
   subjectId: z.string().min(1),

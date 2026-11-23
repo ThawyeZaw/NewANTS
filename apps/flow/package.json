@@ -10,9 +10,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "cf:build": "opennextjs-cloudflare build",
-    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "cf:build": "node -e \"const {execSync}=require('node:child_process');execSync('npx next build',{stdio:'inherit',env:{...process.env,CF_STATIC_EXPORT:'1',NEXT_PUBLIC_API_URL:'https://ants-api.thawyezaw.workers.dev',NEXT_PUBLIC_ORG_URL:'https://ants-org.thawyezaw.workers.dev',NEXT_PUBLIC_STUDY_URL:'https://ants-study.thawyezaw.workers.dev',NEXT_PUBLIC_FLOW_URL:'https://ants-flow.thawyezaw.workers.dev'}})\"",
+    "cf:preview": "pnpm cf:build && wrangler dev",
+    "cf:deploy": "pnpm cf:build && wrangler deploy"
   },
   "dependencies": {
     "@ants/auth-client": "workspace:*",

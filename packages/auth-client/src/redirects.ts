@@ -6,6 +6,13 @@ import {
 
 export const DEFAULT_LOCAL_API_URL = 'http://localhost:8787';
 export const DEFAULT_PROD_API_URL = 'https://api.the-ants.org';
+export const BETA_WORKERS_DEV_HOST_SUFFIX = '.thawyezaw.workers.dev';
+export const DEFAULT_BETA_API_URL = 'https://ants-api.thawyezaw.workers.dev';
+export const BETA_APP_URLS: Record<EcosystemAppId, string> = {
+  org: 'https://ants-org.thawyezaw.workers.dev',
+  study: 'https://ants-study.thawyezaw.workers.dev',
+  flow: 'https://ants-flow.thawyezaw.workers.dev',
+};
 
 const AUTH_LOOP_PATHS = new Set(['/login', '/signup']);
 
@@ -82,6 +89,11 @@ export function isProductionEcosystemHost(hostname: string): boolean {
   return clean === 'the-ants.org' || clean.endsWith('.the-ants.org');
 }
 
+export function isBetaWorkersDevHost(hostname: string): boolean {
+  const clean = hostname.trim().toLowerCase();
+  return clean.endsWith(BETA_WORKERS_DEV_HOST_SUFFIX);
+}
+
 /**
  * Resolves the canonical `@ants/api` base URL for browser and SSR requests.
  */
@@ -96,7 +108,13 @@ export function resolveApiBaseUrl(explicitBaseUrl?: string, runtimeHostname?: st
   }
 
   const host = resolveRuntimeHostname(runtimeHostname);
-  return isProductionEcosystemHost(host) ? DEFAULT_PROD_API_URL : DEFAULT_LOCAL_API_URL;
+  if (isProductionEcosystemHost(host)) {
+    return DEFAULT_PROD_API_URL;
+  }
+  if (isBetaWorkersDevHost(host)) {
+    return DEFAULT_BETA_API_URL;
+  }
+  return DEFAULT_LOCAL_API_URL;
 }
 
 /**
@@ -114,8 +132,13 @@ export function resolveAppOrigin(app: EcosystemAppId, options?: ResolveAppOrigin
   }
 
   const host = resolveRuntimeHostname(options?.currentHostname);
-  const metadata = ECOSYSTEM_APPS[app];
-  return stripTrailingSlash(isProductionEcosystemHost(host) ? metadata.prodUrl : metadata.localUrl);
+  if (isProductionEcosystemHost(host)) {
+    return stripTrailingSlash(ECOSYSTEM_APPS[app].prodUrl);
+  }
+  if (isBetaWorkersDevHost(host)) {
+    return BETA_APP_URLS[app];
+  }
+  return stripTrailingSlash(ECOSYSTEM_APPS[app].localUrl);
 }
 
 export function isTrustedEcosystemOrigin(origin: string): boolean {

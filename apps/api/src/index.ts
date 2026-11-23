@@ -12,6 +12,7 @@ import {
   isAllowedCorsOrigin,
 } from '@ants/shared-types';
 import { createAuthRouter } from './auth/routes';
+import { createCalculatorRouter } from './calculator/routes';
 import { processDueNotificationQueue } from './cron/notification-runner';
 import { createStorageRouter } from './storage/routes';
 import { createTelegramRouter } from './telegram/routes';
@@ -20,6 +21,10 @@ import type { ApiBindings, ScheduledTickResult } from './types';
 export type { ApiBindings, ScheduledTickResult } from './types';
 export type { CookiePolicy, BuildAuthCookiesOptions } from './auth/cookies';
 export type { AuthMutationResult, RequestClientMeta } from './auth/service';
+export type {
+  CalculatorCatalogData,
+  CalculatorComputeResponse,
+} from './calculator/service';
 export type {
   NotificationQueueBatchSummary,
   ProcessNotificationItemResult,
@@ -84,6 +89,7 @@ export function createApiApp() {
   );
 
   app.route('/api/auth', createAuthRouter());
+  app.route('/api/calculator', createCalculatorRouter());
   app.route('/api/storage', createStorageRouter());
   app.route('/api/telegram', createTelegramRouter());
 

@@ -4,6 +4,10 @@ import { OrgArticleReaderView } from '../../../../components/articles/views/OrgA
 import { findArticleBySlug } from '../../../../lib/showcase';
 import { MOCK_ORG_ARTICLES } from '../../../../mocks/showcase-content.mock';
 
+export function generateStaticParams() {
+  return MOCK_ORG_ARTICLES.map((article) => ({ slug: article.slug }));
+}
+
 export async function generateMetadata({
   params,
 }: {

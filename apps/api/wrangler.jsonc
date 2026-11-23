@@ -7,15 +7,15 @@
     "nodejs_compat"
   ],
   "vars": {
-    "ENVIRONMENT": "development",
-    "COOKIE_DOMAIN": "localhost",
-    "BETTER_AUTH_URL": "http://localhost:8787"
+    "ENVIRONMENT": "beta",
+    "COOKIE_DOMAIN": ".the-ants.org",
+    "BETTER_AUTH_URL": "https://ants-api.thawyezaw.workers.dev"
   },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "the-ants-db",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_name": "the-ants-v2-db",
+      "database_id": "08906524-156f-44b6-bc22-e8703c2dae2f",
       "migrations_dir": "../../packages/db/migrations"
     }
   ],

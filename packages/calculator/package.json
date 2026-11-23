@@ -5,7 +5,8 @@
   "description": "Shared guest-accessible IGCSE & IAL Grade Calculator engine and UI mounted at BOTH the-ants.org/calculator and study.the-ants.org/calculator",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./engine": "./src/engine/index.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
@@ -14,6 +15,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@ants/auth-client": "workspace:*",
     "@ants/shared-types": "workspace:*",
     "@ants/ui": "workspace:*",
     "lucide-react": "^0.487.0",

@@ -10,11 +10,12 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "db:migrate:local": "wrangler d1 migrations apply the-ants-db --local",
-    "db:migrate:remote": "wrangler d1 migrations apply the-ants-db --remote",
+    "db:migrate:local": "wrangler d1 migrations apply the-ants-v2-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply the-ants-v2-db --remote",
     "deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@ants/calculator": "workspace:*",
     "@ants/db": "workspace:*",
     "@ants/shared-types": "workspace:*",
     "hono": "^4.7.4",

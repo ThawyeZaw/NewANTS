@@ -83,6 +83,7 @@ export const ALLOWED_CORS_ORIGINS: readonly string[] = [
 ];
 
 const SUBDOMAIN_ORIGIN_PATTERN = /^https:\/\/[a-z0-9-]+\.the-ants\.org$/i;
+const BETA_WORKERS_DEV_ORIGIN_PATTERN = /^https:\/\/[a-z0-9-]+\.thawyezaw\.workers\.dev$/i;
 
 /**
  * Evaluates whether a request `Origin` header is permitted for CORS + Better Auth SSO.
@@ -90,7 +91,7 @@ const SUBDOMAIN_ORIGIN_PATTERN = /^https:\/\/[a-z0-9-]+\.the-ants\.org$/i;
 export function isAllowedCorsOrigin(origin: string | null | undefined): boolean {
   if (!origin) return false;
   if (ALLOWED_CORS_ORIGINS.includes(origin)) return true;
-  return SUBDOMAIN_ORIGIN_PATTERN.test(origin);
+  return SUBDOMAIN_ORIGIN_PATTERN.test(origin) || BETA_WORKERS_DEV_ORIGIN_PATTERN.test(origin);
 }
 
 export const ApiHealthResponseSchema = z.object({

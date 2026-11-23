@@ -1,7 +1,13 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { normalizeProfileHandle } from '@ants/ui';
+import { MOCK_SHARED_PROFILES, normalizeProfileHandle } from '@ants/ui';
 import { FlowProfilePageView } from '../../components/account/views/FlowProfilePageView';
+
+export function generateStaticParams() {
+  return Object.keys(MOCK_SHARED_PROFILES).map((username) => ({
+    handle: `@${username}`,
+  }));
+}
 
 function decodeRouteHandle(rawHandle: string): string {
   try {
