@@ -118,57 +118,57 @@ export function WorkspaceAuthGateView({
 
   const featurePills: GateFeaturePill[] = isSettings
     ? [
+      {
+        id: 'handle',
+        label: '@Username',
+        icon: <UserCog className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
+      },
+      {
+        id: 'slots',
+        label: 'Tutor Slots',
+        icon: <CalendarClock className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
+      },
+      {
+        id: 'bot',
+        label: '@TheANTsFlowBot',
+        icon: <Send className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
+      },
+    ]
+    : isFlow
+      ? [
         {
-          id: 'handle',
-          label: '@Username',
-          icon: <UserCog className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
-        },
-        {
-          id: 'slots',
-          label: 'Tutor Slots',
+          id: 'grid',
+          label: '24h Timetable',
           icon: <CalendarClock className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
         },
         {
-          id: 'bot',
-          label: '@TheANTsFlowBot',
+          id: 'tasks',
+          label: 'P1–P4 Tasks',
+          icon: <ListChecks className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
+        },
+        {
+          id: 'cron',
+          label: 'TG Cron Alerts',
           icon: <Send className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
         },
       ]
-    : isFlow
-      ? [
-          {
-            id: 'grid',
-            label: '24h Timetable',
-            icon: <CalendarClock className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
-          },
-          {
-            id: 'tasks',
-            label: 'P1–P4 Tasks',
-            icon: <ListChecks className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
-          },
-          {
-            id: 'cron',
-            label: 'TG Cron Alerts',
-            icon: <Send className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
-          },
-        ]
       : [
-          {
-            id: 'topics',
-            label: 'Topic Mastery',
-            icon: <BookOpen className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
-          },
-          {
-            id: 'papers',
-            label: 'Paper UMS',
-            icon: <FileSpreadsheet className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
-          },
-          {
-            id: 'countdowns',
-            label: 'Countdowns',
-            icon: <CalendarClock className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
-          },
-        ];
+        {
+          id: 'topics',
+          label: 'Topic Mastery',
+          icon: <BookOpen className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
+        },
+        {
+          id: 'papers',
+          label: 'Paper UMS',
+          icon: <FileSpreadsheet className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
+        },
+        {
+          id: 'countdowns',
+          label: 'Countdowns',
+          icon: <CalendarClock className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden="true" />,
+        },
+      ];
 
   const calculatorHref = isFlow ? `${studyUrl}/calculator` : '/calculator';
   const pomodoroHref = isFlow ? '/pomodoro' : `${flowUrl}/pomodoro`;

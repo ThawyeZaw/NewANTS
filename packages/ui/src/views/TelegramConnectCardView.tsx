@@ -26,7 +26,7 @@ import {
 } from '../lib/account';
 import { Badge } from '../primitives/Badge';
 import { Button } from '../primitives/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../primitives/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../primitives/Card';
 import { cn } from '../utils/cn';
 import { ANT_MASCOT_PRESETS, AntMascotView } from './AntMascotView';
 
@@ -142,11 +142,7 @@ export function TelegramConnectCardView({
             <Send className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
-            <CardTitle>Telegram Bot &amp; Cron Alerts</CardTitle>
-            <CardDescription>
-              Connect <span className="font-mono text-foreground">@TheANTsFlowBot</span> for
-              5-minute Cloudflare Worker Cron timetable pings, exam countdowns, and tutor inquiries.
-            </CardDescription>
+            <CardTitle>Telegram Alerts</CardTitle>
           </div>
         </div>
       </CardHeader>
@@ -317,19 +313,10 @@ export function TelegramConnectCardView({
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">
-                    Linked Telegram account:{' '}
-                    <span className="font-mono text-on-success-tint">{telegram.handle}</span>
-                  </p>
-                  <p className="text-xs text-foreground-muted">
-                    Via <span className="font-mono">@TheANTsFlowBot</span> · Independent of ANTs{' '}
-                    <span className="font-mono">
-                      @{accountUsername || 'username'}
-                    </span>{' '}
-                    · <span className="font-mono">*/5 * * * *</span> Cron alerts active
-                  </p>
-                </div>
+                <p className="text-sm font-semibold text-foreground">
+                  Linked Telegram account:{' '}
+                  <span className="font-mono text-on-success-tint">{telegram.handle}</span>
+                </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -407,29 +394,21 @@ export function TelegramConnectCardView({
           <div className="divide-y divide-border-subtle">
             <PreferenceSwitchRow
               label="Timetable & Task Block Alerts"
-              description="Dispatch reminders queued on Flow blocks before session start."
               checked={telegram.preferences.blockReminders}
               onToggle={(val) => handlePrefToggle('blockReminders', val)}
             />
             <PreferenceSwitchRow
               label="Morning Daily Brief"
-              description={`Summarize Today Focus & P1 priorities at ${telegram.preferences.digestTime}.`}
               checked={telegram.preferences.dailyMorningDigest}
               onToggle={(val) => handlePrefToggle('dailyMorningDigest', val)}
             />
             <PreferenceSwitchRow
               label="Study Exam Countdown Alerts"
-              description="Send 7-day and 24-hour warnings for pinned Study papers."
               checked={telegram.preferences.examCountdownAlerts}
               onToggle={(val) => handlePrefToggle('examCountdownAlerts', val)}
             />
             <PreferenceSwitchRow
               label="Tutor Inquiry Notifications"
-              description={
-                isTutor
-                  ? `Forward new student booking inquiries from /@${accountUsername || '[username]'}.`
-                  : 'Activates automatically when your account has a Tutor role.'
-              }
               checked={telegram.preferences.tutorInquiryAlerts}
               disabled={!isTutor}
               onToggle={(val) => handlePrefToggle('tutorInquiryAlerts', val)}
@@ -443,13 +422,11 @@ export function TelegramConnectCardView({
 
 function PreferenceSwitchRow({
   label,
-  description,
   checked,
   disabled = false,
   onToggle,
 }: {
   label: string;
-  description: string;
   checked: boolean;
   disabled?: boolean;
   onToggle: (next: boolean) => void;
@@ -457,17 +434,14 @@ function PreferenceSwitchRow({
   return (
     <label
       className={cn(
-        'flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0 transition-colors',
+        'flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0 transition-colors',
         disabled ? 'cursor-not-allowed opacity-65' : 'cursor-pointer'
       )}
     >
-      <span className="min-w-0 flex-1">
-        <span className="block text-xs font-semibold text-foreground">{label}</span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-foreground-muted">
-          {description}
-        </span>
+      <span className="min-w-0 flex-1 text-xs font-semibold text-foreground">
+        {label}
       </span>
-      <span className="relative mt-0.5 inline-flex shrink-0">
+      <span className="relative inline-flex shrink-0">
         <input
           type="checkbox"
           role="switch"

@@ -798,21 +798,14 @@ export function OrgArticlesView({
           aria-label="Editorial masthead"
           className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-end"
         >
-          <div className="space-y-3 lg:col-span-8">
+          <div className="lg:col-span-8">
             <h1 className="ants-hero-enter text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground leading-[1.12]">
               Articles, Guides &amp; Notes
             </h1>
-            <p
-              style={{ '--stagger-index': 1 } as React.CSSProperties}
-              className="ants-stagger-item text-sm sm:text-base text-foreground-muted leading-relaxed max-w-[64ch]"
-            >
-              Exam strategy walkthroughs, piecewise UMS scaling guides, and sustainable revision
-              systems written by peer tutors, former candidates, and builders at The ANTs.
-            </p>
           </div>
 
           <div
-            style={{ '--stagger-index': 2 } as React.CSSProperties}
+            style={{ '--stagger-index': 1 } as React.CSSProperties}
             className="ants-stagger-item flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/60 bg-surface-card p-4 lg:col-span-4"
           >
             <div className="flex items-center gap-4 font-mono text-xs tabular-nums">

@@ -230,15 +230,9 @@ export function StudyLeaderboardView({
       <div className="space-y-6">
         {/* Header */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
-              Scholar Leaderboard
-            </h1>
-            <p className="mt-1 text-sm text-foreground-muted">
-              Earn Study XP cleanly through topic mastery (+10 XP), daily check-ins (+15 XP),
-              and timed past papers (+25 XP). Rankings are strictly opt-in.
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
+            Scholar Leaderboard
+          </h1>
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/past-papers"
@@ -641,15 +635,9 @@ export function StudyLeaderboardView({
         {/* Academic Milestone Badges Shelf */}
         <section aria-label="Academic milestone badges" className="space-y-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold tracking-tight text-foreground">
-                Milestone Badges
-              </h2>
-              <p className="text-xs text-foreground-muted">
-                Verified achievements synced to your Study XP ledger ({earnedCount} of{' '}
-                {badges.length} unlocked).
-              </p>
-            </div>
+            <h2 className="text-lg font-bold tracking-tight text-foreground">
+              Milestone Badges
+            </h2>
             <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-foreground-muted tabular-nums">
               <Award className="h-4 w-4 text-primary" aria-hidden="true" />
               <span>

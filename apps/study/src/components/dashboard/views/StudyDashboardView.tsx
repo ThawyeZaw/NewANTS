@@ -147,8 +147,6 @@ export function StudyDashboardView({
   }, [hydrated, state]);
 
   const activeBoard = controlledBoard ?? state.activeBoard;
-  const activeBoardMeta =
-    boardTabs.find((tab) => tab.id === activeBoard) ?? boardTabs[0];
 
   const boardTabsRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -259,10 +257,6 @@ export function StudyDashboardView({
             >
               Academic Workspace
             </h1>
-            <p className="mt-1.5 max-w-xl text-sm text-foreground-muted">
-              Track syllabus mastery, logged past papers, and exam deadlines for{' '}
-              <span className="font-semibold text-foreground">{activeBoardMeta?.label}</span>.
-            </p>
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center gap-2.5 sm:flex-nowrap">
@@ -473,17 +467,12 @@ export function StudyDashboardView({
         {/* Left Primary Column: Enrolled Subjects */}
         <section aria-labelledby="enrolled-subjects-heading" className="xl:col-span-8 space-y-4">
           <div className="flex items-baseline justify-between gap-3">
-            <div>
-              <h2
-                id="enrolled-subjects-heading"
-                className="text-lg font-bold tracking-tight text-foreground"
-              >
-                Enrolled Subjects
-              </h2>
-              <p className="text-xs text-foreground-muted">
-                {activeBoardMeta?.summary}
-              </p>
-            </div>
+            <h2
+              id="enrolled-subjects-heading"
+              className="text-lg font-bold tracking-tight text-foreground"
+            >
+              Enrolled Subjects
+            </h2>
             <span className="font-mono text-xs font-semibold tabular-nums text-foreground-muted">
               {subjects.length} active
             </span>

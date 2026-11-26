@@ -308,15 +308,9 @@ export function OrgCmsStudioView({
       <main className="ants-fade-enter mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10 space-y-6">
         {/* Top Studio Toolbar */}
         <header className="flex flex-col gap-4 border-b border-border pb-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-              Organization Content Studio
-            </h1>
-            <p className="text-xs sm:text-sm text-foreground-muted">
-              Edit Home, Team, Activities, and Articles. Changes save locally and
-              update the public showcase immediately.
-            </p>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+            Organization Content Studio
+          </h1>
 
           <div className="flex flex-wrap items-center gap-2">
             {/* Contributor Access Indicator & Preview Restricted Gate Toggle */}

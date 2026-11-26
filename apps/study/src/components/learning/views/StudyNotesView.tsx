@@ -289,10 +289,6 @@ export function StudyNotesView({
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               Syllabus Markdown Notes
             </h1>
-            <p className="max-w-2xl text-sm text-foreground-muted">
-              Curated Edexcel IAL and Cambridge IGCSE revision summaries with formula blocks,
-              examiner callouts, and interactive checklists synced locally.
-            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

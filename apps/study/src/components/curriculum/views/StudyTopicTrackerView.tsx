@@ -454,9 +454,6 @@ export function StudyTopicTrackerView({
             >
               {currentSubject.title}
             </h1>
-            <p className="mt-1 max-w-2xl text-sm text-foreground-muted">
-              Track specification subtopics, confidence ratings, examiner formulas, and personal revision notes.
-            </p>
           </div>
 
           {/* Subject Switcher Select */}

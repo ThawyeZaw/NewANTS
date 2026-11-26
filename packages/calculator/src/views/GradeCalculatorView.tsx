@@ -376,14 +376,9 @@ export function GradeCalculatorView({
       <main className="mx-auto max-w-5xl px-4 py-10 pb-28 lg:pb-12 sm:px-6 space-y-10">
         {/* Heading & Exam Board Switcher */}
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between border-b border-border pb-8">
-          <div className="space-y-1.5">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-              Grade Calculator
-            </h1>
-            <p className="text-sm sm:text-base text-foreground-muted">
-              Slide your paper marks to see how they convert across recent exam sessions.
-            </p>
-          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+            Grade Calculator
+          </h1>
 
           <Tabs
             variant="segmented"

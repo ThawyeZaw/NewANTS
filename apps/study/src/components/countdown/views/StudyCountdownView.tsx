@@ -309,15 +309,9 @@ export function StudyCountdownView({
       <div className="space-y-6">
         {/* Page Header */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
-              Exam Countdown
-            </h1>
-            <p className="mt-1 text-sm text-foreground-muted">
-              Auto-populated from your Pearson Edexcel IAL &amp; Cambridge IGCSE sittings, paired
-              with timed mock simulations and Flow Timetable sync.
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
+            Exam Countdown
+          </h1>
           <div className="flex flex-wrap items-center gap-2">
             <a
               href={flowUrl}

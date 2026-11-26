@@ -266,12 +266,8 @@ export function StudyQuizzesView({
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-              Topical Quizzes & Mark-Scheme Drills
+              Topical Quizzes &amp; Mark-Scheme Drills
             </h1>
-            <p className="max-w-2xl text-sm text-foreground-muted">
-              Test conceptual precision and numeric accuracy under Practice or Timed conditions with
-              instant worked mark-scheme explanations and mistake retries.
-            </p>
           </div>
 
           {phase !== 'catalog' && (

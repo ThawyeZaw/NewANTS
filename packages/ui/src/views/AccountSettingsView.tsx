@@ -38,7 +38,7 @@ import { ZYY_PROFILE_MOCK } from '../mocks/account-profile.mock';
 import { type UserRole } from '../mocks/ecosystem-chrome.mock';
 import { Badge } from '../primitives/Badge';
 import { Button } from '../primitives/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../primitives/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../primitives/Card';
 import { cn } from '../utils/cn';
 import { TelegramConnectCardView } from './TelegramConnectCardView';
 import { TutorSlotPainterView } from './TutorSlotPainterView';
@@ -338,9 +338,6 @@ export function AccountSettingsView({
               </Badge>
             )}
           </div>
-          <p className="mt-1 text-sm text-foreground-muted">
-            Shared identity, portfolio highlights, Sun–Sat tutor availability, and Telegram Bot alerts across Flow &amp; Study.
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -439,10 +436,6 @@ export function AccountSettingsView({
               <Card>
                 <CardHeader>
                   <CardTitle>Public Identity &amp; Academic Track</CardTitle>
-                  <CardDescription>
-                    Updates displayed across Flow, Study, and your public{' '}
-                    <span className="font-mono text-foreground">{publicProfileHref}</span> showcase.
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -666,9 +659,6 @@ export function AccountSettingsView({
                     <FolderGit2 className="h-4 w-4 text-primary" aria-hidden="true" />
                     <CardTitle>Portfolio Projects &amp; Study Notes</CardTitle>
                   </div>
-                  <CardDescription>
-                    Showcase curated study guides, past-paper logs, or Flow tooling builds on your public profile.
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {activeData.portfolioItems.length === 0 ? (
@@ -689,9 +679,6 @@ export function AccountSettingsView({
                               </span>
                               <Badge variant="active-filter">{item.category}</Badge>
                             </div>
-                            <p className="text-xs leading-relaxed text-foreground-muted">
-                              {item.summary}
-                            </p>
                             <div className="flex flex-wrap items-center gap-1.5">
                               {item.tags.map((tag) => (
                                 <span
@@ -796,9 +783,6 @@ export function AccountSettingsView({
                     <GraduationCap className="h-4 w-4 text-primary" aria-hidden="true" />
                     <CardTitle>Academic Credentials &amp; Certifications</CardTitle>
                   </div>
-                  <CardDescription>
-                    Exam results and ANTs peer fellowships displayed cleanly on your public profile.
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="divide-y divide-border-subtle">
@@ -909,14 +893,8 @@ export function AccountSettingsView({
               >
                 <div className="flex items-center gap-2">
                   <CalendarClock className="h-4 w-4 text-primary" aria-hidden="true" />
-                  <CardTitle>Weekly Tutor Availability Slot-Painter</CardTitle>
+                  <CardTitle>Tutor Availability</CardTitle>
                 </div>
-                <CardDescription>
-                  Select a brush and click-and-drag across Sun–Sat hours (
-                  <span className="font-mono text-foreground">08:00–21:00</span>) to set live
-                  tutoring slots surfaced on{' '}
-                  <span className="font-mono text-foreground">{publicProfileHref}</span>.
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-5">
                 {!isTutor ? (
@@ -1100,41 +1078,32 @@ export function AccountSettingsView({
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Eye className="h-4 w-4 text-primary" aria-hidden="true" />
-                    <CardTitle>Public Profile Section Visibility</CardTitle>
+                    <CardTitle>Public Profile Visibility</CardTitle>
                   </div>
-                  <CardDescription>
-                    Control which sections visitors see when visiting{' '}
-                    <span className="font-mono text-foreground">{publicProfileHref}</span>.
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="divide-y divide-border-subtle">
                   <VisibilityRow
                     label="Show Streak, XP & Monthly Focus Hours"
-                    description="Displays your 14-day Flow streak, Scholar XP ledger, and total focus sessions."
                     checked={activeData.visibility.showStatsStreak}
                     onChange={(v) => handleVisibilityToggle('showStatsStreak', v)}
                   />
                   <VisibilityRow
                     label="Show Portfolio Projects & Study Guides"
-                    description="Publishes curated study notes, past-paper logs, and builds to visitors."
                     checked={activeData.visibility.showPortfolioProjects}
                     onChange={(v) => handleVisibilityToggle('showPortfolioProjects', v)}
                   />
                   <VisibilityRow
                     label="Show Verified Certifications"
-                    description="Lists Edexcel / Cambridge qualifications and community peer fellowships."
                     checked={activeData.visibility.showCertifications}
                     onChange={(v) => handleVisibilityToggle('showCertifications', v)}
                   />
                   <VisibilityRow
                     label="Show Tutor Weekly Availability Grid"
-                    description="Renders your live Sun–Sat slot grid for student inquiries when holding a Tutor role."
                     checked={activeData.visibility.showTutorSchedule}
                     onChange={(v) => handleVisibilityToggle('showTutorSchedule', v)}
                   />
                   <VisibilityRow
                     label="Enable 1-Click Telegram Booking Inquiry"
-                    description="Shows a prefilled Telegram booking message addressed to your tutor handle next to open schedule slots."
                     checked={activeData.visibility.showTelegramInquiry}
                     onChange={(v) => handleVisibilityToggle('showTelegramInquiry', v)}
                   />
@@ -1145,11 +1114,8 @@ export function AccountSettingsView({
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <UserCheck className="h-4 w-4 text-primary" aria-hidden="true" />
-                    <CardTitle>Ecosystem Roles &amp; SSO Workspace</CardTitle>
+                    <CardTitle>Ecosystem Roles</CardTitle>
                   </div>
-                  <CardDescription>
-                    Multi-role capability union assigned via <span className="font-mono">.the-ants.org</span> Better Auth SSO.
-                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex flex-wrap items-center gap-2">
@@ -1175,14 +1141,9 @@ export function AccountSettingsView({
                           : 'text-foreground-muted hover:bg-surface-card hover:text-foreground'
                       )}
                     >
-                      <div>
-                        <p className="text-xs font-semibold text-foreground">
-                          Default Landing: Flow Studio
-                        </p>
-                        <p className="text-xs text-foreground-muted">
-                          Timetable, Tasks &amp; Pomodoro
-                        </p>
-                      </div>
+                      <span className="text-xs font-semibold text-foreground">
+                        Default Landing: Flow Studio
+                      </span>
                       {activeData.preferredApp === 'flow' && (
                         <Check className="h-4 w-4 text-primary" aria-hidden="true" />
                       )}
@@ -1199,14 +1160,9 @@ export function AccountSettingsView({
                           : 'text-foreground-muted hover:bg-surface-card hover:text-foreground'
                       )}
                     >
-                      <div>
-                        <p className="text-xs font-semibold text-foreground">
-                          Default Landing: Study Tracker
-                        </p>
-                        <p className="text-xs text-foreground-muted">
-                          IGCSE &amp; IAL Topics &amp; Past Papers
-                        </p>
-                      </div>
+                      <span className="text-xs font-semibold text-foreground">
+                        Default Landing: Study Tracker
+                      </span>
                       {activeData.preferredApp === 'study' && (
                         <Check className="h-4 w-4 text-primary" aria-hidden="true" />
                       )}
@@ -1383,11 +1339,8 @@ export function AccountSettingsView({
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-primary" aria-hidden="true" />
-                  <CardTitle className="text-sm">Preview Persona Role</CardTitle>
+                  <CardTitle className="text-sm">Switch Demo Persona</CardTitle>
                 </div>
-                <CardDescription>
-                  Switch between Student, Tutor, and Admin states locally.
-                </CardDescription>
               </CardHeader>
               <CardContent className="divide-y divide-border-subtle">
                 {availablePersonas.map((p) => {
@@ -1430,24 +1383,19 @@ export function AccountSettingsView({
 
 function VisibilityRow({
   label,
-  description,
   checked,
   onChange,
 }: {
   label: string;
-  description: string;
   checked: boolean;
   onChange: (next: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-3 py-3 first:pt-0 last:pb-0 transition-colors">
-      <span className="min-w-0 flex-1">
-        <span className="block text-xs font-semibold text-foreground">{label}</span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-foreground-muted">
-          {description}
-        </span>
+    <label className="flex cursor-pointer items-center justify-between gap-3 py-3 first:pt-0 last:pb-0 transition-colors">
+      <span className="min-w-0 flex-1 text-xs font-semibold text-foreground">
+        {label}
       </span>
-      <span className="relative mt-0.5 inline-flex shrink-0">
+      <span className="relative inline-flex shrink-0">
         <input
           type="checkbox"
           role="switch"

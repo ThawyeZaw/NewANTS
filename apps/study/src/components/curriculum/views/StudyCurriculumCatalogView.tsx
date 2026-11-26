@@ -582,20 +582,12 @@ export function StudyCurriculumCatalogView({
       {/* 3. Catalog Filter Bar & 2-Column Subject Grid */}
       <section aria-labelledby="subject-catalog-heading" className="mt-7 space-y-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <h2
-              id="subject-catalog-heading"
-              className="text-lg font-bold tracking-tight text-foreground"
-            >
-              {activeBoardMeta.label} Specifications
-            </h2>
-            <p className="text-xs text-foreground-muted">
-              {activeBoardMeta.qualificationLevel} · Grading scale:{' '}
-              <span className="font-mono font-semibold text-foreground">
-                {activeBoardMeta.gradingScaleLabel}
-              </span>
-            </p>
-          </div>
+          <h2
+            id="subject-catalog-heading"
+            className="text-lg font-bold tracking-tight text-foreground"
+          >
+            {activeBoardMeta.label} Specifications
+          </h2>
 
           <div className="flex flex-wrap items-center gap-2">
             {/* Faculty Filter Pills */}

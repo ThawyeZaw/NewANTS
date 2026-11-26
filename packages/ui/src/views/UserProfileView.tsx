@@ -25,7 +25,7 @@ import {
 import { ZYY_PROFILE_MOCK } from '../mocks/account-profile.mock';
 import { type UserRole } from '../mocks/ecosystem-chrome.mock';
 import { Badge } from '../primitives/Badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../primitives/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../primitives/Card';
 import { cn } from '../utils/cn';
 import { TutorSlotPainterView } from './TutorSlotPainterView';
 
@@ -72,7 +72,7 @@ function getInitials(name: string): string {
 
 export function UserProfileView({
   profile = ZYY_PROFILE_MOCK,
-  requestedHandle,
+  requestedHandle: _requestedHandle,
   isOwnProfile = false,
   availableProfiles,
   onNavigate,
@@ -92,15 +92,10 @@ export function UserProfileView({
   };
 
   if (!profile) {
-    const cleanHandle = requestedHandle ? requestedHandle.replace(/^@+/, '') : 'unknown';
     return (
       <Card className={cn('mx-auto max-w-xl', className)}>
         <CardHeader>
           <CardTitle>Member profile not found</CardTitle>
-          <CardDescription>
-            No public ANTs profile matches{' '}
-            <span className="font-mono text-foreground">@{cleanHandle}</span> in this local workspace.
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {availableProfiles && availableProfiles.length > 0 && (
@@ -148,7 +143,7 @@ export function UserProfileView({
 
   const inquiryHandle = profile.visibility.showTelegramInquiry
     ? profile.tutorTelegramUsername ||
-      (profile.telegram.status === 'connected' ? profile.telegram.handle : '')
+    (profile.telegram.status === 'connected' ? profile.telegram.handle : '')
     : '';
 
   const inquiryHref = inquiryHandle
@@ -300,12 +295,8 @@ export function UserProfileView({
               >
                 <div className="flex items-center gap-2">
                   <CalendarClock className="h-4 w-4 text-primary" aria-hidden="true" />
-                  <CardTitle>Weekly Tutoring Availability</CardTitle>
+                  <CardTitle>Tutoring Availability</CardTitle>
                 </div>
-                <CardDescription>
-                  Click any open <span className="font-semibold text-on-success-tint">Available</span>{' '}
-                  or <span className="font-semibold text-on-primary-tint">Flexible</span> hour below to prepare a Telegram session inquiry.
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {profile.taughtSubjects.length > 0 && (
@@ -348,9 +339,6 @@ export function UserProfileView({
                   <FolderGit2 className="h-4 w-4 text-primary" aria-hidden="true" />
                   <CardTitle>Portfolio Projects &amp; Study Guides</CardTitle>
                 </div>
-                <CardDescription>
-                  Published past-paper logs, visual guides, and workspace tooling built within The ANTs.
-                </CardDescription>
               </CardHeader>
               <CardContent>
                 {profile.portfolioItems.length === 0 ? (
@@ -423,9 +411,6 @@ export function UserProfileView({
                   <GraduationCap className="h-4 w-4 text-primary" aria-hidden="true" />
                   <CardTitle>Academic Credentials &amp; Distinctions</CardTitle>
                 </div>
-                <CardDescription>
-                  Exam results and community mentoring credentials linked to @{profile.username}.
-                </CardDescription>
               </CardHeader>
               <CardContent className="divide-y divide-border-subtle">
                 {profile.certifications.length === 0 ? (
@@ -486,10 +471,7 @@ export function UserProfileView({
         <aside className="space-y-4 xl:sticky xl:top-20">
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm">Booking &amp; Ecosystem Status</CardTitle>
-              <CardDescription>
-                Live cross-app sync across Flow &amp; Study.
-              </CardDescription>
+              <CardTitle className="text-sm">Booking &amp; Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
               <div className="flex items-center justify-between border-b border-border-subtle pb-2.5">
@@ -571,9 +553,6 @@ export function UserProfileView({
                   <Users className="h-4 w-4 text-primary" aria-hidden="true" />
                   <CardTitle className="text-sm">Explore Members</CardTitle>
                 </div>
-                <CardDescription>
-                  Compare public Tutor, Admin &amp; Student profiles.
-                </CardDescription>
               </CardHeader>
               <CardContent className="divide-y divide-border-subtle">
                 {availableProfiles.map((item) => {

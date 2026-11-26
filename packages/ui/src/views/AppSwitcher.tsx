@@ -105,12 +105,7 @@ export function AppSwitcher({
           className="ants-panel-enter absolute right-0 z-50 mt-2 w-80 sm:w-96 origin-top-right rounded-2xl border border-border-hover bg-surface-elevated p-4 text-foreground shadow-[var(--shadow-tier-3)]"
         >
           <div className="flex items-center justify-between border-b border-border pb-3">
-            <div>
-              <p className="label-caps text-foreground-muted">THE ANTS ECOSYSTEM</p>
-              <p className="text-xs text-foreground-muted mt-0.5">
-                Unified SSO across <span className="font-mono">.the-ants.org</span>
-              </p>
-            </div>
+            <p className="label-caps text-foreground-muted">THE ANTS ECOSYSTEM</p>
             <Badge variant="active-filter" mono>
               3 APPS
             </Badge>
@@ -134,7 +129,7 @@ export function AppSwitcher({
                     }
                   }}
                   className={cn(
-                    'group flex items-start gap-3.5 rounded-xl border p-3 transition-all duration-150',
+                    'group flex items-center gap-3.5 rounded-xl border p-3 transition-all duration-150',
                     isCurrent
                       ? 'border-primary-tint-border bg-primary-tint/50'
                       : 'border-border bg-surface-card hover:border-border-hover hover:bg-surface-inset'
@@ -166,11 +161,8 @@ export function AppSwitcher({
                         </span>
                       )}
                     </div>
-                    <p className="mt-0.5 text-xs font-semibold text-foreground-muted">
+                    <p className="mt-0.5 text-xs font-medium text-foreground-muted">
                       {app.tagline}
-                    </p>
-                    <p className="mt-1 text-[11px] text-foreground-subtle leading-relaxed">
-                      {app.description}
                     </p>
                   </div>
                 </a>
@@ -182,7 +174,7 @@ export function AppSwitcher({
           {shortcuts.length > 0 && (
             <div className="mt-3 border-t border-border pt-3">
               <p className="label-caps text-foreground-subtle mb-2">
-                INSTANT GUEST TOOLS (NO LOGIN REQUIRED)
+                Quick Tools
               </p>
               <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                 {shortcuts.map((item) => (

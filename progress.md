@@ -724,3 +724,12 @@
   - **Upgraded Mobile Sticky Bottom Bar (`data-testid="mobile-sticky-grade-bar"`):** Added a top hairline live progress bar, spring-pop grade badge, and an expandable `Cutoffs` `.ants-accordion` drawer (`data-testid="mobile-boundaries-toggle"`) revealing the 4 grade boundary pills on 1 tap.
   - **Verification:** Added SSR test in `packages/calculator/src/__tests__/calculator-view.test.ts` and passed `pnpm typecheck`, `pnpm lint`, and `pnpm test`.
 
+### Session Copy Distillation — 2026-11-26 (`[ZYY]` Strip AI-Style Title Subtitles Across Apps)
+- **Summary:**
+  - **Org Showcase & CMS (`apps/org`):** Removed wordy header intro paragraphs from `/team` (`OrgTeamShowcaseView.tsx`), `/activities` (`OrgActivitiesView.tsx`), `/articles` (`OrgArticlesView.tsx`), and `/cms` (`OrgCmsStudioView.tsx`).
+  - **Study Tracker (`apps/study`):** Stripped AI-sounding title and section descriptions across `/` (`StudyDashboardView.tsx`), `/countdown` (`StudyCountdownView.tsx`), `/curriculum` (`StudyCurriculumCatalogView.tsx`), `/curriculum/[subjectId]` (`StudyTopicTrackerView.tsx`), `/past-papers` (`StudyPastPapersView.tsx`), `/leaderboard` (`StudyLeaderboardView.tsx` — page header & Milestone Badges), `/notes` (`StudyNotesView.tsx`), and `/quizzes` (`StudyQuizzesView.tsx`).
+  - **Grade Calculator (`@ants/calculator`):** Removed the header subtitle under `Grade Calculator` in `GradeCalculatorView.tsx`.
+  - **Account & Profile Settings (`@ants/ui`):** Stripped page/card subtitles, simplified technical card titles (`Tutor Availability`, `Public Profile Visibility`, `Ecosystem Roles`, `Switch Demo Persona`, `Telegram Alerts`, `Booking & Status`), and removed verbose sub-descriptions under Telegram delivery switches, Visibility toggles, Default Landing buttons, linked Telegram metadata, and Portfolio items across `AccountSettingsView.tsx`, `TelegramConnectCardView.tsx`, and `UserProfileView.tsx`.
+  - **9-Dot App Switcher (`@ants/ui`):** Removed multi-line `app.description` sub-descriptions under `The ANTs`, `Flow`, and `Study` (keeping the 1-line taglines) and simplified popover header/footer labels (`Quick Tools`, removed `Unified SSO across .the-ants.org`) in `AppSwitcher.tsx`.
+  - **Verification:** Passed `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), and `pnpm test` (`14/14` tasks).
+

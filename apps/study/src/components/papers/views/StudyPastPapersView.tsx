@@ -438,17 +438,12 @@ export function StudyPastPapersView({
           className="space-y-4"
         >
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1
-                id="past-papers-hub-heading"
-                className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl"
-              >
-                Past Paper Matrix &amp; Score Tracker
-              </h1>
-              <p className="mt-1 max-w-2xl text-sm text-foreground-muted">
-                Log timed past papers by variant and exam series for instant Grade &amp; UMS/PUM boundary derivation.
-              </p>
-            </div>
+            <h1
+              id="past-papers-hub-heading"
+              className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl"
+            >
+              Past Paper Matrix &amp; Score Tracker
+            </h1>
 
             <div className="flex shrink-0 flex-wrap items-center gap-2">
               <Link

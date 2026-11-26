@@ -163,19 +163,12 @@ export function OrgTeamShowcaseView({
 
       <main className="ants-main-enter mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16 space-y-10">
         {/* Page Header — Direct Typography, Understated Inline Count Summary */}
-        <section className="max-w-2xl space-y-3">
+        <section className="max-w-2xl space-y-2">
           <h1 className="ants-hero-enter text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground leading-[1.12]">
             Founders, Tutors &amp; Contributors
           </h1>
           <p
             style={{ '--stagger-index': 1 } as React.CSSProperties}
-            className="ants-stagger-item text-sm sm:text-base text-foreground-muted leading-relaxed max-w-[64ch]"
-          >
-            Teachers, engineers, and past candidates maintaining The ANTs. Open any tutor’s weekly
-            Sun–Sat calendar to check free hours and prefill a Telegram message.
-          </p>
-          <p
-            style={{ '--stagger-index': 2 } as React.CSSProperties}
             className="ants-stagger-item text-xs text-foreground-subtle pt-1 tabular-nums"
           >
             {members.length} members listed · {roleCounts.founder} founders · {roleCounts.tutor}{' '}

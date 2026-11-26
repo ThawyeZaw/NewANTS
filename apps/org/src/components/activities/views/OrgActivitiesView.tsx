@@ -89,17 +89,10 @@ export function OrgActivitiesView({
 
       <main className="ants-main-enter mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6 sm:py-16 space-y-10">
         {/* Header */}
-        <section className="max-w-2xl space-y-3">
+        <section className="max-w-2xl">
           <h1 className="ants-hero-enter text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground leading-[1.12]">
             Community Activities &amp; Galleries
           </h1>
-          <p
-            style={{ '--stagger-index': 1 } as React.CSSProperties}
-            className="ants-stagger-item text-sm sm:text-base text-foreground-muted leading-relaxed max-w-[64ch]"
-          >
-            Past-paper tutoring sessions, Student Meets, pre-exam venue walkthroughs, and
-            student hackathons organized for private and school candidates.
-          </p>
         </section>
 
         {/* Unboxed Hairline Filter Strip */}
