@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { TaskPlannerView } from '../../components/tasks/views/TaskPlannerView';
+import { TasksContainer } from '../../components/tasks/containers/TasksContainer';
 
 export const metadata: Metadata = {
   title: 'Task Planner · Flow — The ANTs Productivity Studio',
@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 };
 
 export default function TasksPage() {
-  return <TaskPlannerView />;
+  return <TasksContainer />;
 }
 

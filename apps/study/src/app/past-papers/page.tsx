@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { StudyPastPapersView } from '../../components/papers/views/StudyPastPapersView';
+import { StudyPastPapersContainer } from '../../components/papers/containers/StudyPastPapersContainer';
 
 export const metadata: Metadata = {
   title: 'Past Paper Matrix & Score Tracker | Study by The ANTs',
@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default function StudyPastPapersPage() {
-  return <StudyPastPapersView />;
+  return <StudyPastPapersContainer />;
 }
 

@@ -181,6 +181,8 @@ export function CustomExamModalView({
             >
               <option value="edexcel-ial">Pearson Edexcel IAL</option>
               <option value="cambridge-igcse">Cambridge IGCSE</option>
+              <option value="cambridge-alevel">Cambridge AS &amp; A-Level</option>
+              <option value="edexcel-igcse">Pearson Edexcel IGCSE</option>
             </select>
           </div>
 

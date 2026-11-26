@@ -58,8 +58,6 @@ import {
 import { createDefaultStudyCurriculumState } from '../../../mocks/study-curriculum.mock';
 import { loadStudyPapersState } from '../../../lib/study/papers';
 import { createDefaultStudyPapersState } from '../../../mocks/study-papers.mock';
-import { loadStudyLearningState } from '../../../lib/study/learning';
-import { createDefaultStudyLearningState } from '../../../mocks/study-learning.mock';
 import { loadStudyCountdownsState } from '../../../lib/study/countdown-leaderboard';
 import { createDefaultStudyCountdownsState } from '../../../mocks/study-countdown-leaderboard.mock';
 import { StudyShellView, type StudyNavItem } from '../../layout/views/StudyShellView';
@@ -75,6 +73,8 @@ export interface StudyDashboardViewProps {
   flowUrl?: string;
   orgUrl?: string;
   /** Controlled overrides for full-stack `[THAW-4.5]` integration */
+  disableLocalStorage?: boolean;
+  mathsSuiteSummary?: string;
   activeBoard?: StudyBoardPresetId;
   onBoardChange?: (boardId: StudyBoardPresetId) => void;
   onToggleSubjectCheckIn?: (boardId: StudyBoardPresetId, subjectId: string) => void;
@@ -93,6 +93,8 @@ export function StudyDashboardView({
   initialState,
   flowUrl = 'http://localhost:3002/timetable',
   orgUrl = 'http://localhost:3000',
+  disableLocalStorage = false,
+  mathsSuiteSummary: controlledMathsSummary,
   activeBoard: controlledBoard,
   onBoardChange,
   onToggleSubjectCheckIn,
@@ -112,10 +114,18 @@ export function StudyDashboardView({
   const [customMathsSummary, setCustomMathsSummary] = useState<string | null>(null);
   const [customTargetGrades, setCustomTargetGrades] = useState<Record<string, string>>({});
   const [extraPaperXp, setExtraPaperXp] = useState<number>(0);
-  const [extraLearningXp, setExtraLearningXp] = useState<number>(0);
   const [customCountdowns, setCustomCountdowns] = useState<StudyExamCountdownItem[]>([]);
 
   useEffect(() => {
+    if (disableLocalStorage) {
+      setState(defaultState);
+      if (controlledMathsSummary !== undefined) {
+        setCustomMathsSummary(controlledMathsSummary);
+      }
+      setHydrated(true);
+      return;
+    }
+
     const loaded = loadStudyDashboardState(defaultState);
     setState(loaded);
     const curriculumState = loadStudyCurriculumState(createDefaultStudyCurriculumState());
@@ -133,20 +143,15 @@ export function StudyDashboardView({
     const defaultPapers = createDefaultStudyPapersState();
     const loadedPapers = loadStudyPapersState(defaultPapers);
     setExtraPaperXp(Math.max(0, loadedPapers.earnedPaperXp - defaultPapers.earnedPaperXp));
-    const defaultLearning = createDefaultStudyLearningState();
-    const loadedLearning = loadStudyLearningState(defaultLearning);
-    setExtraLearningXp(
-      Math.max(0, loadedLearning.earnedLearningXp - defaultLearning.earnedLearningXp)
-    );
     const loadedCountdowns = loadStudyCountdownsState(createDefaultStudyCountdownsState());
     setCustomCountdowns(loadedCountdowns.customCountdowns);
     setHydrated(true);
-  }, [defaultState]);
+  }, [controlledMathsSummary, defaultState, disableLocalStorage]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || disableLocalStorage) return;
     saveStudyDashboardState(state);
-  }, [hydrated, state]);
+  }, [disableLocalStorage, hydrated, state]);
 
   const activeBoard = controlledBoard ?? state.activeBoard;
   const activeBoardMeta =
@@ -171,7 +176,7 @@ export function StudyDashboardView({
 
   const baseXp = user?.xp ?? 2840;
   const streakDays = user?.streakDays ?? 14;
-  const currentXp = computeCurrentXp(baseXp, state.xpBonus + extraPaperXp + extraLearningXp);
+  const currentXp = computeCurrentXp(baseXp, state.xpBonus + extraPaperXp);
 
   const boardCountdowns = useMemo(() => {
     const mergedById = new Map<string, StudyExamCountdownItem>();
@@ -620,13 +625,13 @@ export function StudyDashboardView({
                         Calculator
                       </Link>
                       <Link
-                        href={`/curriculum/${encodeURIComponent(subject.code)}?tab=papers`}
+                        href={`/curriculum/${encodeURIComponent(subject.id)}?tab=papers`}
                         className="text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                       >
                         Papers
                       </Link>
                       <Link
-                        href={`/curriculum/${encodeURIComponent(subject.code)}?tab=topics`}
+                        href={`/curriculum/${encodeURIComponent(subject.id)}?tab=topics`}
                         onClick={() => onOpenTopicTracker?.(subject)}
                         className="inline-flex items-center gap-1 text-primary-solid font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                       >

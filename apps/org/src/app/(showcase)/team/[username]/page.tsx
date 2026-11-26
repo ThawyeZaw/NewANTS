@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
-import { OrgTeamMemberDetailView } from '../../../../components/team/views/OrgTeamMemberDetailView';
+import { OrgTeamMemberContainer } from '../../../../components/team/containers/OrgTeamMemberContainer';
 import { findTeamMemberByUsername } from '../../../../lib/showcase';
 import { MOCK_ORG_TEAM_MEMBERS } from '../../../../mocks/showcase-team.mock';
 
@@ -32,6 +32,6 @@ export default async function OrgTeamMemberPage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  return <OrgTeamMemberDetailView username={username} />;
+  return <OrgTeamMemberContainer username={username} />;
 }
 

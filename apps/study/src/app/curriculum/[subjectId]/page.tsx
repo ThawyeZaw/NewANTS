@@ -1,10 +1,10 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { StudyTopicTrackerView } from '../../../components/curriculum/views/StudyTopicTrackerView';
-import { MOCK_CURRICULUM_SUBJECTS } from '../../../mocks/study-curriculum.mock';
+import { StudyTopicTrackerContainer } from '../../../components/curriculum/containers/StudyTopicTrackerContainer';
+import { ALL_STUDY_STATIC_SUBJECT_IDS } from '../../../lib/study-api';
 
 export function generateStaticParams() {
-  return MOCK_CURRICULUM_SUBJECTS.map((subject) => ({ subjectId: subject.id }));
+  return ALL_STUDY_STATIC_SUBJECT_IDS.map((subjectId) => ({ subjectId }));
 }
 
 export const metadata: Metadata = {
@@ -23,6 +23,6 @@ export default async function StudySubjectTopicTrackerPage({
   params,
 }: StudySubjectTopicTrackerPageProps) {
   const { subjectId } = await params;
-  return <StudyTopicTrackerView initialSubjectId={subjectId} />;
+  return <StudyTopicTrackerContainer initialSubjectId={subjectId} />;
 }
 

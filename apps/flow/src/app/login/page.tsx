@@ -1,7 +1,7 @@
 import React from 'react';
-import { FlowAuthPageView } from '../../components/auth/views/FlowAuthPageView';
+import { FlowAuthContainer } from '../../components/auth/containers/FlowAuthContainer';
 
 export default function FlowLoginPage() {
-  return <FlowAuthPageView initialMode="login" />;
+  return <FlowAuthContainer initialMode="login" />;
 }
 

@@ -41,6 +41,8 @@ import { OrgNavbarView } from '../../layout/views/OrgNavbarView';
 export interface OrgArticlesViewProps {
   /** Articles & essays dataset */
   articles?: OrgArticleMock[];
+  /** Team members dataset for author chips */
+  teamMembers?: OrgTeamMemberMock[];
   /** Optional initial category filter */
   initialCategory?: 'all' | OrgArticleCategory;
   /** Use local dev ports in shared Navbar & Footer */
@@ -706,6 +708,7 @@ function AuthorAvatarChip({
  */
 export function OrgArticlesView({
   articles: articlesProp,
+  teamMembers: teamMembersProp,
   initialCategory = 'all',
   useLocalUrls = true,
 }: OrgArticlesViewProps) {
@@ -713,19 +716,22 @@ export function OrgArticlesView({
   const [cmsTeam, setCmsTeam] = useState<OrgTeamMemberMock[] | null>(null);
 
   useEffect(() => {
+    if (articlesProp !== undefined && teamMembersProp !== undefined) return;
     const sync = () => {
       const state = loadOrgCmsState();
       if (articlesProp === undefined) {
         setCmsArticles(state.articles);
       }
-      setCmsTeam(state.team);
+      if (teamMembersProp === undefined) {
+        setCmsTeam(state.team);
+      }
     };
     sync();
     return subscribeOrgCmsChanges(sync);
-  }, [articlesProp]);
+  }, [articlesProp, teamMembersProp]);
 
   const articles = articlesProp ?? cmsArticles ?? MOCK_ORG_ARTICLES;
-  const teamMembers = cmsTeam ?? MOCK_ORG_TEAM_MEMBERS;
+  const teamMembers = teamMembersProp ?? cmsTeam ?? MOCK_ORG_TEAM_MEMBERS;
   const [category, setCategory] = useState<'all' | OrgArticleCategory>(
     initialCategory
   );

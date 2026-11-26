@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { StudyAuthProvider } from '../components/auth/containers/StudyAuthProvider';
 import { StudyMiloDockView } from '../components/layout/views/StudyMiloDockView';
 import { StudyRouteProgressView } from '../components/layout/views/StudyRouteProgressView';
 import './globals.css';
@@ -43,9 +44,11 @@ export default function RootLayout({
         className="min-h-screen bg-background text-foreground antialiased"
         suppressHydrationWarning
       >
-        <StudyRouteProgressView />
-        {children}
-        <StudyMiloDockView />
+        <StudyAuthProvider>
+          <StudyRouteProgressView />
+          {children}
+          <StudyMiloDockView />
+        </StudyAuthProvider>
       </body>
     </html>
   );

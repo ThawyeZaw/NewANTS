@@ -61,14 +61,27 @@ export interface SubjectTopicMasteryStats {
  * Maps Dashboard subject IDs (`sub_wma11_set`, `sub_0580`, etc.) or syllabus codes (`WMA11-SET`, `9709`)
  * to canonical Curriculum Catalog subject IDs (`ial-maths-suite`, `igcse-maths-0580`, etc.).
  */
-const DASHBOARD_SUBJECT_ALIASES: Record<string, string> = {
-  sub_wma11_set: 'ial-maths-suite',
-  sub_wph_ial: 'ial-physics',
-  sub_wch_ial: 'ial-chemistry',
-  sub_0580: 'igcse-maths-0580',
-  sub_0625: 'igcse-physics-0625',
-  sub_0620: 'igcse-chemistry-0620',
-  sub_0500: 'igcse-cs-0478',
+const SUBJECT_ALIAS_CANDIDATES: Record<string, string[]> = {
+  sub_wma11_set: ['ial-maths-suite', 'edexcel-ial-maths'],
+  'ial-maths-suite': ['edexcel-ial-maths', 'ial-maths-suite'],
+  'wma11-set': ['edexcel-ial-maths', 'ial-maths-suite'],
+  sub_wph_ial: ['ial-physics', 'edexcel-ial-physics'],
+  'ial-physics': ['edexcel-ial-physics', 'ial-physics'],
+  sub_wch_ial: ['ial-chemistry', 'edexcel-ial-chemistry'],
+  'ial-chemistry': ['edexcel-ial-chemistry', 'ial-chemistry'],
+  'ial-biology': ['edexcel-ial-biology', 'ial-biology'],
+  sub_0580: ['igcse-maths-0580', 'caie-igcse-maths-0580'],
+  'igcse-maths-0580': ['caie-igcse-maths-0580', 'igcse-maths-0580'],
+  sub_0625: ['igcse-physics-0625', 'caie-igcse-physics-0625'],
+  'igcse-physics-0625': ['caie-igcse-physics-0625', 'igcse-physics-0625'],
+  sub_0620: ['igcse-chemistry-0620', 'caie-igcse-chemistry-0620'],
+  'igcse-chemistry-0620': ['caie-igcse-chemistry-0620', 'igcse-chemistry-0620'],
+  sub_0500: ['igcse-cs-0478', 'caie-igcse-fle-0500'],
+  'igcse-cs-0478': ['caie-igcse-cs-0478', 'igcse-cs-0478'],
+  'cie-maths-9709': ['caie-alevel-maths-9709', 'cie-maths-9709'],
+  'cie-physics-9702': ['caie-alevel-physics-9702', 'cie-physics-9702'],
+  'edexcel-igcse-4ma1': ['edexcel-igcse-maths-a-4ma1', 'edexcel-igcse-4ma1'],
+  'edexcel-igcse-4pm1': ['edexcel-igcse-fpm-4pm1', 'edexcel-igcse-4pm1'],
 };
 
 export function resolveSubjectIdFromParam(
@@ -79,17 +92,23 @@ export function resolveSubjectIdFromParam(
   const cleaned = decodeURIComponent(rawParam).trim();
   if (!cleaned) return subjects[0]?.id ?? 'ial-maths-suite';
 
-  const aliasHit = DASHBOARD_SUBJECT_ALIASES[cleaned.toLowerCase()];
-  if (aliasHit && subjects.some((s) => s.id === aliasHit)) {
-    return aliasHit;
-  }
-
   const directHit = subjects.find(
     (s) =>
       s.id.toLowerCase() === cleaned.toLowerCase() ||
       s.code.toLowerCase() === cleaned.toLowerCase()
   );
-  return directHit?.id ?? subjects[0]?.id ?? 'ial-maths-suite';
+  if (directHit) {
+    return directHit.id;
+  }
+
+  const candidates = SUBJECT_ALIAS_CANDIDATES[cleaned.toLowerCase()] ?? [];
+  for (const candidateId of candidates) {
+    if (subjects.some((s) => s.id === candidateId)) {
+      return candidateId;
+    }
+  }
+
+  return subjects[0]?.id ?? 'ial-maths-suite';
 }
 
 /**

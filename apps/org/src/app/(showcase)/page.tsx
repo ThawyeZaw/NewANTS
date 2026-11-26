@@ -1,6 +1,6 @@
 import React from 'react';
-import { OrgHomeLandingView } from '../../components/home/views/OrgHomeLandingView';
+import { OrgHomeContainer } from '../../components/home/containers/OrgHomeContainer';
 
 export default function OrgShowcasePage() {
-  return <OrgHomeLandingView />;
+  return <OrgHomeContainer />;
 }

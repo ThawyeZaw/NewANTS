@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { APPEARANCE_BOOTSTRAP_SCRIPT } from '../lib/pomodoro/browser';
+import { FlowAuthProvider } from '../components/auth/containers/FlowAuthProvider';
 import { FlowMiloDockView } from '../components/layout/views/FlowMiloDockView';
 import { FlowRouteProgressView } from '../components/layout/views/FlowRouteProgressView';
 import './globals.css';
@@ -50,9 +51,11 @@ export default function RootLayout({
         className="min-h-screen bg-background text-foreground antialiased"
         suppressHydrationWarning
       >
-        <FlowRouteProgressView />
-        {children}
-        <FlowMiloDockView />
+        <FlowAuthProvider>
+          <FlowRouteProgressView />
+          {children}
+          <FlowMiloDockView />
+        </FlowAuthProvider>
       </body>
     </html>
   );

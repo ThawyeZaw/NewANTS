@@ -37,7 +37,6 @@ import {
   type StudyLeaderboardPrefsState,
 } from '../../../lib/study/countdown-leaderboard';
 import { loadStudyDashboardState } from '../../../lib/study/dashboard';
-import { loadStudyLearningState } from '../../../lib/study/learning';
 import { loadStudyPapersState } from '../../../lib/study/papers';
 import {
   createDefaultLeaderboardPrefs,
@@ -45,7 +44,6 @@ import {
   MOCK_STUDY_BADGES,
 } from '../../../mocks/study-countdown-leaderboard.mock';
 import { createDefaultStudyDashboardState } from '../../../mocks/study-dashboard.mock';
-import { createDefaultStudyLearningState } from '../../../mocks/study-learning.mock';
 import { createDefaultStudyPapersState } from '../../../mocks/study-papers.mock';
 import { StudyShellView } from '../../layout/views/StudyShellView';
 
@@ -57,6 +55,7 @@ export interface StudyLeaderboardViewProps {
   flowUrl?: string;
   orgUrl?: string;
   /** Controlled callbacks for `[THAW-4.5]` full-stack integration */
+  disableLocalStorage?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
   onTimeframeChange?: (timeframe: LeaderboardTimeframe) => void;
   onBoardFilterChange?: (board: LeaderboardBoardFilter) => void;
@@ -71,6 +70,8 @@ const BOARD_FILTERS: { id: LeaderboardBoardFilter; label: string }[] = [
   { id: 'all', label: 'All Cohorts' },
   { id: 'edexcel-ial', label: 'Edexcel IAL' },
   { id: 'cambridge-igcse', label: 'Cambridge IGCSE' },
+  { id: 'cambridge-alevel', label: 'Cambridge A-Level' },
+  { id: 'edexcel-igcse', label: 'Edexcel IGCSE' },
 ];
 
 function renderBadgeIcon(category: StudyBadgeItem['category']) {
@@ -91,6 +92,7 @@ export function StudyLeaderboardView({
   initialPrefs,
   flowUrl = 'http://localhost:3002/timetable',
   orgUrl = 'http://localhost:3000',
+  disableLocalStorage = false,
   onToggleVisibility,
   onTimeframeChange,
   onBoardFilterChange,
@@ -127,6 +129,13 @@ export function StudyLeaderboardView({
   const boardIndicatorReady = boardReady && boardRect.visible;
 
   useEffect(() => {
+    if (disableLocalStorage) {
+      setPrefs(defaultPrefs);
+      setActiveUser(user);
+      setBonusXpDelta(0);
+      return;
+    }
+
     setPrefs(loadLeaderboardPrefs(defaultPrefs));
 
     const syncLiveStats = () => {
@@ -138,14 +147,13 @@ export function StudyLeaderboardView({
       }
       const dash = loadStudyDashboardState(createDefaultStudyDashboardState());
       const papers = loadStudyPapersState(createDefaultStudyPapersState());
-      const learning = loadStudyLearningState(createDefaultStudyLearningState());
-      setBonusXpDelta(dash.xpBonus + papers.earnedPaperXp + learning.earnedLearningXp);
+      setBonusXpDelta(dash.xpBonus + papers.earnedPaperXp);
     };
 
     syncLiveStats();
     window.addEventListener(ANTS_AUTH_SESSION_EVENT, syncLiveStats);
     return () => window.removeEventListener(ANTS_AUTH_SESSION_EVENT, syncLiveStats);
-  }, [defaultPrefs, user]);
+  }, [defaultPrefs, disableLocalStorage, user]);
 
   const effectiveUser = activeUser ?? MOCK_AUTHENTICATED_USER;
   const baseUserXp = effectiveUser.xp ?? 2450;
@@ -186,7 +194,9 @@ export function StudyLeaderboardView({
   const updatePrefs = (updater: (prev: StudyLeaderboardPrefsState) => StudyLeaderboardPrefsState) => {
     setPrefs((prev) => {
       const next = updater(prev);
-      saveLeaderboardPrefs(next);
+      if (!disableLocalStorage) {
+        saveLeaderboardPrefs(next);
+      }
       return next;
     });
   };

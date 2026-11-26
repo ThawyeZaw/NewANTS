@@ -1,7 +1,7 @@
 import React from 'react';
-import { StudySettingsPageView } from '../../components/account/views/StudySettingsPageView';
+import { StudySettingsContainer } from '../../components/account/containers/StudySettingsContainer';
 
 export default function StudySettingsPage() {
-  return <StudySettingsPageView />;
+  return <StudySettingsContainer />;
 }
 

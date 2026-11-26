@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { FlowSettingsPageView } from '../../components/account/views/FlowSettingsPageView';
+import { FlowSettingsContainer } from '../../components/account/containers/FlowSettingsContainer';
 
 export const metadata: Metadata = {
   title: 'Account & Profile Settings · Flow — The ANTs Productivity Studio',
@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 };
 
 export default function SettingsPage() {
-  return <FlowSettingsPageView />;
+  return <FlowSettingsContainer />;
 }
 

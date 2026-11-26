@@ -53,6 +53,9 @@ export interface StudyCurriculumCatalogViewProps {
   flowUrl?: string;
   orgUrl?: string;
   /** Controlled callbacks for `[THAW-4.1]` / `[THAW-4.2]` wiring */
+  disableLocalStorage?: boolean;
+  renderTopicTracker?: (subjectId: string) => React.ReactNode;
+  renderPastPapers?: (subjectId: string) => React.ReactNode;
   onBoardChange?: (boardId: CurriculumBoardId) => void;
   onToggleEnrollSubject?: (subjectId: string, enrolled: boolean) => void;
   onChangeTargetGrade?: (subjectId: string, grade: string) => void;
@@ -68,6 +71,7 @@ const FACULTY_FILTERS: Array<{ id: 'all' | SubjectFaculty; label: string }> = [
   { id: 'Mathematics', label: 'Mathematics' },
   { id: 'Sciences', label: 'Sciences' },
   { id: 'Computing & Economics', label: 'Computing & Economics' },
+  { id: 'Languages & Humanities', label: 'Languages & Humanities' },
 ];
 
 const GRADE_OPTIONS_BY_SCALE: Record<'A*-U' | '9-1', string[]> = {
@@ -83,6 +87,9 @@ export function StudyCurriculumCatalogView({
   initialTopicPreviewSubjectId = null,
   flowUrl = 'http://localhost:3002/timetable',
   orgUrl = 'http://localhost:3000',
+  disableLocalStorage = false,
+  renderTopicTracker,
+  renderPastPapers,
   onBoardChange,
   onToggleEnrollSubject,
   onChangeTargetGrade,
@@ -131,7 +138,14 @@ export function StudyCurriculumCatalogView({
   const facultyIndicatorReady = facultyReady && facultyRect.visible;
 
   useEffect(() => {
-    const loaded = loadStudyCurriculumState(defaultState);
+    const loaded = disableLocalStorage
+      ? {
+          ...defaultState,
+          targetGradeBySubjectId: { ...defaultState.targetGradeBySubjectId },
+          enrolledSubjectIds: [...defaultState.enrolledSubjectIds],
+          enrolledMathsCashIns: [...defaultState.enrolledMathsCashIns],
+        }
+      : loadStudyCurriculumState(defaultState);
 
     // Check URL query parameters (?board=...&subject=...&tab=topics|papers) on client mount
     if (typeof window !== 'undefined') {
@@ -160,12 +174,12 @@ export function StudyCurriculumCatalogView({
 
     setState(loaded);
     setHydrated(true);
-  }, [boards, defaultState, subjects]);
+  }, [boards, defaultState, disableLocalStorage, subjects]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || disableLocalStorage) return;
     saveStudyCurriculumState(state);
-  }, [hydrated, state]);
+  }, [disableLocalStorage, hydrated, state]);
 
   const activeBoardMeta =
     boards.find((b) => b.id === state.activeBoard) ??
@@ -379,10 +393,16 @@ export function StudyCurriculumCatalogView({
             </div>
           </div>
           {activeWorkspaceTab === 'papers' ? (
-            <StudyPastPapersView
-              embedded={true}
-              initialSubjectId={activeTopicSubjectId}
-            />
+            renderPastPapers ? (
+              renderPastPapers(activeTopicSubjectId)
+            ) : (
+              <StudyPastPapersView
+                embedded={true}
+                initialSubjectId={activeTopicSubjectId}
+              />
+            )
+          ) : renderTopicTracker ? (
+            renderTopicTracker(activeTopicSubjectId)
           ) : (
             <StudyTopicTrackerView
               embedded={true}

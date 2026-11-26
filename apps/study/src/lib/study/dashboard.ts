@@ -4,9 +4,11 @@
  * Contains zero React, Next.js, or database dependencies so Thaw can reuse it when wiring `[THAW-4.5]`.
  */
 
+import type { CurriculumBoardId } from './curriculum';
+
 export const STUDY_DASHBOARD_STORAGE_KEY = 'ants-study-dashboard-v1';
 
-export type StudyBoardPresetId = 'edexcel-ial' | 'cambridge-igcse';
+export type StudyBoardPresetId = CurriculumBoardId;
 
 export type StudyNavRouteId =
   | 'dashboard'
@@ -14,9 +16,6 @@ export type StudyNavRouteId =
   | 'past-papers'
   | 'countdown'
   | 'calculator'
-  | 'notes'
-  | 'flashcards'
-  | 'quizzes'
   | 'leaderboard'
   | 'settings';
 
@@ -257,26 +256,25 @@ export function sanitizeStudyDashboardState(
   }
 
   const candidate = raw as Partial<StudyDashboardPersistedState>;
+  const validBoards: StudyBoardPresetId[] = [
+    'edexcel-ial',
+    'cambridge-igcse',
+    'cambridge-alevel',
+    'edexcel-igcse',
+  ];
   const activeBoard: StudyBoardPresetId =
-    candidate.activeBoard === 'cambridge-igcse' || candidate.activeBoard === 'edexcel-ial'
+    candidate.activeBoard && validBoards.includes(candidate.activeBoard)
       ? candidate.activeBoard
       : fallback.activeBoard;
 
   const reviewedRaw = candidate.reviewedSubjectIdsByBoard;
-  const reviewedIal =
+  const pickBoardReviewed = (b: StudyBoardPresetId) =>
     reviewedRaw && typeof reviewedRaw === 'object'
       ? normalizeStringArray(
-          (reviewedRaw as Record<string, unknown>)['edexcel-ial'],
-          fallback.reviewedSubjectIdsByBoard['edexcel-ial']
+          (reviewedRaw as Record<string, unknown>)[b],
+          fallback.reviewedSubjectIdsByBoard[b] ?? []
         )
-      : [...fallback.reviewedSubjectIdsByBoard['edexcel-ial']];
-  const reviewedIgcse =
-    reviewedRaw && typeof reviewedRaw === 'object'
-      ? normalizeStringArray(
-          (reviewedRaw as Record<string, unknown>)['cambridge-igcse'],
-          fallback.reviewedSubjectIdsByBoard['cambridge-igcse']
-        )
-      : [...fallback.reviewedSubjectIdsByBoard['cambridge-igcse']];
+      : [...(fallback.reviewedSubjectIdsByBoard[b] ?? [])];
 
   const xpBonus =
     typeof candidate.xpBonus === 'number' && Number.isFinite(candidate.xpBonus)
@@ -292,8 +290,10 @@ export function sanitizeStudyDashboardState(
         : fallback.sidebarCollapsed,
     xpBonus,
     reviewedSubjectIdsByBoard: {
-      'edexcel-ial': reviewedIal,
-      'cambridge-igcse': reviewedIgcse,
+      'edexcel-ial': pickBoardReviewed('edexcel-ial'),
+      'cambridge-igcse': pickBoardReviewed('cambridge-igcse'),
+      'cambridge-alevel': pickBoardReviewed('cambridge-alevel'),
+      'edexcel-igcse': pickBoardReviewed('edexcel-igcse'),
     },
     pinnedExamIds: normalizeStringArray(candidate.pinnedExamIds, fallback.pinnedExamIds),
     flowSyncedExamIds: normalizeStringArray(candidate.flowSyncedExamIds, fallback.flowSyncedExamIds),

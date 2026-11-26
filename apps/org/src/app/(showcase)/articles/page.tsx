@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
-import { OrgArticlesView } from '../../../components/articles/views/OrgArticlesView';
+import { OrgArticlesContainer } from '../../../components/articles/containers/OrgArticlesContainer';
 
 export const metadata: Metadata = {
   title: 'Articles, Guides & Notes | The ANTs',
@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default function OrgArticlesPage() {
-  return <OrgArticlesView />;
+  return <OrgArticlesContainer />;
 }
 

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
-import { OrgTeamShowcaseView } from '../../../components/team/views/OrgTeamShowcaseView';
+import { OrgTeamContainer } from '../../../components/team/containers/OrgTeamContainer';
 
 export const metadata: Metadata = {
   title: 'Team, Founders & Tutors | The ANTs',
@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default function OrgTeamPage() {
-  return <OrgTeamShowcaseView />;
+  return <OrgTeamContainer />;
 }
 

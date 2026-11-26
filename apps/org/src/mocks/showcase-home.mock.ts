@@ -48,6 +48,7 @@ export interface OrgActivityPreview {
   dateLabel: string;
   location: string;
   summary: string;
+  coverImageSrc?: string;
 }
 
 export interface OrgHomeLandingMockData {

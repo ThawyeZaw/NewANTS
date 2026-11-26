@@ -1,6 +1,6 @@
-import { PomodoroView } from '../../components/pomodoro/views/PomodoroView';
+import { PomodoroContainer } from '../../components/pomodoro/containers/PomodoroContainer';
 
 export default function PomodoroPage() {
-  return <PomodoroView />;
+  return <PomodoroContainer />;
 }
 

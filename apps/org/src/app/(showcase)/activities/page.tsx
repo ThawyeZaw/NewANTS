@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
-import { OrgActivitiesView } from '../../../components/activities/views/OrgActivitiesView';
+import { OrgActivitiesContainer } from '../../../components/activities/containers/OrgActivitiesContainer';
 
 export const metadata: Metadata = {
   title: 'Community Activities & Galleries | The ANTs',
@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default function OrgActivitiesPage() {
-  return <OrgActivitiesView />;
+  return <OrgActivitiesContainer />;
 }
 

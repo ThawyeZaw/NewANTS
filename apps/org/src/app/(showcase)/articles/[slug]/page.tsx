@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
-import { OrgArticleReaderView } from '../../../../components/articles/views/OrgArticleReaderView';
+import { OrgArticleReaderContainer } from '../../../../components/articles/containers/OrgArticleReaderContainer';
 import { findArticleBySlug } from '../../../../lib/showcase';
 import { MOCK_ORG_ARTICLES } from '../../../../mocks/showcase-content.mock';
 
@@ -32,6 +32,6 @@ export default async function OrgArticleReaderPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <OrgArticleReaderView slug={slug} />;
+  return <OrgArticleReaderContainer slug={slug} />;
 }
 

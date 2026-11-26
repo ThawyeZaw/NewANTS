@@ -63,7 +63,11 @@ export interface StudyCountdownViewProps {
   flowUrl?: string;
   orgUrl?: string;
   /** Controlled callbacks for `[THAW-4.4]` full-stack integration */
-  onSaveCustomExam?: (entry: ExamCountdownEntry) => void;
+  disableLocalStorage?: boolean;
+  onSaveCustomExam?: (
+    entry: ExamCountdownEntry,
+    flags?: { pinned: boolean; syncedToFlow: boolean }
+  ) => void;
   onDeleteCustomExam?: (examId: string) => void;
   onTogglePin?: (examId: string) => void;
   onToggleFlowSync?: (examId: string) => void;
@@ -81,6 +85,8 @@ const BOARD_FILTERS: { id: 'all' | StudyBoardPresetId; label: string }[] = [
   { id: 'all', label: 'All Enrolled Boards' },
   { id: 'edexcel-ial', label: 'Edexcel IAL' },
   { id: 'cambridge-igcse', label: 'Cambridge IGCSE' },
+  { id: 'cambridge-alevel', label: 'Cambridge A-Level' },
+  { id: 'edexcel-igcse', label: 'Edexcel IGCSE' },
 ];
 
 const KIND_FILTERS: { id: CountdownKindFilter; label: string }[] = [
@@ -99,6 +105,7 @@ export function StudyCountdownView({
   referenceNowMs = DEFAULT_COUNTDOWN_NOW_MS,
   flowUrl = 'http://localhost:3002/timetable',
   orgUrl = 'http://localhost:3000',
+  disableLocalStorage = false,
   onSaveCustomExam,
   onDeleteCustomExam,
   onTogglePin,
@@ -147,15 +154,20 @@ export function StudyCountdownView({
   const kindIndicatorReady = kindReady && kindRect.visible;
 
   useEffect(() => {
-    setCountdownsState(loadStudyCountdownsState(defaultCountdowns));
-    setDashboardState(loadStudyDashboardState(defaultDashboard));
+    if (disableLocalStorage) {
+      setCountdownsState(defaultCountdowns);
+      setDashboardState(defaultDashboard);
+    } else {
+      setCountdownsState(loadStudyCountdownsState(defaultCountdowns));
+      setDashboardState(loadStudyDashboardState(defaultDashboard));
+    }
     // Advance clock cleanly after SSR hydration so `DDd HHh MMm SSs` ticks live every second
     setLiveNowMs(Math.max(referenceNowMs, Date.now()));
     const interval = window.setInterval(() => {
       setLiveNowMs(Math.max(referenceNowMs, Date.now()));
     }, 1000);
     return () => window.clearInterval(interval);
-  }, [defaultCountdowns, defaultDashboard, referenceNowMs]);
+  }, [defaultCountdowns, defaultDashboard, disableLocalStorage, referenceNowMs]);
 
   useEffect(() => {
     if (!statusNotice) return;
@@ -227,7 +239,14 @@ export function StudyCountdownView({
   );
 
   const handleTogglePin = (exam: ExamCountdownEntry) => {
-    const nextDash = updateExamDashboardFlagsInStorage(defaultDashboard, exam.id, 'pin');
+    const nextDash = disableLocalStorage
+      ? {
+          ...dashboardState,
+          pinnedExamIds: dashboardState.pinnedExamIds.includes(exam.id)
+            ? dashboardState.pinnedExamIds.filter((id) => id !== exam.id)
+            : [...dashboardState.pinnedExamIds, exam.id],
+        }
+      : updateExamDashboardFlagsInStorage(defaultDashboard, exam.id, 'pin');
     setDashboardState(nextDash);
     onTogglePin?.(exam.id);
     const nowPinned = nextDash.pinnedExamIds.includes(exam.id);
@@ -239,7 +258,14 @@ export function StudyCountdownView({
   };
 
   const handleToggleFlowSync = (exam: ExamCountdownEntry) => {
-    const nextDash = updateExamDashboardFlagsInStorage(defaultDashboard, exam.id, 'flow_sync');
+    const nextDash = disableLocalStorage
+      ? {
+          ...dashboardState,
+          flowSyncedExamIds: dashboardState.flowSyncedExamIds.includes(exam.id)
+            ? dashboardState.flowSyncedExamIds.filter((id) => id !== exam.id)
+            : [...dashboardState.flowSyncedExamIds, exam.id],
+        }
+      : updateExamDashboardFlagsInStorage(defaultDashboard, exam.id, 'flow_sync');
     setDashboardState(nextDash);
     onToggleFlowSync?.(exam.id);
     const nowSynced = nextDash.flowSyncedExamIds.includes(exam.id);
@@ -256,7 +282,9 @@ export function StudyCountdownView({
   ) => {
     const nextCountdowns = upsertCustomCountdownState(countdownsState, entry);
     setCountdownsState(nextCountdowns);
-    saveStudyCountdownsState(nextCountdowns);
+    if (!disableLocalStorage) {
+      saveStudyCountdownsState(nextCountdowns);
+    }
 
     const nextDash = syncCustomExamDashboardFlags(
       dashboardState,
@@ -265,9 +293,11 @@ export function StudyCountdownView({
       flags.syncedToFlow
     );
     setDashboardState(nextDash);
-    saveStudyDashboardState(nextDash);
+    if (!disableLocalStorage) {
+      saveStudyDashboardState(nextDash);
+    }
 
-    onSaveCustomExam?.(entry);
+    onSaveCustomExam?.(entry, flags);
     setStatusNotice(`Saved ${entry.paperCode} (${entry.examDateLabel}) countdown.`);
   };
 
@@ -275,7 +305,9 @@ export function StudyCountdownView({
     const target = allMergedExams.find((e) => e.id === examId);
     const nextCountdowns = deleteCustomCountdownState(countdownsState, examId);
     setCountdownsState(nextCountdowns);
-    saveStudyCountdownsState(nextCountdowns);
+    if (!disableLocalStorage) {
+      saveStudyCountdownsState(nextCountdowns);
+    }
     onDeleteCustomExam?.(examId);
     setStatusNotice(
       target ? `Removed custom exam ${target.paperCode}.` : 'Removed custom exam countdown.'

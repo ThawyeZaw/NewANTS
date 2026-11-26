@@ -71,6 +71,10 @@ export interface StudyPastPapersViewProps {
   initialState?: StudyPapersPersistedState;
   /** Render inline inside `/curriculum/[subjectId]?tab=papers` or `/curriculum?tab=papers` */
   embedded?: boolean;
+  disableLocalStorage?: boolean;
+  enrolledSubjectIds?: string[];
+  activeMathsCashInCode?: string;
+  activeMathsCashInUnits?: string[];
   flowUrl?: string;
   orgUrl?: string;
   onSubjectChange?: (subjectId: string) => void;
@@ -92,6 +96,10 @@ export function StudyPastPapersView({
   initialSubjectId = 'ial-maths-suite',
   initialState,
   embedded = false,
+  disableLocalStorage = false,
+  enrolledSubjectIds: controlledEnrolledSubjectIds,
+  activeMathsCashInCode,
+  activeMathsCashInUnits,
   flowUrl = 'http://localhost:3002/timetable',
   orgUrl = 'http://localhost:3000',
   onSubjectChange,
@@ -185,19 +193,28 @@ export function StudyPastPapersView({
   const variantIndicatorReady = variantReady && variantRect.visible;
 
   useEffect(() => {
-    const loadedPapers = loadStudyPapersState(defaultState);
-    setState(loadedPapers);
+    if (disableLocalStorage) {
+      setState(defaultState);
+      if (controlledEnrolledSubjectIds) {
+        setEnrolledSubjectIds(controlledEnrolledSubjectIds);
+      }
+      if (activeMathsCashInCode) setActiveCashInCode(activeMathsCashInCode);
+      if (activeMathsCashInUnits) setActiveCashInUnits(activeMathsCashInUnits);
+    } else {
+      const loadedPapers = loadStudyPapersState(defaultState);
+      setState(loadedPapers);
 
-    const loadedCurriculum = loadStudyCurriculumState(
-      createDefaultStudyCurriculumState()
-    );
-    setEnrolledSubjectIds(loadedCurriculum.enrolledSubjectIds);
-    const cashIn = loadedCurriculum.activeMathsCashIn;
-    setActiveCashInCode(cashIn);
-    setActiveCashInUnits(
-      loadedCurriculum.mathsUnitsByCashIn[cashIn] ??
-      loadedCurriculum.mathsUnitsByCashIn.YMA01
-    );
+      const loadedCurriculum = loadStudyCurriculumState(
+        createDefaultStudyCurriculumState()
+      );
+      setEnrolledSubjectIds(loadedCurriculum.enrolledSubjectIds);
+      const cashIn = loadedCurriculum.activeMathsCashIn;
+      setActiveCashInCode(cashIn);
+      setActiveCashInUnits(
+        loadedCurriculum.mathsUnitsByCashIn[cashIn] ??
+        loadedCurriculum.mathsUnitsByCashIn.YMA01
+      );
+    }
 
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -210,7 +227,15 @@ export function StudyPastPapersView({
     }
 
     setHydrated(true);
-  }, [defaultState, initialSubjectId, subjects]);
+  }, [
+    activeMathsCashInCode,
+    activeMathsCashInUnits,
+    controlledEnrolledSubjectIds,
+    defaultState,
+    disableLocalStorage,
+    initialSubjectId,
+    subjects,
+  ]);
 
   useEffect(() => {
     if (!embedded) return;
@@ -218,9 +243,9 @@ export function StudyPastPapersView({
   }, [embedded, initialSubjectId, subjects]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || disableLocalStorage) return;
     saveStudyPapersState(state);
-  }, [hydrated, state]);
+  }, [disableLocalStorage, hydrated, state]);
 
   const currentSubject = useMemo(
     () =>

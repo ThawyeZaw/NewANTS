@@ -246,7 +246,14 @@ export function createCustomCountdownEntry(
   const cleanTime = /^\d{2}:\d{2}$/.test((input.examTime24h ?? '').trim())
     ? (input.examTime24h ?? '09:00').trim()
     : '09:00';
-  const boardLabel = input.boardId === 'edexcel-ial' ? 'Edexcel IAL' : 'Cambridge IGCSE';
+  const boardLabel =
+    input.boardId === 'edexcel-ial'
+      ? 'Edexcel IAL'
+      : input.boardId === 'cambridge-alevel'
+        ? 'Cambridge A-Level'
+        : input.boardId === 'edexcel-igcse'
+          ? 'Edexcel IGCSE'
+          : 'Cambridge IGCSE';
 
   return {
     id: input.id?.trim() || `custom_exam_${fallbackIdSeed}`,
@@ -400,13 +407,23 @@ export function sanitizeStudyCountdownsState(
             typeof item.paperCode === 'string' &&
             typeof item.title === 'string' &&
             typeof item.examDateIso === 'string' &&
-            (item.boardId === 'edexcel-ial' || item.boardId === 'cambridge-igcse')
+            (item.boardId === 'edexcel-ial' ||
+              item.boardId === 'cambridge-igcse' ||
+              item.boardId === 'cambridge-alevel' ||
+              item.boardId === 'edexcel-igcse')
           );
         })
         .map((item) => ({
           id: item.id,
           boardId: item.boardId,
-          boardLabel: item.boardId === 'edexcel-ial' ? 'Edexcel IAL' : 'Cambridge IGCSE',
+          boardLabel:
+            item.boardId === 'edexcel-ial'
+              ? 'Edexcel IAL'
+              : item.boardId === 'cambridge-alevel'
+                ? 'Cambridge A-Level'
+                : item.boardId === 'edexcel-igcse'
+                  ? 'Edexcel IGCSE'
+                  : 'Cambridge IGCSE',
           paperCode: item.paperCode.slice(0, 20),
           title: item.title.slice(0, 96),
           examDateIso: item.examDateIso,
@@ -621,7 +638,10 @@ export function sanitizeLeaderboardPrefs(
     version: 1,
     timeframe: candidate.timeframe === 'all_time' ? 'all_time' : 'weekly',
     boardFilter:
-      candidate.boardFilter === 'edexcel-ial' || candidate.boardFilter === 'cambridge-igcse'
+      candidate.boardFilter === 'edexcel-ial' ||
+      candidate.boardFilter === 'cambridge-igcse' ||
+      candidate.boardFilter === 'cambridge-alevel' ||
+      candidate.boardFilter === 'edexcel-igcse'
         ? candidate.boardFilter
         : 'all',
     visibleOnLeaderboard:

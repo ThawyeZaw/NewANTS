@@ -90,7 +90,7 @@ function makeALevelCutoffs(
   const out = {} as Record<PastPaperSeriesId, PaperGradeCutoffs>;
 
   for (const s of PAST_PAPER_SERIES) {
-    const shift = SERIES_SHIFT[s.id];
+    const shift = SERIES_SHIFT[s.id] ?? 0;
     out[s.id] = {
       thresholds: {
         'A*': clamp(base.aStar + shift),
@@ -113,7 +113,7 @@ function makeNineToOneCutoffs(
   const out = {} as Record<PastPaperSeriesId, PaperGradeCutoffs>;
 
   for (const s of PAST_PAPER_SERIES) {
-    const shift = SERIES_SHIFT[s.id];
+    const shift = SERIES_SHIFT[s.id] ?? 0;
     out[s.id] = {
       thresholds: {
         '9': clamp(base.g9 + shift),

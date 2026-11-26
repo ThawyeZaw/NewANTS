@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { OrgAuthProvider } from '../components/auth/containers/OrgAuthProvider';
 import { OrgMiloDockView } from '../components/layout/views/OrgMiloDockView';
 import { OrgRouteProgressView } from '../components/layout/views/OrgRouteProgressView';
 import './globals.css';
@@ -35,9 +36,11 @@ export default function RootLayout({
         className="min-h-screen bg-background text-foreground antialiased"
         suppressHydrationWarning
       >
-        <OrgRouteProgressView />
-        {children}
-        <OrgMiloDockView />
+        <OrgAuthProvider>
+          <OrgRouteProgressView />
+          {children}
+          <OrgMiloDockView />
+        </OrgAuthProvider>
       </body>
     </html>
   );

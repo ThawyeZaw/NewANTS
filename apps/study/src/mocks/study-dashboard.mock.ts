@@ -2,6 +2,7 @@
  * Study Dashboard — realistic Pearson Edexcel IAL & Cambridge IGCSE mock datasets
  * aligned with `@ants/ui` (`ZYY_PROFILE_MOCK`) and `apps/flow` (`MOCK_SYNCED_EXAMS`).
  */
+import type { CurriculumBoardId } from '../lib/study/curriculum';
 import type {
   EnrolledSubjectSummary,
   RecentStudyActivityItem,
@@ -28,9 +29,11 @@ export const STUDY_BOARD_TABS: StudyBoardTab[] = [
 ];
 
 export const MOCK_STUDY_SUBJECTS_BY_BOARD: Record<
-  'edexcel-ial' | 'cambridge-igcse',
+  CurriculumBoardId,
   EnrolledSubjectSummary[]
 > = {
+  'cambridge-alevel': [],
+  'edexcel-igcse': [],
   'edexcel-ial': [
     {
       id: 'sub_wma11_set',
@@ -304,6 +307,8 @@ export function createDefaultStudyDashboardState(): StudyDashboardPersistedState
     reviewedSubjectIdsByBoard: {
       'edexcel-ial': ['sub_wma11_set'],
       'cambridge-igcse': ['sub_0580'],
+      'cambridge-alevel': [],
+      'edexcel-igcse': [],
     },
     pinnedExamIds: MOCK_STUDY_COUNTDOWNS.filter((item) => item.defaultPinned).map((item) => item.id),
     flowSyncedExamIds: MOCK_STUDY_COUNTDOWNS.filter((item) => item.defaultSyncedToFlow).map(

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { MOCK_SHARED_PROFILES, normalizeProfileHandle } from '@ants/ui';
-import { FlowProfilePageView } from '../../components/account/views/FlowProfilePageView';
+import { FlowProfileContainer } from '../../components/account/containers/FlowProfileContainer';
 
 export function generateStaticParams() {
   return Object.keys(MOCK_SHARED_PROFILES).map((username) => ({
@@ -46,6 +46,6 @@ export default async function PublicProfilePage({
   if (!decoded.startsWith('@')) {
     notFound();
   }
-  return <FlowProfilePageView handle={decoded} />;
+  return <FlowProfileContainer handle={decoded} />;
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { StudyAuthPageView } from '../../components/auth/views/StudyAuthPageView';
+import { StudyAuthContainer } from '../../components/auth/containers/StudyAuthContainer';
 
 export default function StudyLoginPage() {
-  return <StudyAuthPageView initialMode="login" />;
+  return <StudyAuthContainer initialMode="login" />;
 }
 

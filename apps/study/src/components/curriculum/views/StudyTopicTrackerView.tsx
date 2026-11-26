@@ -68,6 +68,10 @@ export interface StudyTopicTrackerViewProps {
   initialState?: StudyTopicsPersistedState;
   /** Render inline inside `/curriculum?tab=topics` without wrapping in a second StudyShellView */
   embedded?: boolean;
+  disableLocalStorage?: boolean;
+  activeMathsCashInCode?: string;
+  activeMathsCashInUnits?: string[];
+  renderPastPapers?: (subjectId: string) => React.ReactNode;
   flowUrl?: string;
   orgUrl?: string;
   onSubjectChange?: (subjectId: string) => void;
@@ -106,6 +110,10 @@ export function StudyTopicTrackerView({
   initialSubjectId = 'ial-maths-suite',
   initialState,
   embedded = false,
+  disableLocalStorage = false,
+  activeMathsCashInCode,
+  activeMathsCashInUnits,
+  renderPastPapers,
   flowUrl = 'http://localhost:3002/timetable',
   orgUrl = 'http://localhost:3000',
   onSubjectChange,
@@ -184,18 +192,24 @@ export function StudyTopicTrackerView({
   const statusIndicatorReady = statusReady && statusRect.visible;
 
   useEffect(() => {
-    const loadedTopics = loadStudyTopicsState(defaultState);
-    setState(loadedTopics);
+    if (disableLocalStorage) {
+      setState(defaultState);
+      if (activeMathsCashInCode) setActiveCashInCode(activeMathsCashInCode);
+      if (activeMathsCashInUnits) setActiveCashInUnits(activeMathsCashInUnits);
+    } else {
+      const loadedTopics = loadStudyTopicsState(defaultState);
+      setState(loadedTopics);
 
-    const loadedCurriculum = loadStudyCurriculumState(
-      createDefaultStudyCurriculumState()
-    );
-    const cashIn = loadedCurriculum.activeMathsCashIn;
-    const units =
-      loadedCurriculum.mathsUnitsByCashIn[cashIn] ??
-      loadedCurriculum.mathsUnitsByCashIn.YMA01;
-    setActiveCashInCode(cashIn);
-    setActiveCashInUnits(units);
+      const loadedCurriculum = loadStudyCurriculumState(
+        createDefaultStudyCurriculumState()
+      );
+      const cashIn = loadedCurriculum.activeMathsCashIn;
+      const units =
+        loadedCurriculum.mathsUnitsByCashIn[cashIn] ??
+        loadedCurriculum.mathsUnitsByCashIn.YMA01;
+      setActiveCashInCode(cashIn);
+      setActiveCashInUnits(units);
+    }
 
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -219,12 +233,19 @@ export function StudyTopicTrackerView({
     }
 
     setHydrated(true);
-  }, [defaultState, initialSubjectId, subjects]);
+  }, [
+    activeMathsCashInCode,
+    activeMathsCashInUnits,
+    defaultState,
+    disableLocalStorage,
+    initialSubjectId,
+    subjects,
+  ]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || disableLocalStorage) return;
     saveStudyTopicsState(state);
-  }, [hydrated, state]);
+  }, [disableLocalStorage, hydrated, state]);
 
   const currentSubject = useMemo(
     () =>
@@ -661,11 +682,15 @@ export function StudyTopicTrackerView({
 
       {activeSubTab === 'papers' ? (
         <div key="papers" className="ants-fade-enter">
-          <StudyPastPapersView
-            embedded={true}
-            initialSubjectId={currentSubject.id}
-            onSubjectChange={handleSelectSubject}
-          />
+          {renderPastPapers ? (
+            renderPastPapers(currentSubject.id)
+          ) : (
+            <StudyPastPapersView
+              embedded={true}
+              initialSubjectId={currentSubject.id}
+              onSubjectChange={handleSelectSubject}
+            />
+          )}
         </div>
       ) : (
         <div key="topics" className="ants-fade-enter space-y-6">

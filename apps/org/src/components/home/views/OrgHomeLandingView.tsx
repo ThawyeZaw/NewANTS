@@ -239,22 +239,24 @@ export function OrgHomeLandingView({
   // Interactive Tutor Carousel State
   const [activeTutorIdx, setActiveTutorIdx] = useState<number>(0);
   const members = data.featuredMembers;
-  const activeMember = members[activeTutorIdx] ?? members[0]!;
+  const activeMember = members[activeTutorIdx] ?? members[0];
   const tutorChipsRef = useRef<HTMLDivElement | null>(null);
   const {
     rect: tutorChipRect,
     ready: tutorChipReady,
     animate: tutorChipAnimate,
-  } = useSlidingIndicator(tutorChipsRef, activeMember.username, {
+  } = useSlidingIndicator(tutorChipsRef, activeMember?.username ?? '', {
     activeSelector: '[aria-selected="true"]',
   });
   const tutorGlideReady = tutorChipReady && tutorChipRect.visible;
 
   const handlePrevTutor = () => {
+    if (members.length === 0) return;
     setActiveTutorIdx((prev) => (prev - 1 + members.length) % members.length);
   };
 
   const handleNextTutor = () => {
+    if (members.length === 0) return;
     setActiveTutorIdx((prev) => (prev + 1) % members.length);
   };
 
@@ -727,73 +729,75 @@ export function OrgHomeLandingView({
             </div>
 
             {/* Active Tutor Visual Showcase Stage */}
-            <div
-              data-testid="active-tutor-carousel-card"
-              className="rounded-xl border border-border/60 bg-surface-card/90 p-5"
-            >
-              <div key={activeMember.username} className="ants-panel-enter divide-y divide-border/60">
-                <div className="pb-4 flex items-start justify-between gap-3">
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-base font-bold text-foreground">
-                        {activeMember.name}
-                      </h3>
-                      <span className="rounded bg-primary-tint px-2 py-0.5 font-mono text-[11px] font-semibold text-on-primary-tint border border-primary-tint-border">
-                        {activeMember.roleBadge}
+            {activeMember && (
+              <div
+                data-testid="active-tutor-carousel-card"
+                className="rounded-xl border border-border/60 bg-surface-card/90 p-5"
+              >
+                <div key={activeMember.username} className="ants-panel-enter divide-y divide-border/60">
+                  <div className="pb-4 flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base font-bold text-foreground">
+                          {activeMember.name}
+                        </h3>
+                        <span className="rounded bg-primary-tint px-2 py-0.5 font-mono text-[11px] font-semibold text-on-primary-tint border border-primary-tint-border">
+                          {activeMember.roleBadge}
+                        </span>
+                      </div>
+                      <p className="text-xs text-foreground-muted">
+                        {activeMember.title}
+                      </p>
+                      <p className="font-mono text-xs font-semibold text-foreground pt-0.5">
+                        {activeMember.specialization}
+                      </p>
+                    </div>
+
+                    <Link
+                      href={`/team/${activeMember.username}`}
+                      className="inline-flex h-8 shrink-0 items-center gap-1 rounded-md bg-primary-solid px-3 text-xs font-semibold text-on-primary hover:bg-primary-hover"
+                    >
+                      <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Slots &amp; QR</span>
+                    </Link>
+                  </div>
+
+                  {/* Visual Sun–Sat Weekly Slot Strip */}
+                  <div className="pt-4 space-y-2">
+                    <div className="flex items-center justify-between font-mono text-[11px] text-foreground-muted">
+                      <span>Weekly Teaching Availability</span>
+                      <span className="font-bold text-on-success-tint">
+                        {activeMember.availabilityLabel}
                       </span>
                     </div>
-                    <p className="text-xs text-foreground-muted">
-                      {activeMember.title}
-                    </p>
-                    <p className="font-mono text-xs font-semibold text-foreground pt-0.5">
-                      {activeMember.specialization}
-                    </p>
-                  </div>
 
-                  <Link
-                    href={`/team/${activeMember.username}`}
-                    className="inline-flex h-8 shrink-0 items-center gap-1 rounded-md bg-primary-solid px-3 text-xs font-semibold text-on-primary hover:bg-primary-hover"
-                  >
-                    <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>Slots &amp; QR</span>
-                  </Link>
-                </div>
-
-                {/* Visual Sun–Sat Weekly Slot Strip */}
-                <div className="pt-4 space-y-2">
-                  <div className="flex items-center justify-between font-mono text-[11px] text-foreground-muted">
-                    <span>Weekly Teaching Availability</span>
-                    <span className="font-bold text-on-success-tint">
-                      {activeMember.availabilityLabel}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-1.5 text-center font-mono text-[11px]">
-                    {WEEK_DAYS.map((day) => {
-                      const isAvailable = activeMember.availabilityLabel.includes(
-                        day
-                      );
-                      return (
-                        <div
-                          key={day}
-                          className={cn(
-                            'rounded border py-1.5 font-semibold transition-colors',
-                            isAvailable
-                              ? 'border-success-border bg-success-tint text-on-success-tint'
-                              : 'border-border bg-surface-inset/50 text-foreground-subtle'
-                          )}
-                        >
-                          <span className="block">{day}</span>
-                          <span className="block text-[9px]">
-                            {isAvailable ? 'OPEN' : '—'}
-                          </span>
-                        </div>
-                      );
-                    })}
+                    <div className="grid grid-cols-7 gap-1.5 text-center font-mono text-[11px]">
+                      {WEEK_DAYS.map((day) => {
+                        const isAvailable = activeMember.availabilityLabel.includes(
+                          day
+                        );
+                        return (
+                          <div
+                            key={day}
+                            className={cn(
+                              'rounded border py-1.5 font-semibold transition-colors',
+                              isAvailable
+                                ? 'border-success-border bg-success-tint text-on-success-tint'
+                                : 'border-border bg-surface-inset/50 text-foreground-subtle'
+                            )}
+                          >
+                            <span className="block">{day}</span>
+                            <span className="block text-[9px]">
+                              {isAvailable ? 'OPEN' : '—'}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right 6 Cols: Icon-Driven Animated Vertical Activity Timeline */}
@@ -820,6 +824,7 @@ export function OrgHomeLandingView({
                   (a) => a.slug === act.slug
                 );
                 const thumbSrc =
+                  act.coverImageSrc ??
                   matchedActivity?.coverImageSrc ??
                   ACTIVITY_THUMBNAILS[act.category] ??
                   '/images/org/students-meet.jpg';

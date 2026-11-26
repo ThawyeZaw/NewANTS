@@ -6,6 +6,7 @@ import type { TutorWeeklyScheduleRecord } from './profiles';
 
 export interface OrgMissionPillarRecord {
   id: string;
+  code?: string;
   title: string;
   description: string;
 }
@@ -39,13 +40,15 @@ export interface OrgActivityPhotoRecord {
   caption: string;
   locationTag: string;
   shotLabel: string;
+  artworkTheme?: string;
 }
 
 export interface OrgArticleSectionRecord {
   id: string;
   heading?: string;
   paragraphs: string[];
-  callout?: string;
+  callout?: string | { title: string; body: string };
+  codeSnippet?: string;
   codeBlock?: string;
   checklist?: string[];
 }
@@ -171,6 +174,7 @@ export const orgArticles = sqliteTable('org_articles', {
   id: text('id').primaryKey(),
   slug: text('slug').notNull().unique(),
   title: text('title').notNull(),
+  subtitle: text('subtitle').notNull().default(''),
   excerpt: text('excerpt').notNull(),
   category: text('category').notNull().default('Study Guide'),
   authorName: text('author_name').notNull(),
@@ -180,6 +184,9 @@ export const orgArticles = sqliteTable('org_articles', {
   readingTimeMinutes: integer('reading_time_minutes').notNull().default(5),
   tagsJson: text('tags_json', { mode: 'json' }).$type<string[]>().notNull().default([]),
   coverImageSrc: text('cover_image_src'),
+  coverCode: text('cover_code'),
+  coverFormula: text('cover_formula'),
+  coverMetric: text('cover_metric'),
   sectionsJson: text('sections_json', { mode: 'json' })
     .$type<OrgArticleSectionRecord[]>()
     .notNull()

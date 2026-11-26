@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
-import { OrgActivityDetailView } from '../../../../components/activities/views/OrgActivityDetailView';
+import { OrgActivityDetailContainer } from '../../../../components/activities/containers/OrgActivityDetailContainer';
 import { findActivityBySlug } from '../../../../lib/showcase';
 import { MOCK_ORG_ACTIVITIES } from '../../../../mocks/showcase-content.mock';
 
@@ -32,6 +32,6 @@ export default async function OrgActivityDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return <OrgActivityDetailView slug={slug} />;
+  return <OrgActivityDetailContainer slug={slug} />;
 }
 

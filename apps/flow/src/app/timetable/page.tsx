@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SmartTimetableView } from '../../components/timetable/views/SmartTimetableView';
+import { TimetableContainer } from '../../components/timetable/containers/TimetableContainer';
 
 export const metadata: Metadata = {
   title: 'Smart Timetable · Flow — The ANTs Productivity Studio',
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function TimetablePage() {
-  return <SmartTimetableView />;
+  return <TimetableContainer />;
 }

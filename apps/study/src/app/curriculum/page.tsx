@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { StudyCurriculumCatalogView } from '../../components/curriculum/views/StudyCurriculumCatalogView';
+import { StudyCurriculumContainer } from '../../components/curriculum/containers/StudyCurriculumContainer';
 
 export const metadata: Metadata = {
   title: 'Curriculum Catalog & Edexcel Modular Maths Suite | Study by The ANTs',
@@ -9,6 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default function StudyCurriculumPage() {
-  return <StudyCurriculumCatalogView />;
+  return <StudyCurriculumContainer />;
 }
 

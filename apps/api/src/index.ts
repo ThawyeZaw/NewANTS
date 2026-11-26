@@ -11,10 +11,15 @@ import {
   USER_ROLES,
   isAllowedCorsOrigin,
 } from '@ants/shared-types';
+import { createAccountRouter } from './account/routes';
+import { createAdminRouter } from './admin/routes';
 import { createAuthRouter } from './auth/routes';
 import { createCalculatorRouter } from './calculator/routes';
 import { processDueNotificationQueue } from './cron/notification-runner';
+import { createFlowRouter } from './flow/routes';
+import { createOrgRouter } from './org/routes';
 import { createStorageRouter } from './storage/routes';
+import { createStudyRouter } from './study/routes';
 import { createTelegramRouter } from './telegram/routes';
 import type { ApiBindings, ScheduledTickResult } from './types';
 
@@ -89,8 +94,13 @@ export function createApiApp() {
   );
 
   app.route('/api/auth', createAuthRouter());
+  app.route('/api/account', createAccountRouter());
+  app.route('/api/admin', createAdminRouter());
   app.route('/api/calculator', createCalculatorRouter());
+  app.route('/api/flow', createFlowRouter());
+  app.route('/api/org', createOrgRouter());
   app.route('/api/storage', createStorageRouter());
+  app.route('/api/study', createStudyRouter());
   app.route('/api/telegram', createTelegramRouter());
 
   app.notFound((c) => {

@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   Award,
-  BookOpen,
   Calculator,
   CalendarClock,
   CheckCircle2,
@@ -12,9 +11,7 @@ import {
   ExternalLink,
   FileSpreadsheet,
   GraduationCap,
-  HelpCircle,
   Info,
-  Layers,
   LayoutDashboard,
   Menu,
   PanelLeftClose,
@@ -44,7 +41,7 @@ import {
 } from '@ants/ui';
 import type { StudyNavRouteId } from '../../../lib/study/dashboard';
 
-export type StudyNavGroupId = 'workspace' | 'resources' | 'community';
+export type StudyNavGroupId = 'workspace' | 'community';
 
 export interface StudyNavItem {
   id: StudyNavRouteId;
@@ -94,27 +91,6 @@ export const DEFAULT_STUDY_NAV_ITEMS: StudyNavItem[] = [
     available: true,
   },
   {
-    id: 'notes',
-    label: 'Notes',
-    href: '/notes',
-    group: 'resources',
-    available: true,
-  },
-  {
-    id: 'flashcards',
-    label: 'Flashcards',
-    href: '/flashcards',
-    group: 'resources',
-    available: true,
-  },
-  {
-    id: 'quizzes',
-    label: 'Quizzes',
-    href: '/quizzes',
-    group: 'resources',
-    available: true,
-  },
-  {
     id: 'leaderboard',
     label: 'Leaderboard',
     href: '/leaderboard',
@@ -154,16 +130,12 @@ const NAV_ICONS: Record<StudyNavRouteId, React.ReactNode> = {
   'past-papers': <FileSpreadsheet className="h-4 w-4 shrink-0" aria-hidden="true" />,
   countdown: <CalendarClock className="h-4 w-4 shrink-0" aria-hidden="true" />,
   calculator: <Calculator className="h-4 w-4 shrink-0" aria-hidden="true" />,
-  notes: <BookOpen className="h-4 w-4 shrink-0" aria-hidden="true" />,
-  flashcards: <Layers className="h-4 w-4 shrink-0" aria-hidden="true" />,
-  quizzes: <HelpCircle className="h-4 w-4 shrink-0" aria-hidden="true" />,
   leaderboard: <Award className="h-4 w-4 shrink-0" aria-hidden="true" />,
   settings: <Settings className="h-4 w-4 shrink-0" aria-hidden="true" />,
 };
 
 const GROUP_LABELS: { id: StudyNavGroupId; label: string }[] = [
   { id: 'workspace', label: 'Workspace' },
-  { id: 'resources', label: 'Study Library' },
   { id: 'community', label: 'Progress' },
 ];
 

@@ -14,13 +14,7 @@ export const STUDY_PAPERS_STORAGE_KEY = 'ants-study-papers-v1';
 export const PAPER_FIRST_LOG_XP = 25;
 export const PAPER_PB_IMPROVEMENT_XP = 15;
 
-export type PastPaperSeriesId =
-  | 'mj-2025'
-  | 'jan-fm-2025'
-  | 'on-2024'
-  | 'mj-2024'
-  | 'jan-fm-2024'
-  | 'on-2023';
+export type PastPaperSeriesId = string;
 
 export type PaperVariantGroup = 'all' | 'v1' | 'v2' | 'v3' | 'main' | 'regional';
 export type PaperAttemptFilter = 'all' | 'logged' | 'unlogged';
