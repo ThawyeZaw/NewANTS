@@ -3,6 +3,12 @@
   "name": "ants-study",
   "main": "cf-worker.mjs",
   "compatibility_date": "2025-03-01",
+  "routes": [
+    {
+      "pattern": "study.the-ants.org",
+      "custom_domain": true
+    }
+  ],
   "assets": {
     "directory": "./out",
     "binding": "ASSETS",

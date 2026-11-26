@@ -7,10 +7,16 @@
     "nodejs_compat"
   ],
   "vars": {
-    "ENVIRONMENT": "beta",
+    "ENVIRONMENT": "production",
     "COOKIE_DOMAIN": ".the-ants.org",
-    "BETTER_AUTH_URL": "https://ants-api.thawyezaw.workers.dev"
+    "BETTER_AUTH_URL": "https://api.the-ants.org"
   },
+  "routes": [
+    {
+      "pattern": "api.the-ants.org",
+      "custom_domain": true
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
