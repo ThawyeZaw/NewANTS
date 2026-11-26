@@ -1,3 +1,5 @@
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import {
   GradeCalculatorView,
@@ -28,6 +30,13 @@ describe('@ants/calculator [ZYY-1.3] GradeCalculatorView & Mock Catalog', () => 
       expect(subject.seriesBoundaries['jan-2025'].length).toBeGreaterThan(0);
       expect(subject.seriesBoundaries['on-2024'].length).toBeGreaterThan(0);
     }
+  });
+
+  it('renders lively mobile grade hero strip and expandable sticky bar during SSR', () => {
+    const html = renderToStaticMarkup(React.createElement(GradeCalculatorView, {}));
+    expect(html).toContain('data-testid="mobile-grade-hero"');
+    expect(html).toContain('data-testid="mobile-sticky-grade-bar"');
+    expect(html).toContain('data-testid="mobile-boundaries-toggle"');
   });
 });
 

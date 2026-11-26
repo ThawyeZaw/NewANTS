@@ -138,6 +138,7 @@ export function GradeCalculatorView({
 
   const [subjectDropdownOpen, setSubjectDropdownOpen] = useState(false);
   const [seriesDropdownOpen, setSeriesDropdownOpen] = useState(false);
+  const [mobileBoundariesOpen, setMobileBoundariesOpen] = useState(false);
 
   const subjectDropdownRef = useRef<HTMLDivElement>(null);
   const seriesDropdownRef = useRef<HTMLDivElement>(null);
@@ -597,6 +598,66 @@ export function GradeCalculatorView({
           </div>
         </div>
 
+        {/* Mobile Live Grade Hero Strip (< lg) */}
+        <div
+          data-testid="mobile-grade-hero"
+          className={cn(
+            'lg:hidden rounded-2xl border p-4 space-y-3 shadow-[var(--shadow-tier-1)] transition-colors duration-300',
+            isTopGrade
+              ? 'border-primary/40 bg-primary-tint/25'
+              : 'border-border bg-surface-card'
+          )}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <AntMascot
+                mood={isTopGrade ? 'celebrating' : 'studying'}
+                app="study"
+                propVariant={isTopGrade ? 'pencil' : 'scholar'}
+                size="xs"
+                interactive={isTopGrade}
+                ariaLabel=""
+                className="shrink-0"
+              />
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-mono tabular-nums text-2xl font-extrabold text-foreground">
+                    {calculation.metricScore}
+                  </span>
+                  <span className="font-mono tabular-nums text-xs text-foreground-muted">
+                    / {calculation.metricMax} {calculation.metricUnit}
+                  </span>
+                </div>
+                <p className="truncate text-xs text-foreground-muted">
+                  {calculation.nextBoundary
+                    ? `+${calculation.nextBoundary.needed} ${calculation.metricUnit} to Grade ${calculation.nextBoundary.grade}`
+                    : `Top Grade ${calculation.finalGrade} (+${calculation.bufferAboveTop} ${calculation.metricUnit})`}
+                </p>
+              </div>
+            </div>
+
+            <div
+              key={calculation.finalGrade}
+              className={cn(
+                'ants-panel-enter flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl font-mono text-2xl font-extrabold transition-all duration-300',
+                isTopGrade
+                  ? 'bg-primary-solid text-on-primary shadow-[var(--shadow-tier-2)] ring-2 ring-primary/25'
+                  : 'border border-border bg-surface-inset text-foreground'
+              )}
+              aria-label={`Mobile overall grade ${calculation.finalGrade}`}
+            >
+              {calculation.finalGrade}
+            </div>
+          </div>
+
+          <div className="h-2 w-full overflow-hidden rounded-full bg-surface-inset">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+              style={{ width: `${Math.min(100, calculation.percentage)}%` }}
+            />
+          </div>
+        </div>
+
         {/* Main Workspace: Single Column on Mobile, 12-Col Split on Desktop */}
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 items-start">
           {/* Left: Clean Paper Mark List */}
@@ -736,10 +797,11 @@ export function GradeCalculatorView({
               </div>
 
               <div
+                key={calculation.finalGrade}
                 className={cn(
-                  'flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl font-mono text-2xl font-extrabold',
+                  'ants-panel-enter flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl font-mono text-2xl font-extrabold transition-all duration-300',
                   isTopGrade
-                    ? 'bg-primary text-on-primary'
+                    ? 'bg-primary-solid text-on-primary shadow-[var(--shadow-tier-2)] ring-2 ring-primary/25'
                     : 'border border-border bg-surface-inset text-foreground'
                 )}
                 aria-label={`Overall grade ${calculation.finalGrade}`}
@@ -833,47 +895,113 @@ export function GradeCalculatorView({
       </main>
 
       {/* Mobile Sticky Bottom Total Score & Grade Summary Bar (sticky bottom-0 z-50) */}
-      <div className="sticky bottom-0 z-50 border-t border-border-hover bg-surface-elevated/95 px-4 py-3 backdrop-blur-md shadow-[var(--shadow-tier-3)] lg:hidden">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div
-              className={cn(
-                'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-mono text-lg font-extrabold',
-                isTopGrade
-                  ? 'bg-primary text-on-primary'
-                  : 'border border-border bg-surface-inset text-foreground'
-              )}
-              aria-label={`Overall grade ${calculation.finalGrade}`}
-            >
-              {calculation.finalGrade}
-            </div>
+      <div
+        data-testid="mobile-sticky-grade-bar"
+        className="sticky bottom-0 z-50 border-t border-border-hover bg-surface-elevated/95 backdrop-blur-md shadow-[var(--shadow-tier-3)] lg:hidden"
+      >
+        {/* Live Hairline Progress Bar */}
+        <div className="h-1 w-full overflow-hidden bg-surface-inset">
+          <div
+            className="h-full bg-primary transition-all duration-300 ease-out"
+            style={{ width: `${Math.min(100, calculation.percentage)}%` }}
+          />
+        </div>
 
-            <div className="min-w-0">
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-mono tabular-nums text-lg font-extrabold text-foreground">
-                  {calculation.metricScore}
-                </span>
-                <span className="font-mono tabular-nums text-xs text-foreground-muted">
-                  / {calculation.metricMax} {calculation.metricUnit}
-                </span>
+        <div className="mx-auto max-w-5xl px-4 py-2.5 space-y-2.5">
+          {/* Expandable Grade Boundaries Drawer */}
+          <div
+            data-open={mobileBoundariesOpen ? 'true' : 'false'}
+            className="ants-accordion"
+          >
+            <div className="ants-accordion-inner">
+              <div className="grid grid-cols-3 gap-1.5 pb-1 sm:grid-cols-6">
+                {calculation.boundaries.map((b) => {
+                  const isCurrent = b.grade === calculation.finalGrade;
+                  return (
+                    <div
+                      key={b.grade}
+                      className={cn(
+                        'flex flex-col items-center justify-center rounded-lg px-2 py-1.5 text-center transition-colors',
+                        isCurrent
+                          ? 'bg-primary-tint text-on-primary-tint ring-1 ring-primary/40'
+                          : 'bg-surface-inset text-foreground-muted'
+                      )}
+                    >
+                      <span className="font-mono text-xs font-bold">{b.grade}</span>
+                      <span className="font-mono tabular-nums text-[11px] opacity-80">
+                        {b.minScore}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-              <p className="truncate text-xs text-foreground-muted">
-                {calculation.nextBoundary
-                  ? `+${calculation.nextBoundary.needed} ${calculation.metricUnit} to Grade ${calculation.nextBoundary.grade}`
-                  : `Top Grade ${calculation.finalGrade} (+${calculation.bufferAboveTop} ${calculation.metricUnit})`}
-              </p>
             </div>
           </div>
 
-          <Button
-            variant="primary"
-            size="sm"
-            className={cn('shrink-0', FOCUS_RING)}
-            leftIcon={<BookmarkCheck className="h-4 w-4" />}
-            onClick={handleSaveSnapshot}
-          >
-            Save
-          </Button>
+          <div className="flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div
+                key={calculation.finalGrade}
+                className={cn(
+                  'ants-panel-enter flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-mono text-lg font-extrabold transition-all duration-300',
+                  isTopGrade
+                    ? 'bg-primary-solid text-on-primary shadow-[var(--shadow-tier-1)] ring-2 ring-primary/25'
+                    : 'border border-border bg-surface-inset text-foreground'
+                )}
+                aria-label={`Overall grade ${calculation.finalGrade}`}
+              >
+                {calculation.finalGrade}
+              </div>
+
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="font-mono tabular-nums text-lg font-extrabold text-foreground">
+                    {calculation.metricScore}
+                  </span>
+                  <span className="font-mono tabular-nums text-xs text-foreground-muted">
+                    / {calculation.metricMax} {calculation.metricUnit}
+                  </span>
+                </div>
+                <p className="truncate text-[11px] text-foreground-muted">
+                  {calculation.nextBoundary
+                    ? `+${calculation.nextBoundary.needed} to ${calculation.nextBoundary.grade}`
+                    : `Top Grade ${calculation.finalGrade}`}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                aria-expanded={mobileBoundariesOpen}
+                onClick={() => setMobileBoundariesOpen((prev) => !prev)}
+                data-testid="mobile-boundaries-toggle"
+                className={cn(
+                  'inline-flex h-8 items-center gap-1 rounded-lg border border-border bg-surface-card px-2.5 text-xs font-semibold text-foreground-muted transition-colors hover:bg-surface-inset hover:text-foreground',
+                  FOCUS_RING
+                )}
+              >
+                <span>Cutoffs</span>
+                <ChevronDown
+                  className={cn(
+                    'h-3.5 w-3.5 transition-transform duration-200',
+                    mobileBoundariesOpen ? '' : 'rotate-180'
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
+
+              <Button
+                variant="primary"
+                size="sm"
+                className={cn('shrink-0', FOCUS_RING)}
+                leftIcon={<BookmarkCheck className="h-4 w-4" />}
+                onClick={handleSaveSnapshot}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

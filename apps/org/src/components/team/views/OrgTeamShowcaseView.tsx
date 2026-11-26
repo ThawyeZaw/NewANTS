@@ -52,12 +52,12 @@ const ROLE_FILTER_TABS: Array<{
   id: 'all' | OrgMemberRoleCategory;
   label: string;
 }> = [
-  { id: 'all', label: 'All Members' },
-  { id: 'founder', label: 'Founders' },
-  { id: 'tutor', label: 'Tutors' },
-  { id: 'contributor', label: 'Contributors' },
-  { id: 'alumni', label: 'Alumni' },
-];
+    { id: 'all', label: 'All Members' },
+    { id: 'founder', label: 'Founders' },
+    { id: 'tutor', label: 'Tutors' },
+    { id: 'contributor', label: 'Contributors' },
+    { id: 'alumni', label: 'Alumni' },
+  ];
 
 const BOARD_FILTERS: Array<'all' | OrgCurriculumBoard> = [
   'all',

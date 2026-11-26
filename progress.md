@@ -718,3 +718,9 @@
   - **Org Showcase (`apps/org`):** Added `orgHero` mascot beside "Our Products & Public Tools" in `OrgHomeLandingView.tsx` and `curious` empty-filter mascots in `OrgTeamShowcaseView.tsx`, `OrgActivitiesView.tsx`, and `OrgArticlesView.tsx`.
   - **Verification:** Added `<NotFoundView />` SSR tests to `packages/ui/src/__tests__/mascot.test.ts` (`25/25` `@ants/ui` tests passing) and passed `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), and `pnpm test` (`14/14` tasks).
 
+### Session Calculator Mobile Output Polish — 2026-11-26 (`[ZYY]` `@ants/calculator` Lively Mobile Grade Display)
+- **Summary:**
+  - **Mobile Live Grade Hero Strip (`packages/calculator/src/views/GradeCalculatorView.tsx`):** Added a `< lg` live Grade Hero card (`data-testid="mobile-grade-hero"`) above the Paper Marks list featuring `<AntMascot />` (`studying` → `celebrating` on top grades `A*`/`A`/`9`/`8`), prominent `metricScore / metricMax`, next-boundary guidance, an animated `h-14 w-14` grade badge (`ants-panel-enter` spring pop on grade changes), and a smooth progress bar.
+  - **Upgraded Mobile Sticky Bottom Bar (`data-testid="mobile-sticky-grade-bar"`):** Added a top hairline live progress bar, spring-pop grade badge, and an expandable `Cutoffs` `.ants-accordion` drawer (`data-testid="mobile-boundaries-toggle"`) revealing the 4 grade boundary pills on 1 tap.
+  - **Verification:** Added SSR test in `packages/calculator/src/__tests__/calculator-view.test.ts` and passed `pnpm typecheck`, `pnpm lint`, and `pnpm test`.
+
