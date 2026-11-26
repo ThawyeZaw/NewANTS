@@ -4,7 +4,7 @@ import {
   type AvailabilityStatus,
   type TutorScheduleMap,
 } from '@ants/ui';
-import { resolveApiBaseUrl } from '@ants/auth-client';
+import { fetchWithRetry, resolveApiBaseUrl } from '@ants/auth-client';
 import {
   AdminOrgActivityRecordDtoSchema,
   AdminOrgArticleRecordDtoSchema,
@@ -70,7 +70,7 @@ async function requestAdminJson<T>(
   init?: RequestInit
 ): Promise<T> {
   const baseUrl = resolveApiBaseUrl().replace(/\/+$/, '');
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetchWithRetry(`${baseUrl}${path}`, {
     ...init,
     credentials: 'include',
     headers: {

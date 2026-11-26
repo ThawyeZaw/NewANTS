@@ -14,6 +14,7 @@ import {
   createAuthClient,
   evaluateRouteAccess,
   evaluateServerRouteAccess,
+  fetchWithRetry,
   getEcosystemRouteRequirement,
   getServerSession,
   resolveApiBaseUrl,
@@ -84,6 +85,8 @@ describe('@ants/auth-client — Cross-Subdomain Origin & Redirect Helpers [THAW-
     expect(resolveApiBaseUrl('https://staging-api.the-ants.org/')).toBe(
       'https://staging-api.the-ants.org'
     );
+    expect(resolveApiBaseUrl('same-origin')).toBe('');
+    expect(resolveApiBaseUrl('/')).toBe('');
 
     expect(resolveAppOrigin('org', { currentHostname: 'localhost' })).toBe('http://localhost:3000');
     expect(resolveAppOrigin('study', { currentHostname: 'flow.the-ants.org' })).toBe(
@@ -442,5 +445,76 @@ describe('@ants/auth-client — Roles, Access Matrix, Hooks & AuthGuard SSR [THA
     );
     expect(guestHtml).toContain('LOGIN_REQUIRED');
     expect(guestHtml).not.toContain('STUDY_CONTENT');
+  });
+
+  it('retries transient GET network failures and 503 responses, skips POST retries, and honors AbortSignal', async () => {
+    let networkAttempts = 0;
+    const recoveredRes = await fetchWithRetry(
+      '/api/org/home',
+      { method: 'GET' },
+      {
+        retryDelaysMs: [1, 1],
+        fetchImpl: (async () => {
+          networkAttempts += 1;
+          if (networkAttempts < 2) {
+            throw new TypeError('Failed to fetch');
+          }
+          return new Response(JSON.stringify({ ok: true }), { status: 200 });
+        }) as unknown as typeof fetch,
+      }
+    );
+    expect(networkAttempts).toBe(2);
+    expect(recoveredRes.status).toBe(200);
+
+    let gatewayAttempts = 0;
+    const gatewayRes = await fetchWithRetry(
+      '/api/calculator/catalog',
+      { method: 'GET' },
+      {
+        retryDelaysMs: [1, 1],
+        fetchImpl: (async () => {
+          gatewayAttempts += 1;
+          if (gatewayAttempts < 3) {
+            return new Response('Upstream busy', { status: 503 });
+          }
+          return new Response(JSON.stringify({ ok: true }), { status: 200 });
+        }) as unknown as typeof fetch,
+      }
+    );
+    expect(gatewayAttempts).toBe(3);
+    expect(gatewayRes.status).toBe(200);
+
+    let postAttempts = 0;
+    await expect(
+      fetchWithRetry(
+        '/api/auth/sign-in/email',
+        { method: 'POST', body: '{}' },
+        {
+          retryDelaysMs: [1, 1],
+          fetchImpl: (async () => {
+            postAttempts += 1;
+            throw new TypeError('Network lost');
+          }) as unknown as typeof fetch,
+        }
+      )
+    ).rejects.toThrow('Network lost');
+    expect(postAttempts).toBe(1);
+
+    const controller = new AbortController();
+    let abortAttempts = 0;
+    const pendingAbort = fetchWithRetry(
+      '/api/org/home',
+      { method: 'GET', signal: controller.signal },
+      {
+        retryDelaysMs: [5000],
+        fetchImpl: (async () => {
+          abortAttempts += 1;
+          controller.abort();
+          throw new TypeError('Failed to fetch');
+        }) as unknown as typeof fetch,
+      }
+    );
+    await expect(pendingAbort).rejects.toThrow('Failed to fetch');
+    expect(abortAttempts).toBe(1);
   });
 });

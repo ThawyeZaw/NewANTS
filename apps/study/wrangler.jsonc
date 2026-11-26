@@ -9,6 +9,12 @@
       "custom_domain": true
     }
   ],
+  "services": [
+    {
+      "binding": "API",
+      "service": "ants-api"
+    }
+  ],
   "assets": {
     "directory": "./out",
     "binding": "ASSETS",

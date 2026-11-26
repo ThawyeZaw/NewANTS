@@ -23,6 +23,11 @@ export {
 } from './redirects';
 
 export {
+  fetchWithRetry,
+  type FetchWithRetryOptions,
+} from './fetch-retry';
+
+export {
   ANTS_AUTH_CLIENT_EVENT,
   authClient,
   createAuthClient,

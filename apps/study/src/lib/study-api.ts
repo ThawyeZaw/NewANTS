@@ -1,5 +1,5 @@
 import type { MockUserProfile, UserRole } from '@ants/ui';
-import { resolveApiBaseUrl } from '@ants/auth-client';
+import { fetchWithRetry, resolveApiBaseUrl } from '@ants/auth-client';
 import {
   StudyCatalogResponseDtoSchema,
   StudyCheckInResponseDtoSchema,
@@ -177,7 +177,7 @@ async function requestStudyJson<T>(
   init?: RequestInit
 ): Promise<T> {
   const baseUrl = resolveApiBaseUrl().replace(/\/+$/, '');
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetchWithRetry(`${baseUrl}${path}`, {
     ...init,
     credentials: 'include',
     headers: {
@@ -206,7 +206,7 @@ async function requestStudyRaw(
   init?: RequestInit
 ): Promise<Record<string, unknown>> {
   const baseUrl = resolveApiBaseUrl().replace(/\/+$/, '');
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetchWithRetry(`${baseUrl}${path}`, {
     ...init,
     credentials: 'include',
     headers: {

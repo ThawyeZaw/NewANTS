@@ -3,6 +3,10 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if ((url.pathname === '/api' || url.pathname.startsWith('/api/')) && env.API) {
+      return env.API.fetch(request);
+    }
+
     let response = await env.ASSETS.fetch(request);
 
     if (

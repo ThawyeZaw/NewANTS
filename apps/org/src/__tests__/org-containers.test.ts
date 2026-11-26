@@ -285,6 +285,52 @@ describe('@ants/org [THAW-2.2] D1 Showcase API Client & Smart Containers', () =>
     ).toBe('thawyezaw');
   });
 
+  it('retries transient GET network failures on /api/org/home and recovers', async () => {
+    let attempts = 0;
+    const retryingFetch = (async () => {
+      attempts += 1;
+      if (attempts === 1) {
+        throw new TypeError('Failed to fetch');
+      }
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          data: {
+            heroBadge: 'The ANTs',
+            heroTitle: 'Recovered on retry',
+            heroHighlight: '',
+            heroDescription: 'Desc',
+            missionStatement: 'Mission',
+            impactStats: [],
+            missionPillars: [],
+            hackathonBanner: null,
+            socialLinks: {
+              study: 'https://study.the-ants.org',
+              flow: 'https://flow.the-ants.org',
+            },
+            featuredMembers: [],
+            recentActivities: [],
+            counts: {
+              teamCount: 0,
+              tutorCount: 0,
+              activityCount: 0,
+              articleCount: 0,
+              boundaryTablesCount: 0,
+            },
+          },
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }) as unknown as typeof fetch;
+
+    const dto = await fetchOrgHome({
+      apiBaseUrl: 'same-origin',
+      fetchImpl: retryingFetch,
+    });
+    expect(attempts).toBe(2);
+    expect(dto.heroTitle).toBe('Recovered on retry');
+  });
+
   it('renders all 7 Smart Containers cleanly in SSR loading state without crashing', () => {
     const containers = [
       React.createElement(OrgHomeContainer),

@@ -7,6 +7,7 @@ import {
   type AuthSignInEmailInput,
   type AuthSignUpInput,
 } from '@ants/shared-types';
+import { fetchWithRetry } from './fetch-retry';
 import { resolveApiBaseUrl } from './redirects';
 
 export const ANTS_AUTH_CLIENT_EVENT = 'ants-auth-session-change';
@@ -76,13 +77,8 @@ function parseErrorPayload(rawJson: unknown, status: number): AuthApiError {
  */
 export function createAuthClient(config: AuthClientConfig = {}): AntsAuthClient {
   const getBaseUrl = () => resolveApiBaseUrl(config.baseUrl);
-  const runFetch = (...args: Parameters<typeof fetch>): ReturnType<typeof fetch> => {
-    const impl = config.fetchImpl ?? globalThis.fetch;
-    if (typeof impl !== 'function') {
-      return Promise.reject(new Error('No fetch implementation available in this runtime.'));
-    }
-    return impl(...args);
-  };
+  const runFetch = (input: RequestInfo | URL, init?: RequestInit): ReturnType<typeof fetch> =>
+    fetchWithRetry(input, init, { fetchImpl: config.fetchImpl });
 
   async function requestJson(
     path: string,

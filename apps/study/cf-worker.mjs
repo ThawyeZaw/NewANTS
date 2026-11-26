@@ -2,12 +2,16 @@
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    if ((url.pathname === '/api' || url.pathname.startsWith('/api/')) && env.API) {
+      return env.API.fetch(request);
+    }
+
     const response = await env.ASSETS.fetch(request);
     if (response.status !== 404) {
       return response;
     }
 
-    const url = new URL(request.url);
     if (url.pathname.startsWith('/curriculum/')) {
       const fallbackUrl = new URL('/curriculum/ial-maths-suite', url.origin);
       return env.ASSETS.fetch(new Request(fallbackUrl, request));

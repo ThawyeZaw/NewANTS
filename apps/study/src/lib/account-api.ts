@@ -6,7 +6,7 @@ import {
   type TelegramLeadMinutes,
   type TutorScheduleMap,
 } from '@ants/ui';
-import { resolveApiBaseUrl } from '@ants/auth-client';
+import { fetchWithRetry, resolveApiBaseUrl } from '@ants/auth-client';
 import {
   AccountProfileDtoSchema,
   TelegramStatusDtoSchema,
@@ -40,7 +40,7 @@ async function requestAccountJson<T>(
   init?: RequestInit
 ): Promise<T> {
   const baseUrl = resolveApiBaseUrl().replace(/\/+$/, '');
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetchWithRetry(`${baseUrl}${path}`, {
     ...init,
     credentials: 'include',
     headers: {

@@ -1,4 +1,4 @@
-import { isLocalHostname, resolveApiBaseUrl } from '@ants/auth-client';
+import { fetchWithRetry, isLocalHostname, resolveApiBaseUrl } from '@ants/auth-client';
 import {
   ApiErrorResponseSchema,
   ECOSYSTEM_APPS,
@@ -83,11 +83,15 @@ async function fetchOrgJson<T>(
 
   let response: Response;
   try {
-    response = await fetchFn(`${baseUrl}${path}`, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      signal: options?.signal,
-    });
+    response = await fetchWithRetry(
+      `${baseUrl}${path}`,
+      {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        signal: options?.signal,
+      },
+      { fetchImpl: fetchFn }
+    );
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') {
       throw err;

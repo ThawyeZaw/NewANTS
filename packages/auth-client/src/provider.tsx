@@ -118,6 +118,8 @@ function useAuthController({
   const [error, setError] = useState<AuthApiError | null>(null);
   const mountedRef = useRef(true);
   const suppressingLocalEventRef = useRef(false);
+  const sessionStateRef = useRef<AuthSessionBundle | null>(sessionState);
+  sessionStateRef.current = sessionState;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -128,6 +130,7 @@ function useAuthController({
 
   const applySession = useCallback((next: AuthSessionBundle | null) => {
     if (!mountedRef.current) return;
+    sessionStateRef.current = next;
     setSessionState(next);
     setStatus(next ? 'authenticated' : 'unauthenticated');
     setError(null);
@@ -140,14 +143,15 @@ function useAuthController({
     if (!result.ok) {
       setError(result.error);
       setStatus((prev) => (prev === 'loading' ? 'unauthenticated' : prev));
-      return sessionState;
+      return sessionStateRef.current;
     }
 
+    sessionStateRef.current = result.data;
     setSessionState(result.data);
     setStatus(result.data ? 'authenticated' : 'unauthenticated');
     setError(null);
     return result.data;
-  }, [client, sessionState]);
+  }, [client]);
 
   useEffect(() => {
     if (!enabled || hasInitialProp || skipInitialFetch) {

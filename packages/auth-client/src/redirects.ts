@@ -50,6 +50,11 @@ function stripTrailingSlash(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
+function isSameOriginApiToken(value: string): boolean {
+  const normalized = value.trim().toLowerCase();
+  return normalized === 'same-origin' || normalized === '/';
+}
+
 function readPublicEnv(key: string): string | undefined {
   if (typeof process === 'undefined' || !process.env) {
     return undefined;
@@ -99,16 +104,23 @@ export function isBetaWorkersDevHost(hostname: string): boolean {
  */
 export function resolveApiBaseUrl(explicitBaseUrl?: string, runtimeHostname?: string): string {
   if (explicitBaseUrl && explicitBaseUrl.trim().length > 0) {
-    return stripTrailingSlash(explicitBaseUrl.trim());
+    const trimmed = explicitBaseUrl.trim();
+    return isSameOriginApiToken(trimmed) ? '' : stripTrailingSlash(trimmed);
   }
 
   const envApiUrl = readPublicEnv('NEXT_PUBLIC_API_URL');
   if (envApiUrl) {
+    if (isSameOriginApiToken(envApiUrl)) {
+      return typeof window !== 'undefined' ? '' : DEFAULT_PROD_API_URL;
+    }
     return stripTrailingSlash(envApiUrl);
   }
 
   const host = resolveRuntimeHostname(runtimeHostname);
   if (isProductionEcosystemHost(host)) {
+    if (!runtimeHostname && typeof window !== 'undefined' && host !== 'api.the-ants.org') {
+      return '';
+    }
     return DEFAULT_PROD_API_URL;
   }
   if (isBetaWorkersDevHost(host)) {

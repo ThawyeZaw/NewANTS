@@ -5,13 +5,15 @@ import { AlertCircle, BookmarkCheck, RefreshCw, Trash2 } from 'lucide-react';
 import {
   buildCrossSubdomainLoginUrl,
   createAuthClient,
+  fetchWithRetry,
+  isLocalHostname,
   resolveApiBaseUrl,
+  useSession,
 } from '@ants/auth-client';
 import {
   ApiErrorResponseSchema,
   CalculatorCatalogResponseSchema,
   CalculatorSavedSnapshotDtoSchema,
-  type AuthSessionBundle,
   type CalculatorSavedSnapshotDto,
 } from '@ants/shared-types';
 import {
@@ -83,9 +85,19 @@ export function GradeCalculatorContainer({
   fetchImpl,
 }: GradeCalculatorContainerProps) {
   const resolvedApiBase = useMemo(() => resolveApiBaseUrl(apiBaseUrl), [apiBaseUrl]);
-  const authClient = useMemo(
-    () => createAuthClient({ baseUrl: resolvedApiBase, fetchImpl }),
-    [resolvedApiBase, fetchImpl]
+  const hasCustomSessionConfig = Boolean(apiBaseUrl || fetchImpl);
+  const customAuthClient = useMemo(
+    () => (hasCustomSessionConfig ? createAuthClient({ baseUrl: resolvedApiBase, fetchImpl }) : undefined),
+    [hasCustomSessionConfig, resolvedApiBase, fetchImpl]
+  );
+
+  const {
+    session,
+    setSession,
+  } = useSession(
+    customAuthClient
+      ? { apiBaseUrl: resolvedApiBase, client: customAuthClient }
+      : undefined
   );
 
   const runFetch = useCallback(
@@ -97,22 +109,32 @@ export function GradeCalculatorContainer({
   );
 
   const [reloadNonce, setReloadNonce] = useState(0);
+  const [useLocalUrls, setUseLocalUrls] = useState(false);
   const [catalogState, setCatalogState] = useState<CatalogLoadState>({ status: 'loading' });
-  const [session, setSession] = useState<AuthSessionBundle | null>(null);
   const [snapshots, setSnapshots] = useState<CalculatorSavedSnapshotDto[]>([]);
   const [snapshotsLoading, setSnapshotsLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveFeedback, setSaveFeedback] = useState<CalculatorSaveFeedback | null>(null);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setUseLocalUrls(isLocalHostname(window.location.hostname));
+    }
+  }, []);
+
   const fetchUserSnapshots = useCallback(async () => {
     setSnapshotsLoading(true);
     try {
-      const res = await runFetch(`${resolvedApiBase}/api/calculator/snapshots`, {
-        method: 'GET',
-        credentials: 'include',
-        cache: 'no-store',
-      });
+      const res = await fetchWithRetry(
+        `${resolvedApiBase}/api/calculator/snapshots`,
+        {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-store',
+        },
+        { fetchImpl }
+      );
       if (!res.ok) {
         if (res.status === 401) {
           setSession(null);
@@ -136,7 +158,7 @@ export function GradeCalculatorContainer({
     } finally {
       setSnapshotsLoading(false);
     }
-  }, [resolvedApiBase, runFetch]);
+  }, [resolvedApiBase, fetchImpl, setSession]);
 
   useEffect(() => {
     let active = true;
@@ -145,11 +167,15 @@ export function GradeCalculatorContainer({
     async function loadInitial() {
       setCatalogState({ status: 'loading' });
       try {
-        const catalogRes = await runFetch(`${resolvedApiBase}/api/calculator/catalog`, {
-          method: 'GET',
-          cache: 'no-store',
-          signal: controller.signal,
-        });
+        const catalogRes = await fetchWithRetry(
+          `${resolvedApiBase}/api/calculator/catalog`,
+          {
+            method: 'GET',
+            cache: reloadNonce > 0 ? 'no-cache' : 'default',
+            signal: controller.signal,
+          },
+          { fetchImpl }
+        );
         const rawJson: unknown = await catalogRes.json().catch(() => null);
         if (!active) return;
 
@@ -202,26 +228,23 @@ export function GradeCalculatorContainer({
       }
     }
 
-    async function loadAuthAndSnapshots() {
-      const sessionRes = await authClient.getSession({ signal: controller.signal });
-      if (!active || controller.signal.aborted) return;
-      if (sessionRes.ok && sessionRes.data) {
-        setSession(sessionRes.data);
-        await fetchUserSnapshots();
-      } else {
-        setSession(null);
-        setSnapshots([]);
-      }
-    }
-
     void loadInitial();
-    void loadAuthAndSnapshots();
 
     return () => {
       active = false;
       controller.abort();
     };
-  }, [resolvedApiBase, authClient, fetchUserSnapshots, runFetch, reloadNonce]);
+  }, [resolvedApiBase, fetchImpl, reloadNonce]);
+
+  const sessionUserId = session?.user?.id ?? null;
+
+  useEffect(() => {
+    if (!sessionUserId) {
+      setSnapshots([]);
+      return;
+    }
+    void fetchUserSnapshots();
+  }, [sessionUserId, fetchUserSnapshots]);
 
   const handleSaveSnapshot = useCallback(
     async (snapshot: GradeCalculationSnapshot) => {
@@ -326,7 +349,7 @@ export function GradeCalculatorContainer({
         setIsSaving(false);
       }
     },
-    [session, hostApp, resolvedApiBase, runFetch]
+    [session, hostApp, resolvedApiBase, runFetch, setSession]
   );
 
   const handleDeleteSnapshot = useCallback(
@@ -379,7 +402,7 @@ export function GradeCalculatorContainer({
                   Home
                 </a>
                 <ThemeToggle />
-                <AppSwitcher currentApp={hostApp} useLocalUrls />
+                <AppSwitcher currentApp={hostApp} useLocalUrls={useLocalUrls} />
               </div>
             </div>
           </header>
