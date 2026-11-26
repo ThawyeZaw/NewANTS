@@ -2,9 +2,9 @@
  * @ants/ui — Paired Stitch Semantic Design Tokens (tokens.css)
  *
  * Light Mode: "The ANTs Academic System" (docs/design/the_ants_academic_system.md)
- *   - Modern Editorial Academic: #f8fafc Slate 50 canvas, #ffffff crisp cards, #d97706 Amber 600 primary
+ *   - Soft Warm Editorial Paper: #F6F5F2 canvas, #ffffff crisp cards, #E7E5E0 borders, #d97706 Amber 600 primary
  * Dark Mode:  "Amber Academic Studio" (docs/design/amber_academic_studio.md)
- *   - Obsidian Academic Sanctuary: #0B0C0E / #121316 canvas, #18191E / #1E2026 cards, #F59E0B Amber 500 primary
+ *   - Studio Deep Charcoal: #14161B canvas, #1F222A cards, #272B35 elevated, #d97706 Amber 600 primary
  */
 
 :root,
@@ -15,54 +15,54 @@
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Core Canvas & Surfaces (Modern Editorial Academic) */
-  --background: #f8fafc;
-  --on-background: #0f172a;
-  --foreground: #0f172a;
-  --foreground-muted: #475569;
-  --muted-foreground: #475569;
-  --foreground-subtle: #94a3b8;
+  /* Core Canvas & Surfaces (Soft Warm Editorial Paper — Reduced Glare) */
+  --background: #f6f5f2;
+  --on-background: #1e293b;
+  --foreground: #1e293b;
+  --foreground-muted: #526071;
+  --muted-foreground: #526071;
+  --foreground-subtle: #8a99ad;
 
-  --surface: #faf8ff;
-  --surface-dim: #d2d9f4;
-  --surface-bright: #faf8ff;
+  --surface: #faf9f6;
+  --surface-dim: #ded9d0;
+  --surface-bright: #fcfbf9;
   --surface-card: #ffffff;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #1e293b;
   --surface-elevated: #ffffff;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --surface-inset: #f1f5f9;
-  --muted: #f1f5f9;
+  --popover-foreground: #1e293b;
+  --surface-inset: #edeae4;
+  --muted: #edeae4;
   --surface-ivory: #faf8f4;
   --surface-ivory-border: #eae4d9;
 
   /* Stitch MD3 Surface Containers (Light) */
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #f2f3ff;
-  --surface-container: #eaedff;
-  --surface-container-high: #e2e7ff;
-  --surface-container-highest: #dae2fd;
-  --on-surface: #131b2e;
-  --on-surface-variant: #554336;
-  --inverse-surface: #283044;
-  --inverse-on-surface: #eef0ff;
+  --surface-container-low: #f4f2ed;
+  --surface-container: #edeae4;
+  --surface-container-high: #e6e2da;
+  --surface-container-highest: #ded9d0;
+  --on-surface: #1e293b;
+  --on-surface-variant: #5c5046;
+  --inverse-surface: #252c38;
+  --inverse-on-surface: #f6f5f2;
 
   /* Structural Outlines & Focus Rings */
-  --border: #e2e8f0;
-  --border-subtle: #f1f5f9;
-  --border-hover: #cbd5e1;
-  --outline: #887364;
-  --outline-variant: #dbc2b0;
+  --border: #e7e5e0;
+  --border-subtle: #f0ede8;
+  --border-hover: #d3cfc7;
+  --outline: #8c7d71;
+  --outline-variant: #d5c8be;
   --ring: rgba(217, 119, 6, 0.18);
   --ring-strong: #fde68a;
 
-  /* Primary Accent (Scholarship & Golden Energy — Amber 600) */
+  /* Primary Accent (Scholarship & Golden Energy — Unified Amber 600) */
   --primary: #d97706;
   --primary-hover: #b45309;
   --primary-active: #92400e;
-  --primary-solid: var(--primary-hover);
-  --primary-solid-hover: var(--primary-active);
+  --primary-solid: var(--primary);
+  --primary-solid-hover: var(--primary-hover);
   --on-primary: #ffffff;
   --primary-foreground: #ffffff;
   --primary-container: #b15f00;
@@ -102,9 +102,9 @@
   --on-error-container: #93000a;
 
   /* Elevation Tiers */
-  --shadow-tier-1: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
-  --shadow-tier-2: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
-  --shadow-tier-3: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-tier-1: 0 1px 3px rgba(30, 41, 59, 0.04), 0 1px 2px rgba(30, 41, 59, 0.02);
+  --shadow-tier-2: 0 10px 15px -3px rgba(30, 41, 59, 0.05), 0 4px 6px -4px rgba(30, 41, 59, 0.03);
+  --shadow-tier-3: 0 20px 25px -5px rgba(30, 41, 59, 0.08), 0 8px 10px -6px rgba(30, 41, 59, 0.04);
 
   /* Radii & Layout Rhythm */
   --radius-control: 0.25rem;
@@ -135,56 +135,56 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
-  /* Core Canvas & Surfaces (Amber Academic Studio — Obsidian Sanctuary) */
-  --background: #0b0c0e;
-  --on-background: #e3e2e6;
-  --foreground: #e3e2e6;
-  --foreground-muted: #d8c3ad;
-  --muted-foreground: #d8c3ad;
-  --foreground-subtle: #a08e7a;
+  /* Core Canvas & Surfaces (Amber Academic Studio — Studio Deep Charcoal) */
+  --background: #14161b;
+  --on-background: #e2e8f0;
+  --foreground: #e2e8f0;
+  --foreground-muted: #d5c3b1;
+  --muted-foreground: #d5c3b1;
+  --foreground-subtle: #9fa7b6;
 
-  --surface: #121316;
-  --surface-dim: #121316;
-  --surface-bright: #38393c;
-  --surface-card: #18191e;
-  --card: #18191e;
-  --card-foreground: #e3e2e6;
-  --surface-elevated: #1e2026;
-  --popover: #1e2026;
-  --popover-foreground: #e3e2e6;
-  --surface-inset: #121316;
-  --muted: #121316;
+  --surface: #181b22;
+  --surface-dim: #14161b;
+  --surface-bright: #3c4250;
+  --surface-card: #1f222a;
+  --card: #1f222a;
+  --card-foreground: #e2e8f0;
+  --surface-elevated: #272b35;
+  --popover: #272b35;
+  --popover-foreground: #e2e8f0;
+  --surface-inset: #111317;
+  --muted: #181b22;
   --surface-ivory: #faf8f4;
   --surface-ivory-border: #eae4d9;
 
   /* Stitch MD3 Surface Containers (Dark) */
-  --surface-container-lowest: #0d0e11;
-  --surface-container-low: #1b1b1f;
-  --surface-container: #1f1f23;
-  --surface-container-high: #292a2d;
-  --surface-container-highest: #343538;
-  --on-surface: #e3e2e6;
-  --on-surface-variant: #d8c3ad;
-  --inverse-surface: #e3e2e6;
-  --inverse-on-surface: #2f3034;
+  --surface-container-lowest: #0f1115;
+  --surface-container-low: #181b22;
+  --surface-container: #1f222a;
+  --surface-container-high: #272b35;
+  --surface-container-highest: #323743;
+  --on-surface: #e2e8f0;
+  --on-surface-variant: #d5c3b1;
+  --inverse-surface: #e2e8f0;
+  --inverse-on-surface: #20242e;
 
   /* Structural Outlines & Amber Glows */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-hover: rgba(245, 158, 11, 0.35);
+  --border: rgba(255, 255, 255, 0.10);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(245, 158, 11, 0.40);
   --outline: #a08e7a;
   --outline-variant: #534434;
   --ring: rgba(245, 158, 11, 0.45);
   --ring-strong: rgba(245, 158, 11, 0.55);
 
-  /* Primary Accent (Golden Amber 500) */
-  --primary: #f59e0b;
-  --primary-hover: #ffc174;
-  --primary-active: #d97706;
+  /* Primary Accent (Unified Amber 600) */
+  --primary: #d97706;
+  --primary-hover: #f59e0b;
+  --primary-active: #b45309;
   --primary-solid: var(--primary);
   --primary-solid-hover: var(--primary-hover);
-  --on-primary: #0b0c0e;
-  --primary-foreground: #0b0c0e;
+  --on-primary: #14161b;
+  --primary-foreground: #14161b;
   --primary-container: #f59e0b;
   --on-primary-container: #472a00;
   --primary-tint: rgba(245, 158, 11, 0.12);
@@ -221,10 +221,10 @@
   --error-container: #93000a;
   --on-error-container: #ffdad6;
 
-  /* Elevation Tiers (Obsidian + Amber Edge Illumination) */
-  --shadow-tier-1: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-tier-2: 0 8px 24px -4px rgba(0, 0, 0, 0.6), 0 0 16px 0 rgba(245, 158, 11, 0.12);
-  --shadow-tier-3: 0 20px 32px -6px rgba(0, 0, 0, 0.72), 0 0 24px 0 rgba(245, 158, 11, 0.16);
+  /* Elevation Tiers (Deep Charcoal + Amber Edge Illumination) */
+  --shadow-tier-1: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-tier-2: 0 8px 24px -4px rgba(0, 0, 0, 0.48), 0 0 16px 0 rgba(245, 158, 11, 0.12);
+  --shadow-tier-3: 0 20px 32px -6px rgba(0, 0, 0, 0.60), 0 0 24px 0 rgba(245, 158, 11, 0.16);
 }
 
 /* Tailwind CSS v4 @theme token bridge */

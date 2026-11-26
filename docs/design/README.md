@@ -6,8 +6,8 @@ Light and dark themes form **one paired semantic token system** mapped into `pac
 
 | Theme / Guide | Aesthetic | Specification |
 | :--- | :--- | :--- |
-| **Light** | Modern Editorial Academic (`#f8fafc` Slate canvas, `#d97706` Amber 600 primary) | [`the_ants_academic_system.md`](./the_ants_academic_system.md) |
-| **Dark** | Amber Academic Studio (`#0B0C0E` / `#121316` Obsidian canvas, `#F59E0B` Amber 500 primary) | [`amber_academic_studio.md`](./amber_academic_studio.md) |
+| **Light** | Modern Editorial Academic (`#F6F5F2` Soft Paper canvas, `#d97706` Amber 600 primary) | [`the_ants_academic_system.md`](./the_ants_academic_system.md) |
+| **Dark** | Amber Academic Studio (`#14161B` Deep Charcoal canvas, `#d97706` Amber 600 primary) | [`amber_academic_studio.md`](./amber_academic_studio.md) |
 | **Brand Mascot** | Lighter Sunlit-Gold Playful Geometric Vector (`#FBBF24` / `#FEF08A`, warm & energetic) | [`mascot.md`](./mascot.md) · [`mascot-hero-sheet.jpg`](./assets/mascot-hero-sheet.jpg) · [`mascot-expressions-grid.jpg`](./assets/mascot-expressions-grid.jpg) |
 
 ## Non-Negotiable Token Rules

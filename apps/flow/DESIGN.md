@@ -2,28 +2,28 @@
 name: Flow by The ANTs
 description: Dual-theme academic productivity studio pairing Stitch Slate Light and Obsidian Amber Dark tokens across Timetable, Tasks, Pomodoro, and Account views.
 colors:
-  light-background: "#f8fafc"
+  light-background: "#f6f5f2"
   light-surface-card: "#ffffff"
-  light-surface-inset: "#f1f5f9"
-  light-foreground: "#0f172a"
-  light-foreground-muted: "#475569"
-  light-border: "#e2e8f0"
+  light-surface-inset: "#edeae4"
+  light-foreground: "#1e293b"
+  light-foreground-muted: "#526071"
+  light-border: "#e7e5e0"
   light-primary: "#d97706"
-  light-primary-solid: "#b45309"
+  light-primary-solid: "#d97706"
   light-primary-tint: "#fef3c7"
   light-on-primary-tint: "#92400e"
   light-success: "#059669"
   light-success-tint: "#ecfdf5"
   light-on-success-tint: "#065f46"
   light-destructive: "#e11d48"
-  dark-background: "#0b0c0e"
-  dark-surface-card: "#18191e"
-  dark-surface-inset: "#121316"
-  dark-foreground: "#e3e2e6"
-  dark-foreground-muted: "#d8c3ad"
-  dark-primary: "#f59e0b"
-  dark-primary-hover: "#ffc174"
-  dark-on-primary: "#0b0c0e"
+  dark-background: "#14161b"
+  dark-surface-card: "#1f222a"
+  dark-surface-inset: "#111317"
+  dark-foreground: "#e2e8f0"
+  dark-foreground-muted: "#d5c3b1"
+  dark-primary: "#d97706"
+  dark-primary-hover: "#f59e0b"
+  dark-on-primary: "#14161b"
   dark-on-primary-tint: "#fde68a"
   dark-success: "#10b981"
   dark-on-success-tint: "#6ee7b7"
@@ -103,7 +103,7 @@ components:
 
 **Creative North Star: "The Editorial Obsidian & Amber Sanctuary"**
 
-Flow translates The ANTs' paired Stitch aesthetic (*The ANTs Academic System* in Light mode and *Amber Academic Studio* in Dark mode) into an `Operate` workspace built for high-frequency planning, deep Pomodoro execution, weekly tutoring availability painting, and public member portfolios. Surfaces prioritize calm scannability over chrome: crisp cool-slate sheets (`#f8fafc` / `#ffffff`) hold daytime study clarity, while warm obsidian surfaces (`#0b0c0e` / `#18191e`) pair with amber accents (`#f59e0b`) for late-night revision sessions without glare.
+Flow translates The ANTs' paired Stitch aesthetic (*The ANTs Academic System* in Light mode and *Amber Academic Studio* in Dark mode) into an `Operate` workspace built for high-frequency planning, deep Pomodoro execution, weekly tutoring availability painting, and public member portfolios. Surfaces prioritize calm scannability over chrome: crisp warm-paper sheets (`#f6f5f2` / `#ffffff`) hold daytime study clarity, while deep studio charcoal surfaces (`#14161b` / `#1f222a`) pair with amber accents (`#f59e0b`) for late-night revision sessions without glare.
 
 User-selectable accent presets (`amber`, `ocean`, `forest`, `rose`, `violet`) override `--primary`, `--primary-hover`, `--primary-tint`, and `--on-primary-tint` via `[data-accent]` attributes while automatically preserving `--primary-solid` accessible contrast on solid fills.
 
@@ -117,8 +117,8 @@ User-selectable accent presets (`amber`, `ocean`, `forest`, `rose`, `violet`) ov
 Semantic palette split across Light (*Editorial Academic*) and Dark (*Amber Studio*) surfaces, reserving vibrant accent fills strictly for primary actions, selected brushes, and verified states.
 
 ### Primary
-- **Scholar Amber Fill (`--primary-solid`)**: Light `#b45309` with `#ffffff` ink (`>=5.0:1` contrast across small and medium buttons); Dark `#f59e0b` with `#0b0c0e` ink (`~9.5:1`). Used for active section tabs, primary CTAs, avatar badges, and checked switches.
-- **Amber Accent (`--primary`)**: Light `#d97706`, Dark `#f59e0b`. Used for focus borders, progress bars, inline brand highlights, and focus rings (`rgba(217,119,6,0.18)` Light / `rgba(245,158,11,0.45)` Dark).
+- **Scholar Amber Fill (`--primary-solid`)**: Unified `#d97706` across both Light (with `#ffffff` ink) and Dark (with `#14161b` ink, `~5.3:1`). Used for active section tabs, primary CTAs, avatar badges, and checked switches.
+- **Amber Accent (`--primary`)**: Unified `#d97706` across both Light and Dark modes. Used for focus borders, progress bars, inline brand highlights, and focus rings (`rgba(217,119,6,0.18)` Light / `rgba(245,158,11,0.45)` Dark).
 - **Amber Tint Well (`--primary-tint` / `--on-primary-tint`)**: Light `#fef3c7` with `#92400e` ink; Dark `rgba(245,158,11,0.12)` with `#fde68a` ink. Used for `Flexible` tutor slots, category badges, and non-competing secondary inquiry actions.
 
 ### Secondary
@@ -128,11 +128,11 @@ Semantic palette split across Light (*Editorial Academic*) and Dark (*Amber Stud
 - **Urgency Rose (`--destructive` / `--destructive-tint` / `--on-destructive-tint`)**: Light `#e11d48` / `#fff1f2` / `#9f1239`; Dark `#f43f5e` / `rgba(244,63,94,0.14)` / `#fda4af`. Reserved strictly for `P1` urgency markers, exam countdown deadlines, and destructive remove actions.
 
 ### Neutral
-- **Ground & Card Surfaces**: Light `#f8fafc` ground / `#ffffff` card / `#f1f5f9` inset; Dark `#0b0c0e` obsidian ground / `#18191e` card / `#121316` inset.
-- **Ink & Structural Rules**: Light `#0f172a` ink / `#475569` secondary ink / `#e2e8f0` hairline borders; Dark `#e3e2e6` ink / `#d8c3ad` warm sand secondary ink / `rgba(255,255,255,0.08)` borders.
+- **Ground & Card Surfaces**: Light `#f6f5f2` ground / `#ffffff` card / `#edeae4` inset; Dark `#14161b` deep charcoal ground / `#1f222a` card / `#111317` inset.
+- **Ink & Structural Rules**: Light `#1e293b` ink / `#526071` secondary ink / `#e7e5e0` hairline borders; Dark `#e2e8f0` ink / `#d5c3b1` warm secondary ink / `rgba(255,255,255,0.10)` borders.
 
 ### Named Rules
-- **The Solid-Fill Contrast Rule.** Never render white `12px` button text directly on `#d97706` or fade disabled primary buttons with raw opacity; use `--primary-solid` (`#b45309` Light / `#f59e0b` Dark) when enabled and neutral inset surface (`--surface-inset` + `--foreground-muted`) when disabled.
+- **The Solid-Fill Contrast Rule.** Never fade disabled primary buttons with raw opacity; use `--primary-solid` (unified `#d97706` across Light and Dark) when enabled and neutral inset surface (`--surface-inset` + `--foreground-muted`) when disabled.
 - **The One Primary Action Rule.** Limit each route viewport to a single solid `--primary-solid` CTA for a given intent so companion links or grid actions degrade cleanly to `--primary-tint` chips or outlined controls.
 
 ## Typography

@@ -684,3 +684,17 @@
   - **React Provider, Hooks & `<AuthGuard />` (`packages/auth-client/src/provider.tsx`):** Built `'use client'` `<AuthProvider />` (initial hydration, focus/visibility/tab sync), standalone-safe `useSession()`, `useRole()`, and `<AuthGuard />`, exposed granular subpath exports (`.`, `./client`, `./guards`, `./redirects`, `./server`) in `packages/auth-client/package.json`, and added `'@ants/auth-client'` to `transpilePackages` in `apps/{org,study,flow}/next.config.ts`.
   - **Verification:** Created `packages/auth-client/src/__tests__/auth-client.test.ts` (`7/7` passing), passed `pnpm typecheck` (`14/14` Turbo tasks), `pnpm lint` (`14/14` Turbo tasks), `pnpm turbo run test --concurrency=1` (`14/14` Turbo tasks; 151 tests passing across workspace packages), and verified HTTP `200` on all 4 running dev servers (`:3000`, `:3001`, `:3002`, `:8787`).
 - **Next Session Target (`[THAW]`):** Run `/continue` for **`[THAW-2.1]`** (`@ants/calculator` Engine & Public API Wiring).
+
+### Session UI Token Polish — 2026-11-26 (`[ZYY]` Theme Brightness Refinement)
+- **Summary:**
+  - **Clarified via `/askmefirst` Modal:** User identified that Light mode was too glaring/bright and Dark mode was too pitch-black. Aligned on:
+    - **Light Mode:** Soft Warm Editorial Paper (`#F6F5F2` canvas, `#FFFFFF` / `#FDFCFB` cards, `#E7E5E0` subtle warm borders, `#1E293B` softened high-contrast text foreground) to eliminate screen glare and reduce eye fatigue.
+    - **Dark Mode:** Studio Deep Charcoal (`#14161B` canvas, `#1F222A` cards, `#272B35` elevated surfaces, `#E2E8F0` foreground text, `#111317` insets, refined `rgba(255, 255, 255, 0.10)` borders) to replace pitch-black obsidian with a rich, comfortable academic sanctuary dark mode.
+    - **Balanced Contrast & Elevation:** Calibrated elevation shadows for both themes and updated `--on-primary` to `#14161B` on Dark mode to maintain accessible text contrast on golden buttons.
+  - **Shared Token System & Design Docs Updated:**
+    - Updated `packages/ui/src/styles/tokens.css` (core canvas, surfaces, MD3 surface containers, borders, elevation tiers, and selection/focus tokens).
+    - Synchronized `docs/design/the_ants_academic_system.md`, `docs/design/amber_academic_studio.md`, `docs/design/README.md`, and `apps/flow/DESIGN.md`.
+  - **Unified Orange Accent (`#d97706`) Across Light & Dark Modes:**
+    - Clarified via `/askmefirst` modal and unified `--primary` and `--primary-solid` to `#d97706` (ANTs Amber-Orange 600) in both Light and Dark modes (`packages/ui/src/styles/tokens.css`, `docs/design/README.md`, `apps/flow/DESIGN.md`) so hero headlines (`ACE With Us`), accent labels, links, and primary buttons share the exact same orange across both themes.
+  - **Verification:** Passed `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), and `pnpm test` (`14/14` tasks, 114+ tests passing across workspace).
+
