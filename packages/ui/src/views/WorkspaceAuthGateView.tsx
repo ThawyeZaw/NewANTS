@@ -12,7 +12,6 @@ import {
   GraduationCap,
   HardDrive,
   ListChecks,
-  Lock,
   LogIn,
   Send,
   ShieldCheck,
@@ -32,6 +31,7 @@ import {
   CardTitle,
 } from '../primitives/Card';
 import { cn } from '../utils/cn';
+import { AntMascotView } from './AntMascotView';
 import {
   DEFAULT_AUTH_DEMO_PERSONAS,
   type AuthDemoPersonaOption,
@@ -268,9 +268,13 @@ export function WorkspaceAuthGateView({
           }
         >
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary-tint-border bg-primary-tint text-on-primary-tint">
-              <Lock className="h-5 w-5" aria-hidden="true" />
-            </span>
+            <AntMascotView
+              mood="curious"
+              app={isFlow ? 'flow' : 'study'}
+              size="sm"
+              ariaLabel=""
+              className="shrink-0"
+            />
             <div className="min-w-0">
               <CardTitle className="text-xl font-extrabold tracking-tight">
                 {defaultTitle}

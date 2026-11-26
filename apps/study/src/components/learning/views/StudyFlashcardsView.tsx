@@ -17,6 +17,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   Input,
@@ -732,7 +733,16 @@ export function StudyFlashcardsView({
               </div>
             ) : (
               <div className="mx-auto max-w-lg rounded-2xl border border-dashed border-border bg-surface-inset/35 p-8 text-center space-y-3">
-                <CheckCircle2 className="mx-auto h-8 w-8 text-success" aria-hidden="true" />
+                <div className="flex justify-center">
+                  <AntMascot
+                    mood={activeStats.total === 0 ? 'curious' : 'celebrating'}
+                    app="study"
+                    propVariant="scholar"
+                    size="md"
+                    interactive={activeStats.total > 0}
+                    ariaLabel=""
+                  />
+                </div>
                 <h3 className="text-base font-bold text-foreground">
                   {activeStats.total === 0
                     ? 'This deck has no cards yet'

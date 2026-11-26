@@ -7,6 +7,7 @@ import {
   ANT_MASCOT_PRESETS,
   AntMascot,
   AntMascotView,
+  NotFoundView,
   resolveMascotPropVariant,
   resolveMascotSize,
   type AntMascotMood,
@@ -96,6 +97,16 @@ describe('@ants/ui <AntMascot /> Brand Mascot', () => {
       'ants-mascot-sparkle',
     ]) {
       expect(css).toContain(token);
+    }
+  });
+
+  it('renders NotFoundView cleanly across org, flow, and study', () => {
+    for (const app of ['org', 'flow', 'study'] as const) {
+      const html = renderToStaticMarkup(React.createElement(NotFoundView, { app }));
+      expect(html).toContain('data-testid="not-found-view"');
+      expect(html).toContain(`data-app="${app}"`);
+      expect(html).toContain('data-testid="ant-mascot"');
+      expect(html).toContain('404');
     }
   });
 });

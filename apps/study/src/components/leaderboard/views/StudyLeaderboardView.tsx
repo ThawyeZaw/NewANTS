@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   ANTS_AUTH_SESSION_EVENT,
+  AntMascot,
   Badge,
   Button,
   MOCK_AUTHENTICATED_USER,
@@ -321,7 +322,20 @@ export function StudyLeaderboardView({
 
         {/* Top 3 Academic Podium */}
         {topThree.length > 0 && (
-          <section aria-label="Top three scholars">
+          <section aria-label="Top three scholars" className="space-y-3">
+            <div className="flex items-center gap-2.5">
+              <AntMascot
+                mood="celebrating"
+                app="study"
+                propVariant="scholar"
+                size="xs"
+                interactive
+                ariaLabel=""
+              />
+              <span className="text-xs font-semibold text-foreground-muted">
+                Top scholars this sprint
+              </span>
+            </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {topThree.map((scholar, index) => (
                 <article

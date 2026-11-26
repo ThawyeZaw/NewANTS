@@ -9,6 +9,7 @@ import {
   X,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   MOCK_AUTHENTICATED_USER,
@@ -672,7 +673,16 @@ export function StudyCurriculumCatalogView({
 
         {/* Subject Cards Grid */}
         {filteredSubjects.length === 0 ? (
-          <div className="rounded-lg border border-border bg-surface-card p-8 text-center space-y-2">
+          <div className="rounded-lg border border-border bg-surface-card p-8 text-center space-y-3">
+            <div className="flex justify-center">
+              <AntMascot
+                mood="curious"
+                app="study"
+                propVariant="scholar"
+                size="md"
+                ariaLabel=""
+              />
+            </div>
             <p className="text-sm font-semibold text-foreground">
               No specifications match your current filter.
             </p>

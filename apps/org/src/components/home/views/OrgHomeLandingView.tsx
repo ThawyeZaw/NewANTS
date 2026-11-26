@@ -12,7 +12,7 @@ import {
   QrCode,
   Users,
 } from 'lucide-react';
-import { ScrollReveal, cn, useSlidingIndicator } from '@ants/ui';
+import { ANT_MASCOT_PRESETS, AntMascot, ScrollReveal, cn, useSlidingIndicator } from '@ants/ui';
 import {
   loadOrgCmsState,
   subscribeOrgCmsChanges,
@@ -587,13 +587,22 @@ export function OrgHomeLandingView({
           data-testid="bento-products-grid"
           className="space-y-6 border-t border-border/60 pt-14"
         >
-          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-end sm:justify-between">
-            <h2
-              id="bento-products-heading"
-              className="text-2xl font-extrabold tracking-tight text-foreground"
-            >
-              Our Products &amp; Public Tools
-            </h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-center gap-3">
+              <AntMascot
+                {...ANT_MASCOT_PRESETS.orgHero}
+                size="sm"
+                interactive
+                ariaLabel=""
+                className="shrink-0"
+              />
+              <h2
+                id="bento-products-heading"
+                className="text-2xl font-extrabold tracking-tight text-foreground"
+              >
+                Our Products &amp; Public Tools
+              </h2>
+            </div>
             <p className="font-mono text-xs text-foreground-muted">
               Shared .the-ants.org SSO · Works in Light &amp; Amber Dark
             </p>

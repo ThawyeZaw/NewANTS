@@ -9,11 +9,11 @@ import {
   CalendarClock,
   Check,
   ExternalLink,
-  Flame,
   Pin,
   RefreshCw,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   MOCK_AUTHENTICATED_USER,
   cn,
@@ -320,8 +320,16 @@ export function StudyDashboardView({
         {/* Restrained Single-Row Academic Telemetry Strip */}
         <div className="flex flex-col gap-3 border-y border-border py-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6">
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-2">
-            <div className="flex items-center gap-2">
-              <Flame className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
+            <div className="flex items-center gap-2.5">
+              <AntMascot
+                mood="celebrating"
+                app="study"
+                propVariant="pencil"
+                size="xs"
+                interactive
+                ariaLabel=""
+                className="shrink-0"
+              />
               <div>
                 <span className="block text-[11px] font-semibold uppercase tracking-wider text-foreground-muted">
                   Streak

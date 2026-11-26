@@ -20,6 +20,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   Input,
@@ -702,14 +703,25 @@ export function StudyQuizzesView({
           <section aria-label="Quiz results and review" className="mx-auto max-w-3xl space-y-5">
             <div className="rounded-2xl border border-border bg-surface-card p-6 space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-primary" aria-hidden="true" />
-                    <span className="font-mono text-xs font-bold uppercase tracking-[0.06em] text-primary">
-                      Quiz Graded · {activeQuiz.subjectCode}
-                    </span>
+                <div className="flex items-center gap-3.5">
+                  <AntMascot
+                    mood={lastResult.percent >= 80 ? 'celebrating' : 'studying'}
+                    app="study"
+                    propVariant={lastResult.percent >= 80 ? 'pencil' : 'scholar'}
+                    size="sm"
+                    interactive={lastResult.percent >= 80}
+                    ariaLabel=""
+                    className="shrink-0"
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="h-4 w-4 text-primary" aria-hidden="true" />
+                      <span className="font-mono text-xs font-bold uppercase tracking-[0.06em] text-primary">
+                        Quiz Graded · {activeQuiz.subjectCode}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-extrabold text-foreground">{activeQuiz.title}</h2>
                   </div>
-                  <h2 className="text-xl font-extrabold text-foreground">{activeQuiz.title}</h2>
                 </div>
 
                 <div className="flex items-center gap-3">

@@ -16,6 +16,7 @@ import { Button } from '../primitives/Button';
 import { ThemeToggle } from '../primitives/ThemeToggle';
 import { cn } from '../utils/cn';
 import { AppSwitcher } from './AppSwitcher';
+import { AntMascotView } from './AntMascotView';
 import {
   AuthFormView,
   DEFAULT_AUTH_DEMO_PERSONAS,
@@ -149,7 +150,7 @@ export function AuthStudioView({
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               <span>
-                {isFlow ? 'Guest Pomodoro (/pomodoro)' : 'Guest Calculator (/calculator)'}
+                {isFlow ? 'Pomodoro Timer' : 'Grade Calculator'}
               </span>
             </a>
             <ThemeToggle />
@@ -189,7 +190,7 @@ export function AuthStudioView({
                   </Badge>
                 </div>
                 <p className="mt-0.5 text-xs text-foreground-muted">
-                  You already have an active `.the-ants.org` session. Continue straight to{' '}
+                  You&apos;re already signed in. Continue to{' '}
                   <span className="font-mono text-foreground">{targetRedirect}</span> or
                   switch accounts below.
                 </p>
@@ -215,7 +216,7 @@ export function AuthStudioView({
                   onClick={onSignOut}
                   data-testid="auth-studio-signout-btn"
                 >
-                  Sign Out (Guest Mode)
+                  Sign Out
                 </Button>
               )}
             </div>
@@ -231,11 +232,6 @@ export function AuthStudioView({
                   ? 'Sync schedules, tasks & study in one place.'
                   : 'Track topics, past papers & exam countdowns.'}
               </h1>
-              {redirectTo && (
-                <span className="font-mono text-xs text-on-primary-tint">
-                  Returns to {redirectTo}
-                </span>
-              )}
             </div>
 
             <AuthShowcaseVideoView
@@ -247,6 +243,13 @@ export function AuthStudioView({
             {/* Compact Guest Access Strip (Zero Login Required per Spec Matrix) */}
             <div className="flex flex-wrap items-center justify-between gap-2.5 border-t border-border pt-4">
               <div className="flex flex-wrap items-center gap-2">
+                <AntMascotView
+                  mood="happy"
+                  app={app === 'flow' ? 'flow' : 'study'}
+                  size="xs"
+                  animated={false}
+                  ariaLabel=""
+                />
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground-muted">
                   <CheckCircle2 className="h-3.5 w-3.5 text-success" aria-hidden="true" />
                   <span>No login needed:</span>

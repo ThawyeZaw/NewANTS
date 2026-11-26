@@ -89,6 +89,20 @@ describe('@ants/ui Cross-Subdomain Authentication System & Access Matrix', () =>
     expect(invalidSignUp.fieldErrors?.username).toBeDefined();
     expect(invalidSignUp.fieldErrors?.password).toBeDefined();
 
+    // Registers a new unified account on /signup (with auto-derived handle when omitted)
+    const minimalSignUp = authenticateSignUp(
+      {
+        mode: 'signup',
+        name: 'Su Myat Noe',
+        email: 'sumyat@the-ants.org',
+        password: 'StrongPassword2026!',
+        rememberMe: true,
+      },
+      initialAccounts
+    );
+    expect(minimalSignUp.ok).toBe(true);
+    expect(minimalSignUp.session?.username).toBe('sumyatnoe');
+
     // Registers a new unified account on /signup
     const validSignUp = authenticateSignUp(
       {
@@ -300,7 +314,11 @@ describe('@ants/ui Cross-Subdomain Authentication System & Access Matrix', () =>
         redirectTo: '/tasks',
       })
     );
-    expect(studioHtml).toContain('Create your unified ANTs account');
+    expect(studioHtml).toContain('Create your Flow account');
+    expect(studioHtml).toContain('Continue with Google');
+    expect(studioHtml).toContain('or continue with email');
+    expect(studioHtml).not.toContain('data-testid="demo-accounts-toggle"');
+    expect(studioHtml).not.toContain('Better Auth Cross-Subdomain Cookie');
     expect(studioHtml).toContain('Sync schedules, tasks &amp; study in one place.');
     expect(studioHtml).toContain('data-testid="auth-showcase-video"');
     expect(studioHtml).toContain('<video');
@@ -318,6 +336,8 @@ describe('@ants/ui Cross-Subdomain Authentication System & Access Matrix', () =>
       })
     );
     expect(studyStudioHtml).toContain('Track topics, past papers &amp; exam countdowns.');
+    expect(studyStudioHtml).toContain('data-testid="demo-accounts-toggle"');
+    expect(studyStudioHtml).toContain('data-testid="demo-persona-zaylynnhtet"');
     expect(studyStudioHtml).toContain('WMA11-SET Mastery');
     expect(studyStudioHtml).toContain('Past Paper UMS');
     expect(studyStudioHtml).toContain('Flow Sprint Sync');

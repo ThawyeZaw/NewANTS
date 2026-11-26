@@ -3,13 +3,12 @@
 import React, { useMemo, useState } from 'react';
 import {
   ArrowRight,
-  AtSign,
   CheckCircle2,
+  ChevronDown,
   Eye,
   EyeOff,
   KeyRound,
   Mail,
-  ShieldCheck,
   User,
 } from 'lucide-react';
 import {
@@ -19,12 +18,10 @@ import {
 import {
   evaluatePasswordStrength,
   validateAuthEmail,
-  validateSignInIdentifier,
   type AuthFieldErrors,
 } from '../lib/auth';
 import { MOCK_SHARED_PROFILES } from '../mocks/account-profile.mock';
 import { type EcosystemAppId } from '../mocks/ecosystem-chrome.mock';
-import { Badge } from '../primitives/Badge';
 import { Button } from '../primitives/Button';
 import {
   Card,
@@ -96,11 +93,11 @@ export interface AuthFormViewProps {
   onSocialAuth?: (provider: 'google' | 'github') => void;
   /** Callback when a 1-click Demo Persona pill is clicked */
   onDemoPersonaSelect?: (username: string) => void;
-  /** Existing usernames for live signup handle collision checks */
+  /** Existing usernames for unique handle generation */
   existingUsernames?: readonly string[];
   /** Custom demo personas list */
   demoPersonas?: readonly AuthDemoPersonaOption[];
-  /** Whether to show the 1-click Demo Persona bar (default: true) */
+  /** Whether to show the collapsible Demo accounts disclosure in Sign In mode (default: true) */
   showDemoPersonas?: boolean;
   /** Hide internal BrandHeaderBadge when rendered inside AuthStudioView */
   hideBrandHeader?: boolean;
@@ -114,38 +111,46 @@ export interface AuthFormViewProps {
   className?: string;
 }
 
-const TRACK_OPTIONS: Array<{ id: AcademicTrackOption; label: string; code: string }> = [
-  { id: 'ial', label: 'IAL / A-Level', code: 'AS & A2' },
-  { id: 'igcse', label: 'IGCSE Student', code: 'CAIE / EDEXCEL' },
-  { id: 'tutor', label: 'Educator / Tutor', code: 'MENTOR' },
-  { id: 'productivity', label: 'Flow Planner', code: '24H STUDIO' },
-];
-
 function GoogleMarkSvg() {
   return (
     <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
       <path
-        fill="currentColor"
-        d="M21.35 11.1h-9.17v2.73h6.51c-.33 1.81-1.5 3.34-3.2 4.37v3.62h5.18c3.03-2.79 4.78-6.9 4.78-11.78 0-.8-.08-1.57-.2-2.31Z"
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09Z"
       />
       <path
-        fill="currentColor"
-        opacity="0.75"
-        d="M12.18 22c4.32 0 7.95-1.43 10.6-3.88l-5.18-3.62c-1.43.96-3.26 1.53-5.42 1.53-4.17 0-7.7-2.81-8.96-6.59H-2.1v3.73C.54 18.42 5.93 22 12.18 22Z"
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53Z"
       />
     </svg>
   );
 }
 
-function GitHubMarkSvg() {
-  return (
-    <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M12 2C6.48 2 2 6.58 2 12.26c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.49 0-.24-.01-.88-.01-1.72-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.38 9.38 0 0 1 12 6.84c.85 0 1.71.12 2.51.35 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.48-.01 2.81 0 .27.18.59.69.49A10.27 10.27 0 0 0 22 12.26C22 6.58 17.52 2 12 2Z"
-      />
-    </svg>
-  );
+function deriveAvailableUsername(
+  name: string,
+  email: string,
+  knownHandles: readonly string[]
+): string {
+  const baseSeed =
+    sanitizeAccountUsernameInput(name) ||
+    sanitizeAccountUsernameInput(email.split('@')[0] ?? '') ||
+    'scholar';
+  const padded = baseSeed.length >= 3 ? baseSeed : `${baseSeed}ant`;
+  let candidate = padded;
+  let suffix = 2;
+  while (!validateAccountUsername(candidate, knownHandles).valid) {
+    candidate = `${padded}${suffix}`;
+    suffix += 1;
+  }
+  return candidate;
 }
 
 export function AuthFormView({
@@ -171,14 +176,11 @@ export function AuthFormView({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [academicTrack, setAcademicTrack] = useState<AcademicTrackOption>(
-    app === 'flow' ? 'productivity' : 'ial'
-  );
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [resetPanelOpen, setResetPanelOpen] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState<string | null>(null);
+  const [demoOpen, setDemoOpen] = useState(false);
   const [localFieldErrors, setLocalFieldErrors] = useState<AuthFieldErrors>({});
   const [submittedNotice, setSubmittedNotice] = useState<string | null>(null);
 
@@ -186,11 +188,6 @@ export function AuthFormView({
     () => existingUsernames ?? Object.keys(MOCK_SHARED_PROFILES),
     [existingUsernames]
   );
-
-  const liveUsernameCheck = useMemo(() => {
-    if (activeMode !== 'signup' || !username.trim()) return null;
-    return validateAccountUsername(username, knownHandles);
-  }, [activeMode, username, knownHandles]);
 
   const passwordStrength = useMemo(
     () => evaluatePasswordStrength(password),
@@ -211,6 +208,7 @@ export function AuthFormView({
     setSubmittedNotice(null);
     setResetPanelOpen(false);
     setResetEmailSent(null);
+    setDemoOpen(false);
     onModeChange?.(nextMode);
   };
 
@@ -235,30 +233,26 @@ export function AuthFormView({
       return;
     }
 
-    setSubmittedNotice(
-      `Signed in as ${persona.name} (@${persona.username}) across .the-ants.org`
-    );
+    setSubmittedNotice(`Signed in as ${persona.name} (@${persona.username})`);
   };
 
-  const handleSocialClick = (provider: 'google' | 'github') => {
+  const handleGoogleClick = () => {
     setLocalFieldErrors({});
+    setSubmittedNotice(null);
     if (onSocialAuth) {
-      onSocialAuth(provider);
+      onSocialAuth('google');
       return;
     }
-    const label = provider === 'google' ? 'Google' : 'GitHub';
-    setSubmittedNotice(
-      `${label} SSO session verified for .the-ants.org`
-    );
+    setSubmittedNotice('Signed in with Google.');
   };
 
   const handleSendPasswordReset = () => {
-    const target = email.trim() || 'zay@the-ants.org';
+    const target = email.trim();
     const check = validateAuthEmail(target);
     if (!check.valid) {
       setLocalFieldErrors((prev) => ({
         ...prev,
-        email: check.error,
+        email: 'Enter your email address above to receive a reset link.',
       }));
       return;
     }
@@ -270,68 +264,49 @@ export function AuthFormView({
     e.preventDefault();
     setSubmittedNotice(null);
 
-    // When standalone without input, allow quick prototype submit with realistic defaults
-    const effectiveEmail =
-      email.trim() || (activeMode === 'login' ? 'zay@the-ants.org' : '');
-    const effectivePassword =
-      password || (activeMode === 'login' && !email.trim() ? 'ants-studio-2026' : '');
+    const emailCheck = validateAuthEmail(email);
+    const nextErrors: AuthFieldErrors = {};
+
+    if (!emailCheck.valid) {
+      nextErrors.email = emailCheck.error;
+    }
 
     if (activeMode === 'login') {
-      const idCheck = validateSignInIdentifier(effectiveEmail);
-      const nextErrors: AuthFieldErrors = {};
-      if (!idCheck.valid) {
-        nextErrors.email = idCheck.error;
-      }
-      if (!effectivePassword) {
-        nextErrors.password = 'Enter your password (or pick a Demo Persona above).';
-      } else if (effectivePassword.length < 6) {
+      if (!password) {
+        nextErrors.password = 'Enter your password.';
+      } else if (password.length < 6) {
         nextErrors.password = 'Password must be at least 6 characters.';
       }
-
-      if (nextErrors.email || nextErrors.password) {
-        setLocalFieldErrors(nextErrors);
-        return;
-      }
     } else {
-      const nextErrors: AuthFieldErrors = {};
-      const cleanName = name.trim();
-      if (cleanName.length < 2) {
+      if (name.trim().length < 2) {
         nextErrors.name = 'Enter your full name (at least 2 characters).';
-      }
-      const handleCheck = validateAccountUsername(username, knownHandles);
-      if (!handleCheck.valid) {
-        nextErrors.username = handleCheck.error;
-      }
-      const emailCheck = validateAuthEmail(email);
-      if (!emailCheck.valid) {
-        nextErrors.email = emailCheck.error;
       }
       if (!passwordStrength.checks.minLength) {
         nextErrors.password = 'Password must be at least 8 characters.';
       }
+    }
 
-      if (
-        nextErrors.name ||
-        nextErrors.username ||
-        nextErrors.email ||
-        nextErrors.password
-      ) {
-        setLocalFieldErrors(nextErrors);
-        return;
-      }
+    if (nextErrors.name || nextErrors.email || nextErrors.password) {
+      setLocalFieldErrors(nextErrors);
+      return;
     }
 
     setLocalFieldErrors({});
-    const normalizedUsername = sanitizeAccountUsernameInput(username) || 'zaylynnhtet';
+    const defaultTrack: AcademicTrackOption = app === 'flow' ? 'productivity' : 'ial';
+    const derivedUsername =
+      activeMode === 'signup'
+        ? deriveAvailableUsername(name, emailCheck.normalized, knownHandles)
+        : undefined;
+
     const payload: AuthFormSubmitPayload = {
       mode: activeMode,
-      email: effectiveEmail,
-      password: effectivePassword,
+      email: emailCheck.normalized,
+      password,
       ...(activeMode === 'signup'
         ? {
-            name: name.trim() || 'Zay Lynn Htet',
-            username: normalizedUsername,
-            academicTrack,
+            name: name.trim(),
+            username: derivedUsername,
+            academicTrack: defaultTrack,
           }
         : {}),
       rememberMe,
@@ -342,26 +317,20 @@ export function AuthFormView({
     } else {
       setSubmittedNotice(
         activeMode === 'login'
-          ? `Session verified for ${payload.email} (SSO .the-ants.org)`
-          : `Account created for @${payload.username} (${academicTrack.toUpperCase()})`
+          ? `Signed in as ${payload.email}`
+          : `Account created for ${payload.email}`
       );
     }
   };
 
-  const hostAppLabel = app === 'flow' ? 'Flow Studio' : 'Study Workspace';
+  const hostAppLabel = app === 'flow' ? 'Flow' : 'Study';
 
   return (
     <Card
       variant="elevated"
       className={cn('mx-auto w-full max-w-md border-border-hover', className)}
     >
-      <CardHeader
-        action={
-          <Badge variant="verified" dot mono>
-            SSO .the-ants.org
-          </Badge>
-        }
-      >
+      <CardHeader className="pb-4">
         {!hideBrandHeader && (
           <div className="mb-2">
             <BrandHeaderBadge app={app} showEndorsement />
@@ -370,13 +339,12 @@ export function AuthFormView({
         <CardTitle className="text-xl font-extrabold tracking-tight">
           {activeMode === 'login'
             ? `Sign in to ${hostAppLabel}`
-            : 'Create your unified ANTs account'}
+            : `Create your ${hostAppLabel} account`}
         </CardTitle>
         <CardDescription>
-          One single sign-on session across{' '}
-          <span className="font-semibold text-foreground">Flow</span> (Timetable & Tasks)
-          and <span className="font-semibold text-foreground">Study</span> (IGCSE & IAL
-          Trackers).
+          {activeMode === 'login'
+            ? 'Continue with Google or your email and password.'
+            : 'One ANTs account works across both Flow and Study.'}
         </CardDescription>
       </CardHeader>
 
@@ -388,69 +356,29 @@ export function AuthFormView({
           onValueChange={handleModeSwitch}
           className="w-full"
           items={[
-            { value: 'login', label: 'Sign In (/login)' },
-            { value: 'signup', label: 'Create Account (/signup)' },
+            { value: 'login', label: 'Sign In' },
+            { value: 'signup', label: 'Create Account' },
           ]}
         />
 
-        {/* 1-Click Demo Persona Quick-Sign-In Bar */}
-        {showDemoPersonas && demoPersonas.length > 0 && (
-          <div className="rounded-xl bg-surface-inset p-3 space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-semibold text-foreground">
-                Instant Demo Personas
-              </span>
-              <span className="font-mono text-[11px] text-foreground-muted">
-                1-click SSO
-              </span>
-            </div>
-            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
-              {demoPersonas.map((persona) => (
-                <button
-                  key={persona.username}
-                  type="button"
-                  onClick={() => handleSelectDemoPersona(persona)}
-                  data-testid={`demo-persona-${persona.username}`}
-                  className="flex flex-col items-start rounded-lg bg-background/80 px-2.5 py-2 text-left transition-colors hover:bg-primary-tint/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <span className="font-mono text-xs font-bold text-foreground">
-                    @{persona.username}
-                  </span>
-                  <span className="mt-0.5 truncate w-full text-[11px] text-foreground-muted">
-                    {persona.roleSummary}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* OAuth Social Buttons */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            leftIcon={<GoogleMarkSvg />}
-            onClick={() => handleSocialClick('google')}
-          >
-            Google
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            leftIcon={<GitHubMarkSvg />}
-            onClick={() => handleSocialClick('github')}
-          >
-            GitHub
-          </Button>
-        </div>
+        {/* Primary Social Auth: Google */}
+        <Button
+          type="button"
+          variant="secondary"
+          fullWidth
+          leftIcon={<GoogleMarkSvg />}
+          onClick={handleGoogleClick}
+          disabled={isLoading}
+          data-testid="auth-google-btn"
+          className="h-10 font-semibold"
+        >
+          Continue with Google
+        </Button>
 
         <div className="relative flex items-center py-0.5">
           <div className="grow border-t border-border-subtle" />
           <span className="mx-3 shrink-0 text-xs font-medium text-foreground-muted">
-            or continue with credentials
+            or continue with email
           </span>
           <div className="grow border-t border-border-subtle" />
         </div>
@@ -476,100 +404,28 @@ export function AuthFormView({
 
         <form onSubmit={handleFormSubmit} className="space-y-3.5" noValidate>
           {activeMode === 'signup' && (
-            <>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Input
-                  label="Full Name"
-                  placeholder="e.g. Aung Myat"
-                  value={name}
-                  onChange={(e) => {
-                    const nextName = e.target.value;
-                    setName(nextName);
-                    if (!username && nextName.trim().length >= 3) {
-                      setUsername(sanitizeAccountUsernameInput(nextName));
-                    }
-                    if (localFieldErrors.name) {
-                      setLocalFieldErrors((prev) => ({ ...prev, name: undefined }));
-                    }
-                  }}
-                  error={mergedFieldErrors.name}
-                  leftIcon={<User className="h-4 w-4" />}
-                />
-                <Input
-                  label="Public Handle"
-                  placeholder="aungmyat"
-                  mono
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(sanitizeAccountUsernameInput(e.target.value));
-                    if (localFieldErrors.username) {
-                      setLocalFieldErrors((prev) => ({ ...prev, username: undefined }));
-                    }
-                  }}
-                  error={
-                    mergedFieldErrors.username ??
-                    (liveUsernameCheck && !liveUsernameCheck.valid
-                      ? liveUsernameCheck.error
-                      : undefined)
-                  }
-                  hint={
-                    liveUsernameCheck?.valid
-                      ? `@${liveUsernameCheck.normalized} is available`
-                      : undefined
-                  }
-                  leftIcon={<AtSign className="h-4 w-4" />}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-xs font-semibold text-foreground">
-                  Primary Focus Track
-                </span>
-                <div
-                  role="radiogroup"
-                  aria-label="Primary Focus Track"
-                  className="grid grid-cols-2 gap-2"
-                >
-                  {TRACK_OPTIONS.map((track) => {
-                    const selected = academicTrack === track.id;
-                    return (
-                      <button
-                        key={track.id}
-                        type="button"
-                        role="radio"
-                        aria-checked={selected}
-                        onClick={() => setAcademicTrack(track.id)}
-                        className={cn(
-                          'flex flex-col items-start rounded-lg px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                          selected
-                            ? 'bg-primary-tint text-on-primary-tint ring-1 ring-primary'
-                            : 'bg-surface-inset text-foreground hover:bg-surface-inset/80'
-                        )}
-                      >
-                        <span className="text-xs font-bold">{track.label}</span>
-                        <span className="font-mono text-[10px] text-foreground-muted">
-                          {track.code}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
+            <Input
+              label="Full Name"
+              type="text"
+              autoComplete="name"
+              placeholder="Your full name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (localFieldErrors.name) {
+                  setLocalFieldErrors((prev) => ({ ...prev, name: undefined }));
+                }
+              }}
+              error={mergedFieldErrors.name}
+              leftIcon={<User className="h-4 w-4" />}
+            />
           )}
 
           <Input
-            label={
-              activeMode === 'login'
-                ? 'Email or ANTs @username'
-                : 'Academic or Personal Email'
-            }
-            type={activeMode === 'login' ? 'text' : 'email'}
-            placeholder={
-              activeMode === 'login'
-                ? 'zay@the-ants.org or @zaylynnhtet'
-                : 'scholar@the-ants.org'
-            }
+            label="Email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -582,10 +438,34 @@ export function AuthFormView({
           />
 
           <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <label
+                htmlFor="auth-password-input"
+                className="text-xs font-semibold text-foreground"
+              >
+                Password
+              </label>
+              {activeMode === 'login' && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetPanelOpen((prev) => !prev);
+                    setResetEmailSent(null);
+                  }}
+                  className="text-xs font-semibold text-on-primary-tint hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xs"
+                >
+                  {resetPanelOpen ? 'Close reset' : 'Forgot password?'}
+                </button>
+              )}
+            </div>
+
             <Input
-              label="Password"
+              id="auth-password-input"
               type={showPassword ? 'text' : 'password'}
-              placeholder="Enter at least 8 characters"
+              autoComplete={activeMode === 'login' ? 'current-password' : 'new-password'}
+              placeholder={
+                activeMode === 'login' ? 'Enter your password' : 'At least 8 characters'
+              }
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -608,11 +488,6 @@ export function AuthFormView({
                     <Eye className="h-4 w-4" />
                   )}
                 </button>
-              }
-              hint={
-                activeMode === 'signup' && password.length === 0
-                  ? 'Minimum 8 characters. Syncs across study.the-ants.org & flow.the-ants.org.'
-                  : undefined
               }
             />
 
@@ -642,34 +517,14 @@ export function AuthFormView({
                 <div className="flex items-center justify-between text-[11px] text-foreground-muted">
                   <span>
                     {passwordStrength.checks.minLength
-                      ? '8+ chars verified'
+                      ? '8+ characters'
                       : 'At least 8 characters required'}
                   </span>
                   <span className="font-mono font-semibold text-foreground">
-                    {passwordStrength.label} ({passwordStrength.score}/4)
+                    {passwordStrength.label}
                   </span>
                 </div>
               </div>
-            )}
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-            <Checkbox
-              checked={rememberMe}
-              onCheckedChange={setRememberMe}
-              label="Keep session active across .the-ants.org"
-            />
-            {activeMode === 'login' && (
-              <button
-                type="button"
-                onClick={() => {
-                  setResetPanelOpen((prev) => !prev);
-                  setResetEmailSent(null);
-                }}
-                className="text-xs font-semibold text-on-primary-tint hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xs"
-              >
-                {resetPanelOpen ? 'Close reset' : 'Forgot password?'}
-              </button>
             )}
           </div>
 
@@ -680,13 +535,13 @@ export function AuthFormView({
               className="ants-accordion"
             >
               <div className="ants-accordion-inner">
-                <div className="mt-1 rounded-xl bg-surface-inset p-3 space-y-2">
+                <div className="rounded-xl bg-surface-inset p-3 space-y-2">
                   <p className="text-xs font-medium text-foreground">
-                    Send a password recovery link to your `.the-ants.org` email:
+                    Send a password reset link to your email:
                   </p>
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate font-mono text-xs text-foreground-muted">
-                      {email.trim() || 'zay@the-ants.org'}
+                      {email.trim() || 'Enter your email above'}
                     </span>
                     <Button
                       type="button"
@@ -700,7 +555,7 @@ export function AuthFormView({
                   </div>
                   {resetEmailSent && (
                     <p className="text-xs font-medium text-on-success-tint">
-                      Recovery link dispatched to{' '}
+                      Reset link sent to{' '}
                       <span className="font-mono font-semibold">{resetEmailSent}</span>.
                     </p>
                   )}
@@ -709,6 +564,14 @@ export function AuthFormView({
             </div>
           )}
 
+          <div className="pt-0.5">
+            <Checkbox
+              checked={rememberMe}
+              onCheckedChange={setRememberMe}
+              label="Keep me signed in"
+            />
+          </div>
+
           <Button
             type="submit"
             variant="primary"
@@ -716,26 +579,79 @@ export function AuthFormView({
             isLoading={isLoading}
             rightIcon={<ArrowRight className="h-4 w-4" />}
           >
-            {activeMode === 'login'
-              ? `Sign In to ${hostAppLabel}`
-              : 'Create Unified Account'}
+            {activeMode === 'login' ? 'Sign in with Email' : 'Create Account'}
           </Button>
         </form>
+
+        {/* Collapsible Demo Accounts (Sign In mode only) */}
+        {activeMode === 'login' && showDemoPersonas && demoPersonas.length > 0 && (
+          <div className="border-t border-border-subtle pt-3">
+            <button
+              type="button"
+              aria-expanded={demoOpen}
+              onClick={() => setDemoOpen((prev) => !prev)}
+              data-testid="demo-accounts-toggle"
+              className="flex w-full items-center justify-between rounded-md py-1 text-xs font-medium text-foreground-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span>Demo accounts</span>
+              <ChevronDown
+                className={cn(
+                  'h-3.5 w-3.5 transition-transform duration-200',
+                  demoOpen && 'rotate-180'
+                )}
+                aria-hidden="true"
+              />
+            </button>
+
+            <div
+              data-open={demoOpen ? 'true' : 'false'}
+              className="ants-accordion"
+            >
+              <div className="ants-accordion-inner">
+                <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-3">
+                  {demoPersonas.map((persona) => (
+                    <button
+                      key={persona.username}
+                      type="button"
+                      tabIndex={demoOpen ? undefined : -1}
+                      onClick={() => handleSelectDemoPersona(persona)}
+                      data-testid={`demo-persona-${persona.username}`}
+                      className="flex flex-col items-start rounded-lg bg-surface-inset px-2.5 py-2 text-left transition-colors hover:bg-primary-tint/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <span className="font-mono text-xs font-bold text-foreground">
+                        @{persona.username}
+                      </span>
+                      <span className="mt-0.5 w-full truncate text-[11px] text-foreground-muted">
+                        {persona.roleSummary}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
 
-      <CardFooter>
-        <span className="inline-flex items-center gap-1.5 text-xs text-foreground-muted">
-          <ShieldCheck className="h-4 w-4 text-primary" />
-          <span>Better Auth Cross-Subdomain Cookie</span>
-        </span>
+      <CardFooter className="justify-center">
         <button
           type="button"
           onClick={() =>
             handleModeSwitch(activeMode === 'login' ? 'signup' : 'login')
           }
-          className="text-xs font-bold text-on-primary-tint hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xs"
+          className="text-xs font-semibold text-foreground-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-xs"
         >
-          {activeMode === 'login' ? 'Need an account? Sign up' : 'Have an account? Sign in'}
+          {activeMode === 'login' ? (
+            <>
+              Don&apos;t have an account?{' '}
+              <span className="font-bold text-on-primary-tint">Sign up</span>
+            </>
+          ) : (
+            <>
+              Already have an account?{' '}
+              <span className="font-bold text-on-primary-tint">Sign in</span>
+            </>
+          )}
         </button>
       </CardFooter>
     </Card>

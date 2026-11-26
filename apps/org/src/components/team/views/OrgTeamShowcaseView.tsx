@@ -9,10 +9,10 @@ import {
   QrCode,
   RotateCcw,
   Search,
-  Users,
   X,
 } from 'lucide-react';
 import {
+  AntMascot,
   Badge,
   Button,
   Input,
@@ -313,7 +313,9 @@ export function OrgTeamShowcaseView({
         {/* Two-Column Directory Grid */}
         {filteredMembers.length === 0 ? (
           <div className="border-b border-border/60 py-12 text-center space-y-3">
-            <Users className="mx-auto h-7 w-7 text-foreground-subtle" aria-hidden="true" />
+            <div className="flex justify-center">
+              <AntMascot mood="curious" app="org" size="sm" ariaLabel="" />
+            </div>
             <div className="space-y-1">
               <h2 className="text-base font-bold text-foreground">
                 No members match those filters

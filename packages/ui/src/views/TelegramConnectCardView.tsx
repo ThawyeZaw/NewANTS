@@ -28,6 +28,7 @@ import { Badge } from '../primitives/Badge';
 import { Button } from '../primitives/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../primitives/Card';
 import { cn } from '../utils/cn';
+import { ANT_MASCOT_PRESETS, AntMascotView } from './AntMascotView';
 
 export interface TelegramConnectCardViewProps {
   /** Current Telegram link state & per-channel notification preferences */
@@ -154,7 +155,16 @@ export function TelegramConnectCardView({
         {/* State 1: Unlinked -> Generate One-Time /start Verification Code Immediately */}
         {telegram.status === 'unlinked' && (
           <div className="flex flex-col gap-3 rounded-lg bg-surface-inset/75 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex items-start gap-3 min-w-0 flex-1">
+              <AntMascotView
+                mood={ANT_MASCOT_PRESETS.telegramNudge.mood}
+                app="telegram"
+                propVariant="bell"
+                size="sm"
+                ariaLabel=""
+                className="hidden sm:inline-flex shrink-0"
+              />
+              <div className="min-w-0 flex-1 space-y-1">
               <p className="text-sm font-semibold text-foreground">
                 Link your Telegram account via{' '}
                 <span className="font-mono">@TheANTsFlowBot</span>
@@ -172,6 +182,7 @@ export function TelegramConnectCardView({
                 ) : null}
                 .
               </p>
+              </div>
             </div>
             <Button
               type="button"

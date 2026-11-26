@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Bell, BellOff, Clock, Send } from 'lucide-react';
-import { Badge, Button, Modal, cn } from '@ants/ui';
+import { AntMascot, Badge, Button, Modal, cn } from '@ants/ui';
 import {
   REMINDER_LEAD_OPTIONS,
   formatMinutes12h,
@@ -87,17 +87,28 @@ export function TelegramReminderModalView({
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {!telegramConnected && (
-          <div className="rounded-xl border border-border bg-surface-inset/75 px-3.5 py-2.5 text-xs leading-relaxed text-foreground-muted">
-            Telegram isn&apos;t linked yet. You can arm reminder offsets below and link{' '}
-            <span className="font-mono text-foreground">@TheANTsFlowBot</span> during onboarding or in{' '}
-            <Link
-              href="/settings#telegram"
-              onClick={onClose}
-              className="font-semibold text-on-primary-tint hover:underline"
-            >
-              Account Settings
-            </Link>
-            .
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-inset/75 px-3.5 py-2.5 text-xs leading-relaxed text-foreground-muted">
+            <AntMascot
+              mood="nudge"
+              app="telegram"
+              propVariant="bell"
+              size="xs"
+              animated={false}
+              ariaLabel=""
+              className="shrink-0"
+            />
+            <div>
+              Telegram isn&apos;t linked yet. You can arm reminder offsets below and link{' '}
+              <span className="font-mono text-foreground">@TheANTsFlowBot</span> during onboarding or in{' '}
+              <Link
+                href="/settings#telegram"
+                onClick={onClose}
+                className="font-semibold text-on-primary-tint hover:underline"
+              >
+                Account Settings
+              </Link>
+              .
+            </div>
           </div>
         )}
         <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-border bg-surface-card px-4 py-3 transition-colors hover:border-border-hover">

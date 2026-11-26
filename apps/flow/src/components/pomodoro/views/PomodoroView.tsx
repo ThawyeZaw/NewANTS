@@ -13,6 +13,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import {
+  AntMascot,
   THEME_CHANGE_EVENT,
   THEME_STORAGE_KEY,
   ThemeToggle,
@@ -895,6 +896,30 @@ export function PomodoroView({
                   )}
                 </div>
               )}
+
+              <div className="mt-3 flex items-center justify-center gap-2.5 text-xs text-foreground-muted">
+                <AntMascot
+                  mood={
+                    state.timer.status === 'running'
+                      ? isWork
+                        ? 'focus'
+                        : 'sleeping'
+                      : 'happy'
+                  }
+                  app="flow"
+                  propVariant={isWork ? 'headphones' : 'timer'}
+                  size="xs"
+                  interactive
+                  ariaLabel=""
+                />
+                <span>
+                  {state.timer.status === 'running'
+                    ? isWork
+                      ? 'Heads down — I’ll guard the clock.'
+                      : 'Nice session! Stretch and recharge.'
+                    : 'Ready when you are.'}
+                </span>
+              </div>
 
               <TimerRingView
                 className="my-3 sm:my-5"

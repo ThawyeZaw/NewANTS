@@ -562,9 +562,26 @@ export function authenticateSignUp(
     fieldErrors.name = 'Enter your full name (at least 2 characters).';
   }
 
-  const usernameResult = validateAccountUsername(payload.username ?? '', existingUsernames);
-  if (!usernameResult.valid) {
-    fieldErrors.username = usernameResult.error;
+  let resolvedUsername: string;
+  if (payload.username !== undefined) {
+    const usernameResult = validateAccountUsername(payload.username, existingUsernames);
+    if (!usernameResult.valid) {
+      fieldErrors.username = usernameResult.error;
+    }
+    resolvedUsername = usernameResult.normalized;
+  } else {
+    const baseSeed =
+      sanitizeAccountUsernameInput(cleanName) ||
+      sanitizeAccountUsernameInput(payload.email.split('@')[0] ?? '') ||
+      'scholar';
+    const paddedSeed = baseSeed.length >= 3 ? baseSeed : `${baseSeed}ant`;
+    let candidate = paddedSeed;
+    let suffix = 2;
+    while (!validateAccountUsername(candidate, existingUsernames).valid) {
+      candidate = `${paddedSeed}${suffix}`;
+      suffix += 1;
+    }
+    resolvedUsername = candidate;
   }
 
   const emailResult = validateAuthEmail(payload.email);
@@ -600,7 +617,7 @@ export function authenticateSignUp(
   const newProfile = createProfileFromSignUp(
     {
       name: cleanName,
-      username: usernameResult.normalized,
+      username: resolvedUsername,
       email: emailResult.normalized,
       academicTrack: payload.academicTrack ?? 'ial',
     },

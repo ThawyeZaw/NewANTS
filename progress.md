@@ -698,3 +698,23 @@
     - Clarified via `/askmefirst` modal and unified `--primary` and `--primary-solid` to `#d97706` (ANTs Amber-Orange 600) in both Light and Dark modes (`packages/ui/src/styles/tokens.css`, `docs/design/README.md`, `apps/flow/DESIGN.md`) so hero headlines (`ACE With Us`), accent labels, links, and primary buttons share the exact same orange across both themes.
   - **Verification:** Passed `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), and `pnpm test` (`14/14` tasks, 114+ tests passing across workspace).
 
+### Session Auth UI Cleanup — 2026-11-26 (`[ZYY]` Google + Email Auth Distillation)
+- **Summary:**
+  - **Clarified via `/askmefirst` Modal:** Aligned on simplifying `/login` and `/signup` around **Continue with Google** + **Email** inside the 2-column `<AuthStudioView />`.
+  - **Simplified `<AuthFormView />` (`packages/ui/src/views/AuthFormView.tsx`):**
+    - Removed `GitHub` OAuth button, `SSO .the-ants.org` badge, `(/login)`/`(/signup)` route labels, `Better Auth Cross-Subdomain Cookie` footer jargon, and signup `@username` / `Primary Focus Track` fields.
+    - Tucked **Demo accounts** (`@zaylynnhtet`, `@thawyezaw`, `@minkhant`) into a clean collapsible `.ants-accordion` disclosure (`data-testid="demo-accounts-toggle"`) at the bottom of **Sign In** mode only, keeping 1-click sign-in intact without cluttering the Google + Email form.
+    - Promoted a full-width **Continue with Google** button (`data-testid="auth-google-btn"`) above an `or continue with email` divider.
+    - Streamlined **Email Login** (`Email` + `Password` with inline `Forgot password?` link and collapsible reset drawer + `Keep me signed in`) and **Create Account** (`Full Name` + `Email` + `Password` with 4-bar strength meter, auto-deriving a unique non-colliding `@username` handle in `packages/ui/src/lib/auth.ts`).
+  - **Cleaned `<AuthStudioView />` (`packages/ui/src/views/AuthStudioView.tsx`):** Removed `Returns to ...` path chip and `(Guest Mode)` / `(/pomodoro)` / `(/calculator)` technical copy while keeping the 2-column product walkthrough and guest tool links.
+  - **Verification:** Updated `packages/ui/src/__tests__/auth.test.ts` (`24/24` `@ants/ui` tests passing) and passed `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), and `pnpm test` (`14/14` tasks).
+
+### Session Mascot Integration — 2026-11-26 (`[ZYY]` Ecosystem-Wide `<AntMascot />` Rollout)
+- **Summary:**
+  - **Shared `@ants/ui` & 404 Pages:** Created `<NotFoundView />` (`packages/ui/src/views/NotFoundView.tsx`, exported from `@ants/ui`) using `ANT_MASCOT_PRESETS.notFound` and mounted `app/not-found.tsx` across `apps/org`, `apps/flow`, and `apps/study`. Integrated `<AntMascot />` into `AuthStudioView` (guest strip), `WorkspaceAuthGateView` (gate header), and `TelegramConnectCardView` (`bell` nudge).
+  - **Shared `@ants/calculator`:** Added `xs` `scholar` / `celebrating` mascot to the sticky Grade & UMS result card header in `GradeCalculatorView.tsx`.
+  - **Flow Productivity (`apps/flow`):** Added state-aware `focus` / `sleeping` / `happy` mascot in `PomodoroView.tsx`, empty/cleared-queue mascot in `TaskPlannerView.tsx`, and `bell` nudge in `TelegramReminderModalView.tsx` (keeping the 24h Timetable grid uncluttered).
+  - **Study Tracker (`apps/study`):** Integrated interactive `celebrating` streak mascot in `StudyDashboardView.tsx`, `scholar` podium header in `StudyLeaderboardView.tsx`, deck-cleared/empty mascot in `StudyFlashcardsView.tsx`, graded results mascot in `StudyQuizzesView.tsx`, and empty filter mascot in `StudyCurriculumCatalogView.tsx`.
+  - **Org Showcase (`apps/org`):** Added `orgHero` mascot beside "Our Products & Public Tools" in `OrgHomeLandingView.tsx` and `curious` empty-filter mascots in `OrgTeamShowcaseView.tsx`, `OrgActivitiesView.tsx`, and `OrgArticlesView.tsx`.
+  - **Verification:** Added `<NotFoundView />` SSR tests to `packages/ui/src/__tests__/mascot.test.ts` (`25/25` `@ants/ui` tests passing) and passed `pnpm typecheck` (`14/14` tasks), `pnpm lint` (`14/14` tasks), and `pnpm test` (`14/14` tasks).
+

@@ -13,7 +13,7 @@ import {
   SlidersHorizontal,
   Tag,
 } from 'lucide-react';
-import { Button, ThemeToggle, cn, useSlidingIndicator, type MockUserProfile } from '@ants/ui';
+import { AntMascot, Button, ThemeToggle, cn, useSlidingIndicator, type MockUserProfile } from '@ants/ui';
 import {
   addDaysIso,
   computeDayAllocations,
@@ -1123,7 +1123,16 @@ export function TaskPlannerView({
 
           {/* Filtered & Priority-Sorted Task Cards */}
           {openVisibleTasks.length === 0 && (smartView !== 'completed' || completedVisibleTasks.length === 0) ? (
-            <div className="rounded-xl border border-dashed border-border-hover bg-surface-card px-6 py-12 text-center">
+            <div className="rounded-xl border border-dashed border-border-hover bg-surface-card px-6 py-10 text-center">
+              <div className="mb-3 flex justify-center">
+                <AntMascot
+                  mood={hasActiveFilters ? 'curious' : 'happy'}
+                  app="flow"
+                  size="md"
+                  interactive={!hasActiveFilters}
+                  ariaLabel=""
+                />
+              </div>
               <p className="text-sm font-semibold text-foreground">
                 {hasActiveFilters
                   ? 'No tasks match your active tag or priority filters.'

@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import {
+  AntMascot,
   AppSwitcher,
   BrandHeaderBadge,
   Button,
@@ -708,9 +709,19 @@ export function GradeCalculatorView({
           <div className="hidden lg:block lg:col-span-5 lg:sticky lg:top-24 rounded-2xl border border-border bg-surface-card p-6 sm:p-7 space-y-6 shadow-[var(--shadow-tier-1)]">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
-                <h2 className="text-base font-semibold text-foreground">
-                  {activeSubject.title}
-                </h2>
+                <div className="flex items-center gap-2">
+                  <AntMascot
+                    mood={isTopGrade ? 'celebrating' : 'studying'}
+                    app="study"
+                    propVariant={isTopGrade ? 'pencil' : 'scholar'}
+                    size="xs"
+                    animated={false}
+                    ariaLabel=""
+                  />
+                  <h2 className="text-base font-semibold text-foreground">
+                    {activeSubject.title}
+                  </h2>
+                </div>
                 <p className="text-xs text-foreground-muted">
                   {activeSeries.label} boundaries
                 </p>

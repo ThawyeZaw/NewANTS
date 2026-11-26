@@ -277,3 +277,8 @@ export {
   type AntMascotPropVariant,
   type AntMascotSize,
 } from './views/AntMascotView';
+
+export {
+  NotFoundView,
+  type NotFoundViewProps,
+} from './views/NotFoundView';
